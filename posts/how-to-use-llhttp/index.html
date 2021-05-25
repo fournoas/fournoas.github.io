@@ -1,0 +1,49 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>如何使用 llhttp &middot; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/rainbow.min.css><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/languages/scala.min.js crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/languages/nim.min.js crossorigin=anonymous></script><script>hljs.initHighlightingOnLoad();</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><a href=/><h2 class=nav-title>白汤四物</h2></a><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>栏目</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main><div class=post><h1 class=post-title>如何使用 llhttp</h1><div class=post-line></div><div class=post-info><span>作者</span>
+Fournoas
+<span>于&nbsp;</span><time datetime="2021-04-09 00:00:00 &#43;0000 UTC">2021年4月9日</time>
+<span>发布在</span><ul class=categories><li><a href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p><a href=https://llhttp.org/ target=_blank>llhttp</a> 是 <a href=https://nodejs.org/ target=_blank>Node.js</a> v12 以上版本使用的 HTTP 解析器，代替了旧版的 <a href=https://github.com/nodejs/http-parser target=_blank>http_parser</a>。根据官方宣传，相较于旧版解析器，新版本解析器性能提升了 156%。llhttp 的主要代码由 <a href=https://www.typescriptlang.org/ target=_blank>Typescript</a> 实现，描述了一个有限状态机，最终通过 <a href=https://github.com/nodejs/llparse target=_blank>llparse</a> 将代码转换成 C 语言源代码。然而官方文档里根本没写如何生成 C 语言代码，只能自己探索了。</p><p>首先 clone 下 llhttp 的代码：</p><pre><code class=language-shell>git clone https://github.com/nodejs/llhttp
+</code></pre><p>在项目根目录下能找到 <code>Makefile</code> 配置文件。打开看了下，并不是很复杂。这个 Makefile 配置仅支持 clang 编译器 和 Linux 操作系统。不过我们只需要生成 C 语言代码的部分就行了。</p><p>找到 <code>Makefile</code> 的 <code>generate:</code> 一节：</p><pre><code class=language-makefile>generate:
+	npx ts-node bin/generate.ts
+</code></pre><p>原来只要执行 <code>bin</code> 目录下的 <code>generate.ts</code> 就能生成 C 语言代码了。在此之前需要先安装 Node.js 环境。</p><p>在项目根目录下执行命令：</p><pre><code class=language-shell>npm i
+npx ts-node bin/generate.ts
+</code></pre><p>构建成功后，会在项目 <code>build</code> 目录下创建 <code>llhttp.h</code> 和 <code>c/llhttp.c</code> 两个文件。再加上项目 <code>src/native</code> 目录下的 <code>api.c</code>、<code>api.h</code> 和 <code>http.c</code> 三个 C 源代码文件，就是完整的 llhttp 源代码了。</p><p>此外，也可以在 <a href=https://github.com/pallas/pyllhttp/tree/master/lib target=_blank>pyllhttp</a> 项目中找到生成好的全部 C 源代码。只不过这里的代码并不是最新版本的。</p><p>测试代码：</p><pre><code class=language-c>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &quot;llhttp/llhttp.h&quot;
+
+#define URL_MAX_LEN 2048
+
+int handle_url(llhttp_t* parser, const char* at, size_t length)
+{
+    char url[URL_MAX_LEN];
+    strncpy_s(url, URL_MAX_LEN, at, length);
+    printf(&quot;URL: %s&quot;, url);
+    return 0;
+}
+
+int main()
+{
+    llhttp_t parser;
+    llhttp_settings_t settings;
+    llhttp_settings_init(&amp;settings);
+    llhttp_init(&amp;parser, HTTP_BOTH, &amp;settings);
+
+    settings.on_url = handle_url;
+
+    const char* request = &quot;GET /index.html HTTP/1.1\r\n\r\n&quot;;
+    int request_len = strlen(request);
+
+    enum llhttp_errno err = llhttp_execute(&amp;parser, request, request_len);
+    if (err == HPE_OK) {
+        /* Successfully parsed! */
+    }
+    else {
+        fprintf(stderr, &quot;Parse error: %s %s\n&quot;, llhttp_errno_name(err),
+            parser.reason);
+    }
+
+    return 0;
+}
+</code></pre></div><div class=taxonomy><div class=taxonomy-tags><ul class=tags><li>#<a href=https://www.fournoas.com/tags/%E7%AC%94%E8%AE%B0/>笔记</a></li></ul></div></div><div class=pagination><a href=/moments/202104/1617238260/ class="left arrow">上一篇</a>
+<a href=/moments/202104/1618993860/ class="right arrow">下一篇</a>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2021-05-25 03:32:26.032790514 &#43;0000 UTC m=&#43;0.254177066">2021</time> fournoas.com. 本站使用了 <a href=https://github.com/EmielH/tale-hugo>Tale</a> 模板并由 <a href=https://gohugo.io>Hugo</a> 生成</span></footer><script src=/js/main.js></script></body></html>

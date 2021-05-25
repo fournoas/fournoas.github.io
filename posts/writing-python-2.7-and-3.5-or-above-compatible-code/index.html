@@ -1,0 +1,62 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>编写兼容 python 2.7 和 3.5&#43; 的代码 &middot; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/rainbow.min.css><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/languages/scala.min.js crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/languages/nim.min.js crossorigin=anonymous></script><script>hljs.initHighlightingOnLoad();</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><a href=/><h2 class=nav-title>白汤四物</h2></a><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>栏目</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main><div class=post><h1 class=post-title>编写兼容 python 2.7 和 3.5&#43; 的代码</h1><div class=post-line></div><div class=post-info><span>作者</span>
+Fournoas
+<span>于&nbsp;</span><time datetime="2018-09-14 00:00:00 &#43;0000 UTC">2018年9月14日</time>
+<span>发布在</span><ul class=categories><li><a href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p>编写新的代码最好不要再兼容 Python 2.6 及以下版本了，坑太多。兼容 2.7 就足够了。同样地，Python 3.5 及以下版本的坑也很多，Python 3 最好从 3.5 开始兼容。</p><h2 id=导入模块>导入模块</h2><p>Python 3 默认绝对导入，Python 2 默认相对导入。所以代码第一行就应写上：</p><pre><code class=language-python>from __future__ import absolute_import
+</code></pre><h2 id=异常处理>异常处理</h2><p>Python 2 和 3 异常处理语句有所差异，应使用新的异常处理语句：</p><pre><code class=language-python>try:
+    raise ValueError('value error')
+except ValueError as e
+    pass
+</code></pre><h2 id=显式继承新式类>显式继承新式类</h2><p>Python 3 默认使用新式类， 代码显式继承新式类实现兼容：</p><pre><code class=language-python>class Foo(object):
+    pass
+</code></pre><h2 id=print-代替-print>print() 代替 print</h2><p>Python 2 中 print 是语句，Python 3 中的 print 是函数。</p><pre><code class=language-python>from __future__ import print_function
+
+print('Hello', 'World')
+</code></pre><h2 id=注意重命名的库>注意重命名的库</h2><p>Python 3 中的一些库名已经更名，需要手动添加代码实现兼容：</p><pre><code class=language-python>try:
+    from urllib2 import urlopen 
+except ImportError:
+    from urllib.request import urlopen
+
+try:
+    from itertools import izip as zip 
+except ImportError:
+    pass
+
+try:
+    from io import BytesIO as StringIO 
+except ImportError:
+    try:
+        from cStringIO import StringIO
+    except ImportError:
+        from StringIO import StringIO
+
+try:
+    import cPickle as pickle 
+except ImportError:
+    import pickle
+
+try:
+    range = xrange 
+except NameError:
+    range = range
+</code></pre><h2 id=使用兼容库>使用兼容库</h2><pre><code class=language-shell>pip install future
+pip install six
+</code></pre><p>如果不打算支持 Python 2.7 以下版本，six库的意义不大。</p><h2 id=使用内置-next-函数>使用内置 next() 函数</h2><p>迭代器的 <code>next()</code> 方法变成 <code>__next__()</code> 了。使用内置 <code>next()</code> 函数进行遍历。</p><h2 id=整数除法>整数除法</h2><p>Python 2 中的 <code>/</code> 除法是整数除法，Python 3 中则需要使用 <code>//</code> 来实现整数除法。为了实现兼容，开启 Python 2 的浮点除法功能：</p><pre><code class=language-python>from __future__ import division
+
+assert 3 / 2 == 1.5
+</code></pre><h2 id=字符串处理>字符串处理</h2><p>字符串类型判断：</p><ul><li><code>isinstance(s, basestring)</code> 用 <code>isinstance(s, string_types)</code> 代替；</li><li><code>isinstance(s, unicode)</code> 用 <code>isinstance(s, text_type)</code> 代替；</li><li><code>isinstance(s, str)</code> 要获取 <code>bytes</code> 类型，用 <code>isinstance(s, bytes)</code> 或 <code>isinstance(s, (bytes, bytearray))</code> 代替。</li></ul><p>默认使用 Unicode 字符串：</p><pre><code class=language-python>from __future__ import unicode_literals
+</code></pre><h2 id=使用-io-open-代替内置函数-open>使用 io.open 代替内置函数 open</h2><p>Python 3 中的 <code>io.open()</code> 是 内置 <code>open()</code> 函数的别名。</p><h2 id=八进制>八进制</h2><p>使用 Python 2 和 3 兼容的八进制表示方法：</p><pre><code class=language-python>0o777
+</code></pre><h2 id=字典迭代>字典迭代</h2><p>Python 3 中取消了字典对象的 <code>iterkeys()</code> 、 <code>itervalues()</code> 和 <code>iteritems()</code> 方法。</p><pre><code class=language-python>for (key, value) in dictionary.items():
+    pass
+
+for key in dictionary.keys():
+    pass
+
+for key in dictionary:
+    pass
+
+for value in dictionary.values():
+    pass
+</code></pre></div><div class=taxonomy><div class=taxonomy-tags><ul class=tags><li>#<a href=https://www.fournoas.com/tags/Python/>Python</a></li></ul></div></div><div class=pagination><a href=/posts/application-of-blockchain-technology-in-education/ class="left arrow">上一篇：<br>区块链技术在教育领域的应用调研</a>
+<a href=/posts/the-python-ssl-extension-was-not-compiled-missing-the-OpenSSL-lib/ class="right arrow">下一篇：<br>编译安装 Python 时发生“Missing the OpenSSL lib”错误</a>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2021-05-25 03:32:26.139315732 &#43;0000 UTC m=&#43;0.360702253">2021</time> fournoas.com. 本站使用了 <a href=https://github.com/EmielH/tale-hugo>Tale</a> 模板并由 <a href=https://gohugo.io>Hugo</a> 生成</span></footer><script src=/js/main.js></script></body></html>
