@@ -17,9 +17,7 @@ set https_proxy=http://127.0.0.1:8080
 </code></pre><p>显式配置 Chocolatey 的代理：</p><pre><code class=language-powershell>choco config set proxy http://127.0.0.1:8080
 </code></pre><p>Chocolatey 不支持 SOCKS 代理。如果你使用 SOCKS 代理，可以通过 <a href=https://www.privoxy.org/ target=_blank>Privoxy</a> 转换成 HTTP 代理。</p><h1 id=scoop>Scoop</h1><p>Scoop 可以添加第三方的 bucket，也就是安装源。默认的 main bucket 里有 900 多个软件，extras bucket 里有 1300 多个软件。值得一提的是，还有个 versions bucket，里面包含了一些软件的历史版本。虽然 Scoop 上的软件数量不多，但是涵盖了大多数开发工具。对于软件开发人员来说，使用 Scoop 来搭建开发环境相当方便。</p><p>与 Chocolatey 采用系统全局安装方式不同的是，Scoop 安装的软件都保存在 <code>%userprofile%\scoop\apps</code> 路径下，不会污染全局环境，不需要管理员权限就可以安装软件。</p><h2 id=安装-1>安装</h2><p>安装 Scoop 前，需要先安装 <a href=https://aka.ms/wmf5download target=_blank>PowerShell 5</a> 及以上版本，和 <a href=https://www.microsoft.com/net/download target=_blank>.NET Framework 4.5</a> 及以上版本。</p><p>打开 PowerShell 的命令行界面，输入如下命令：</p><pre><code class=language-powershell>Set-ExecutionPolicy RemoteSigned -Scope Process -Force; iwr -useb get.scoop.sh | iex
 </code></pre><h2 id=常用命令-1>常用命令</h2><p>安装完毕后先运行环境检查命令：</p><pre><code class=language-powershell>scoop checkup
-</code></pre><p>根据提示信息，完成系统配置即可。例如下面的错误消息意味着需要安装 <code>dark</code> 或 <code>wixtools</code> 才能解压安装文件：</p><blockquote><p>WARN This version of Windows does not support configuration of LongPaths.
-ERROR &lsquo;dark&rsquo; is not installed! It&rsquo;s required for unpacking installers created with the WiX Toolset. Please run &lsquo;scoop install dark&rsquo; or &lsquo;scoop install wixtoolset&rsquo;.
-WARN Found 2 potential problems.</p></blockquote><h3 id=安装软件-1>安装软件</h3><p>使用 <code>scoop checkup</code> 命令检查后，一般会要求安装三个包，分别是：7zip、dark 和 innounp。使用如下命令安装：</p><pre><code class=language-powershell>scoop install 7zip dark innounp
+</code></pre><p>根据提示信息，完成系统配置即可。例如下面的错误消息意味着需要安装 <code>dark</code> 或 <code>wixtools</code> 才能解压安装文件：</p><blockquote><p>WARN This version of Windows does not support configuration of LongPaths.<br>ERROR &lsquo;dark&rsquo; is not installed! It&rsquo;s required for unpacking installers created with the WiX Toolset. Please run &lsquo;scoop install dark&rsquo; or &lsquo;scoop install wixtoolset&rsquo;.<br>WARN Found 2 potential problems.</p></blockquote><h3 id=安装软件-1>安装软件</h3><p>使用 <code>scoop checkup</code> 命令检查后，一般会要求安装三个包，分别是：7zip、dark 和 innounp。使用如下命令安装：</p><pre><code class=language-powershell>scoop install 7zip dark innounp
 </code></pre><h3 id=卸载软件-1>卸载软件</h3><pre><code class=language-powershell>scoop uninstall 7zip
 </code></pre><h3 id=更新软件-1>更新软件</h3><p>更新指定软件：</p><pre><code class=language-powershell>scoop update 7zip
 </code></pre><p>或者使用如下命令更新所有已安装软件：</p><pre><code class=language-powershell>scoop update -a
@@ -30,15 +28,7 @@ WARN Found 2 potential problems.</p></blockquote><h3 id=安装软件-1>安装软
 </code></pre><h3 id=查找软件-1>查找软件</h3><pre><code class=language-powershell>scoop search 7zip
 </code></pre><h3 id=查看需要更新的包-1>查看需要更新的包</h3><pre><code class=language-powershell>scoop status
 </code></pre><h3 id=软件仓库>软件仓库</h3><p>在 Scoop 中，bucket 代表软件仓库。使用如下命令列出官方支持的 bucket：</p><pre><code class=language-powershell>scoop bucket known
-</code></pre><blockquote><p>main
-extras
-versions
-nirsoft
-php
-nerd-fonts
-nonportable
-java
-games</p></blockquote><p>其中 <code>extras</code> 是对 <code>main</code> 仓库的补充，<code>versions</code> 提供各软件的历史版本。上述两个 bucket 比较常用，使用如下命令添加：</p><pre><code class=language-powershell>scoop bucket add extras
+</code></pre><blockquote><p>main<br>extras<br>versions<br>nirsoft<br>php<br>nerd-fonts<br>nonportable<br>java<br>games</p></blockquote><p>其中 <code>extras</code> 是对 <code>main</code> 仓库的补充，<code>versions</code> 提供各软件的历史版本。上述两个 bucket 比较常用，使用如下命令添加：</p><pre><code class=language-powershell>scoop bucket add extras
 scoop bucket add versions
 </code></pre><p>还可以添加第三方的 bucket：</p><pre><code class=language-powershell>scoop bucket add dorado https://github.com/chawyehsu/dorado
 </code></pre><p>访问下面的网址查看 Scoop 的第三方 bucket：</p><p><a href=https://rasa.github.io/scoop-directory/by-apps target=_blank>https://rasa.github.io/scoop-directory/by-apps</a></p><h3 id=软件版本切换>软件版本切换</h3><p>Scoop 可以安装同一个软件的多个版本，并支持在不同的版本之间切换。</p><h2 id=设置代理-1>设置代理</h2><p>基于相同的原因，scoop 也需要设置代理才能正常使用：</p><pre><code class=language-powershell>scoop config proxy 127.0.0.1:8080
@@ -53,4 +43,4 @@ scoop bucket add versions
 </code></pre><p>WinGet 会列出系统中安装的所有软件，而不仅限于通过 WinGet 安装的软件。可以通过列表的 Source 列的值是否为 <code>winget</code> 来判断 WinGet 中是否包含该软件包。</p><h3 id=查找软件-2>查找软件</h3><pre><code class=language-powershell>winget search 7zip
 </code></pre><p>也通过下面的网址在线查找软件包：</p><p><a href=https://winget.run/ target=_blank>https://winget.run/</a></p><h3 id=查看需要更新的包-2>查看需要更新的包</h3><pre><code class=language-powershell>winget upgrade
 </code></pre><h1 id=总结>总结</h1><p>如果仅需要安装和管理普通应用软件，推荐使用 Chocolatey；如果需要安装各种开发工具配置开发环境，推荐使用 Scoop；Windows <sup>10</sup>&frasl;<sub>11</sub> 用户可以使用 WinGet 代替 Chocolatey。</p></div><div class=taxonomy><div class=taxonomy-tags><ul class=tags><li>#<a href=https://www.fournoas.com/tags/%E8%BD%AF%E4%BB%B6/>软件</a></li></ul></div></div><div class=pagination><a href=/moments/202112/1640183755/ class="left arrow">上一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-01-24 10:41:16.349995927 &#43;0000 UTC m=&#43;0.148570761">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-01-24 10:51:17.134606179 &#43;0000 UTC m=&#43;0.113985563">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
