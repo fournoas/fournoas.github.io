@@ -2,13 +2,13 @@
 gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main><div class=post><h1 class=post-title>使用 Vagrant 作为开发环境</h1><div class=post-line></div><div class=post-info><span>作者</span>
 Fournoas
 <span>于&nbsp;</span><time datetime="2015-12-28 00:00:00 &#43;0000 UTC">2015年12月28日</time>
-<span>发布在</span><ul class=categories><li><a href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><h2 id=初始化虚拟机环境>初始化虚拟机环境</h2><p>下载 <a href=https://github.com/kraksoft/vagrant-box-ubuntu/releases/download/15.04/ubuntu-15.04-amd64.box target=_blank>ubuntu-15.04-amd64.box</a> 包文件。使用离线安装的方式：</p><pre><code>&gt; vagrant box add ubuntu-15.04-amd64 file:///D:\downloads\ubuntu-15.04-amd64.box
+<span>发布在</span><ul class=categories><li><a href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><h1 id=初始化虚拟机环境>初始化虚拟机环境</h1><p>下载 <a href=https://github.com/kraksoft/vagrant-box-ubuntu/releases/download/15.04/ubuntu-15.04-amd64.box target=_blank>ubuntu-15.04-amd64.box</a> 包文件。使用离线安装的方式：</p><pre><code>&gt; vagrant box add ubuntu-15.04-amd64 file:///D:\downloads\ubuntu-15.04-amd64.box
 </code></pre><p>其中 <code>D:\downloads\ubuntu-15.04-amd64.box</code> 是下载后的 box 文件路径。</p><p>切换到项目路径下，初始化并启动 Vagrant：</p><pre><code class=language-shell>mkdir ~/project/devstack
 cd ~/project/devstack
 vagrant init ubuntu-15.04-amd64
 </code></pre><p>启动并登录虚拟机系统</p><pre><code class=language-shell>vagrant up
 vagrant ssh
-</code></pre><h2 id=安装软件>安装软件</h2><p>更新 apt 软件库：</p><pre><code class=language-shell>sudo apt-get update -y
+</code></pre><h1 id=安装软件>安装软件</h1><p>更新 apt 软件库：</p><pre><code class=language-shell>sudo apt-get update -y
 sudo apt-get upgrade -y
 </code></pre><p>安装需要的软件包：</p><pre><code class=language-shell>sudo apt-get install -y git ansible libmysqld-dev mysql-server mongodb-server redis-server nginx-full supervisor uwsgi uwsgi-plugin-python python-pip python-dev python-virtualenv python-mysqldb python-mongoengine python-redis python-gevent virtualenvwrapper php5 php5-fpm php5-dev libjpeg-dev
 </code></pre><p>安装第三方软件：</p><pre><code class=language-shell>sudo dpkg -i /vagrant/elasticsearch-2.0.0.deb
@@ -16,7 +16,7 @@ sudo dpkg -i /vagrant/logstash_2.0.0-1_all.deb
 </code></pre><p>禁用无用的服务：</p><pre><code class=language-shell>sudo update-rc.d apache2 defaults
 sudo service apparmor stop
 sudo update-rc.d -f apparmor remove
-</code></pre><h2 id=配置-vagrantfile>配置 Vagrantfile</h2><p>编辑 Vagrantfile 文件：</p><pre><code class=language-ruby>Vagrant.require_version &quot;&gt;= 1.5.3&quot;
+</code></pre><h1 id=配置-vagrantfile>配置 Vagrantfile</h1><p>编辑 Vagrantfile 文件：</p><pre><code class=language-ruby>Vagrant.require_version &quot;&gt;= 1.5.3&quot;
 unless Vagrant.has_plugin?(&quot;vagrant-vbguest&quot;)
     raise &quot;Please install the vagrant-vbguest plugin by running `vagrant plugin install vagrant-vbguest`&quot;
 end
@@ -75,9 +75,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.provision &quot;shell&quot;, inline: $script, args: CONFIG_REPO
     config.vm.provision &quot;shell&quot;, inline: $autorun, run: &quot;always&quot;
 end
-</code></pre><h2 id=打包发布>打包发布</h2><p>退出虚拟机环境并关闭 Vagrant：</p><pre><code class=language-shell>vagrant halt
+</code></pre><h1 id=打包发布>打包发布</h1><p>退出虚拟机环境并关闭 Vagrant：</p><pre><code class=language-shell>vagrant halt
 </code></pre><p>打包发布 box 文件：</p><pre><code class=language-shell>vagrant package
-</code></pre><p>并将生成的 package.box 重命名为 devstack.box。</p><h2 id=ansible-playbook-自动部署开发环境>Ansible playbook 自动部署开发环境</h2><p>参见代码：</p><pre><code class=language-shell>git clone https://github.com/mine/project.git
-</code></pre><p>ansible 脚本使用 <code>template</code> 无法将文件直接生成到同步的文件夹内，需要先生成在临时文件夹内，再移动到目标路径下。</p><h2 id=安装开发环境>安装开发环境</h2><p>将 <code>devstack.box</code> 和 <code>Vagrantfile</code> 放在同一部目录下。命令行切换到该目录路径下，执行 <code>vagrant up</code>。</p><blockquote><p>uWSGI 太过混乱，apt-get 安装的版本和 pip install 安装的版本，版本号一样，但是命令行参数竟然完全不同。UWSGI_PYHOME 也不再支持。准备换投 Gunicorn。</p></blockquote></div><div class=taxonomy><div class=taxonomy-tags><ul class=tags><li>#<a href=https://www.fournoas.com/tags/Vagrant/>Vagrant</a></li></ul></div></div><div class=pagination><a href=/posts/issue-with-convert-HTML-entities/ class="left arrow">上一篇：<br>HTML Entities 转换问题</a>
+</code></pre><p>并将生成的 package.box 重命名为 devstack.box。</p><h1 id=ansible-playbook-自动部署开发环境>Ansible playbook 自动部署开发环境</h1><p>参见代码：</p><pre><code class=language-shell>git clone https://github.com/mine/project.git
+</code></pre><p>ansible 脚本使用 <code>template</code> 无法将文件直接生成到同步的文件夹内，需要先生成在临时文件夹内，再移动到目标路径下。</p><h1 id=安装开发环境>安装开发环境</h1><p>将 <code>devstack.box</code> 和 <code>Vagrantfile</code> 放在同一部目录下。命令行切换到该目录路径下，执行 <code>vagrant up</code>。</p><blockquote><p>uWSGI 太过混乱，apt-get 安装的版本和 pip install 安装的版本，版本号一样，但是命令行参数竟然完全不同。UWSGI_PYHOME 也不再支持。准备换投 Gunicorn。</p></blockquote></div><div class=taxonomy><div class=taxonomy-tags><ul class=tags><li>#<a href=https://www.fournoas.com/tags/Vagrant/>Vagrant</a></li></ul></div></div><div class=pagination><a href=/posts/issue-with-convert-HTML-entities/ class="left arrow">上一篇：<br>HTML Entities 转换问题</a>
 <a href=/posts/php-and-python-quick-start-guide/ class="right arrow">下一篇：<br>PHP 和 Python 速查手册</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-01-26 03:24:46.121372909 &#43;0000 UTC m=&#43;0.467414016">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-01-26 10:41:23.79016539 &#43;0000 UTC m=&#43;0.481992787">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
