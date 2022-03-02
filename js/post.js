@@ -15,5 +15,27 @@ $(function(){
   if ($tableOfContents.length > 0) {
     var $asideTOC = $('#aside-toc').children('.content');
     $asideTOC.append($tableOfContents.children('ul').clone());
+
+    var anchorPositions;
+    var loadAnchorPositions = function () {
+      anchorPositions = new Array();
+      $('h1,h2,h3,h4,h5,h6').each(function () {
+        if (!this.id) return;
+        anchorPositions.unshift({id: this.id, top: this.offsetTop});
+      });
+    };
+    loadAnchorPositions();
+
+    $(window).scroll(function () {
+      $(anchorPositions).each(function () {
+        if (window.pageYOffset + 1 >= this.top) {
+          $('#aside-toc a').removeClass('active');
+          $('#aside-toc a[href="#' + this.id + '"]').addClass('active');
+          loadAnchorPositions();
+          return false;
+        }
+      });
+    });
+    // end of toc processing
   }
 });
