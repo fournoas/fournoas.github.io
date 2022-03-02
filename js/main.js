@@ -24,15 +24,4 @@ $(function(){
     $rootElement.removeClass('is-clipped');
     $(e.target).parents('.modal').remove();
   });
-
-  var $post = $body.find('.post');
-  if ($post.length) {
-    var postContainerWidth = $post.width();
-    $post.find('table').each(function () {
-      var $table = $(this);
-      if ($table.width() > postContainerWidth) {
-        $table.wrap('<div class="table-container"></div>');
-      }
-    });
-  }
 });
