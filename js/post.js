@@ -13,6 +13,9 @@ $(function(){
 
   var $tableOfContents = $('#TableOfContents');
   if ($tableOfContents.length > 0) {
+    var $rootElement = $(document.documentElement);
+    var $asideBar = $('#aside-toc');
+    var $collapsedTOC = $('#collapsed-toc');
     var $asideTOC = $('#aside-toc').children('.content');
     $asideTOC.append($tableOfContents.children('ul').clone());
 
@@ -29,12 +32,23 @@ $(function(){
     $(window).scroll(function () {
       $(anchorPositions).each(function () {
         if (window.pageYOffset + 1 >= this.top) {
-          $('#aside-toc a').removeClass('active');
-          $('#aside-toc a[href="#' + this.id + '"]').addClass('active');
+          $asideTOC.find('a').removeClass('active');
+          $asideTOC.find('a[href="#' + this.id + '"]').addClass('active');
           loadAnchorPositions();
           return false;
         }
       });
+    });
+
+    $asideTOC.on('click', 'a', function () {
+      $asideBar.removeClass('active');
+      $rootElement.removeClass('is-clipped');
+    });
+
+    $collapsedTOC.children('a').click(function () {
+      $rootElement.addClass('is-clipped');
+      $asideBar.addClass('active');
+      return false;
     });
     // end of toc processing
   }
