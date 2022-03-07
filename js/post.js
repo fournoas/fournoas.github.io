@@ -16,7 +16,7 @@ $(function(){
     var $rootElement = $(document.documentElement);
     var $asideBar = $('#aside-toc');
     var $collapsedTOC = $('#collapsed-toc');
-    var $asideTOC = $('#aside-toc').children('.content');
+    var $asideTOC = $asideBar.children('.content');
     $asideTOC.append($tableOfContents.children('ul').clone());
 
     var anchorPositions;
@@ -40,7 +40,7 @@ $(function(){
       });
     });
 
-    $asideTOC.on('click', 'a', function () {
+    $asideBar.on('click', 'a', function () {
       $asideBar.removeClass('active');
       $rootElement.removeClass('is-clipped');
     });
