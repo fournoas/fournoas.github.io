@@ -1,0 +1,86 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Scoop 踩坑记录 &middot; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script>hljs.highlightAll();</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main><div class=post><h1 class=post-title>Scoop 踩坑记录</h1><div class=post-line></div><div class=post-info><span>作者</span>
+Fournoas
+<span>于&nbsp;</span><time datetime="2022-06-17 00:00:00 &#43;0000 UTC">2022年6月17日</time>
+<span>发布在</span><ul class=categories><li><a href=https://www.fournoas.com/categories/using/>Using</a></li></ul></div><h1 id=安装时无法指定软件版本>安装时无法指定软件版本</h1><p>网上部分教程表示 scoop 安装软件时可以指定版本号：</p><pre><code class=language-powershell>scoop install git@2.34.0.windows.1
+</code></pre><p>但实际上这个功能现在已无法正常使用，目前的官方文档里也没有注明这样的用法。此外，有些软件官方网站并不会保留历史版本的下载链接，这也是 scoop 不能支持安装软件指定版本的原因之一。</p><p>如果要安装软件的历史版本，只能通过自建软件仓库的方式来实现。</p><h1 id=不支持通过-manifest-文件安装>不支持通过 manifest 文件安装</h1><p>通过命令 <code>scoop help install</code> 查看安装参数可以得知，scoop 应该是支持从 URL 或本地 manifest 文件来安装软件的。</p><pre><code class=language-plaintext>Usage: scoop install &lt;app&gt; [options]
+
+e.g. The usual way to install an app (uses your local 'buckets'):
+     scoop install git
+
+To install an app from a manifest at a URL:
+     scoop install https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/runat.json
+
+To install an app from a manifest on your computer
+     scoop install \path\to\app.json
+
+Options:
+  -g, --global              Install the app globally
+  -i, --independent         Don't install dependencies automatically
+  -k, --no-cache            Don't use the download cache
+  -u, --no-update-scoop     Don't update Scoop before installing if it's outdated
+  -s, --skip                Skip hash validation (use with caution!)
+  -a, --arch &lt;32bit|64bit&gt;  Use the specified architecture, if the app supports it
+</code></pre><p>但是实测并不成功，会得到一个 <code>Couldn't find manifest for 'APP_NAME'.</code> 错误。看起来，安装的软件名称必须在现有的仓库中存在才行。这样的话，通过 URL 或 json 文件来安装软件的功能就一点意义都没有了。</p><h1 id=安装时发生-hash-check-failed-错误>安装时发生 Hash check failed 错误</h1><p>有时，在安装软件时会遇到 <code>Hash check failed</code> 错误。比如目前用 <code>scoop install nirsoft\filetypesman</code> 命令安装 FileTypesMan 时报错：</p><pre><code class=language-plaintext>Installing 'filetypesman' (1.95) [64bit]
+Checking hash of filetypesman-x64.zip ... ERROR Hash check failed!
+App:         nirsoft/filetypesman
+URL:         https://www.nirsoft.net/utils/filetypesman-x64.zip
+First bytes: 50 4B 03 04 14 00 02 00
+Expected:    d032ee7ea72b6678a65c3500f19eb3edb58574f33a2be9ff0ac6d9ef9ea29ada
+Actual:      5feec2a7c0ca1d46ff8bd27a0eadd068f3d8c6dc3fee6f7354973319aeecefb3
+
+Please try again or create a new issue by using the following link and paste your console output:
+https://github.com/kodybrown/scoop-nirsoft/issues/new?title=filetypesman%401.95%3a+hash+check+failed
+</code></pre><p>发生该错误的原因是，官方软件的下载地址没有版本区分，发布的历史版本和当前版本都是用同一个 URL。FileTypesMan 已经发布了 1.96 版本，而仓库中的 manifest 文件未及时更新，仍是 1.95 版本，导致下载后的安装包没有通过 Hash 验证。解决方法就是安装时使用 <code>-s</code> 参数跳过 Hash 验证：</p><pre><code class=language-powershell>scoop install -s nirsoft\filetypesman
+</code></pre><h1 id=manifest-的-persist-默认为文件夹>manifest 的 persist 默认为文件夹</h1><p>在 manifest 文件中，可以用 persist 定义持久性数据，但是默认为文件夹。如果要指向文件，需要用 pre_install 脚本特别处理。</p><pre><code class=language-json>{
+    &quot;version&quot;: &quot;2.51.0&quot;,
+    &quot;homepage&quot;: &quot;https://www.xnview.com/en/xnview/&quot;,
+    &quot;license&quot;: &quot;Freeware|Proprietary&quot;,
+    &quot;url&quot;: &quot;https://download.xnview.com/XnView-win-full.zip&quot;,
+    &quot;hash&quot;: &quot;DF376971063951076211D00AF74E98513C6E25377C57FCA4957EE817AB809B30&quot;,
+    &quot;extract_dir&quot;: &quot;XnView&quot;,
+    &quot;bin&quot;: &quot;xnview.exe&quot;,
+    &quot;shortcuts&quot;: [
+        [
+            &quot;xnview.exe&quot;,
+            &quot;XnView&quot;
+        ]
+    ],
+    &quot;pre_install&quot;: [
+        &quot;# --- If xnview.ini exists as a folder, then remove it ---&quot;,
+        &quot;if (Test-Path \&quot;$persist_dir\\xnview.ini\&quot; -PathType Container) {&quot;,
+        &quot;    Remove-Item \&quot;$persist_dir\\xnview.ini\&quot; -Force -Recurse&quot;,
+        &quot;}&quot;,
+        &quot;if (!(Test-Path \&quot;$persist_dir\\xnview.ini\&quot;)) {&quot;,
+        &quot;   New-Item \&quot;$dir\\xnview.ini\&quot; -ItemType File | Out-Null&quot;,
+        &quot;}&quot;,
+        &quot;# --- If category.db exists as a folder, then remove it ---&quot;,
+        &quot;if (Test-Path \&quot;$persist_dir\\category.db\&quot; -PathType Container) {&quot;,
+        &quot;    Remove-Item \&quot;$persist_dir\\category.db\&quot; -Force -Recurse&quot;,
+        &quot;}&quot;,
+        &quot;if (!(Test-Path \&quot;$persist_dir\\category.db\&quot;)) {&quot;,
+        &quot;   New-Item \&quot;$dir\\category.db\&quot; -ItemType File | Out-Null&quot;,
+        &quot;}&quot;
+    ],
+    &quot;uninstaller&quot;: {
+        &quot;script&quot;: [
+            &quot;# Manually copy because Xnview overwrites hardlink with a regular file, which breaks persist&quot;,
+            &quot;if ((Test-Path \&quot;$dir\\xnview.ini\&quot;) -and !(Get-Item \&quot;$dir\\xnview.ini\&quot;).LinkType -and (Test-Path $persist_dir)) { Copy-Item \&quot;$dir\\xnview.ini\&quot; $persist_dir -Force }&quot;,
+            &quot;if ((Test-Path \&quot;$dir\\category.db\&quot;) -and !(Get-Item \&quot;$dir\\category.db\&quot;).LinkType -and (Test-Path $persist_dir)) { Copy-Item \&quot;$dir\\category.db\&quot; $persist_dir -Force }&quot;
+        ]
+    },
+    &quot;persist&quot;: [
+        &quot;xnview.ini&quot;,
+        &quot;category.db&quot;
+    ],
+    &quot;checkver&quot;: &quot;Download &lt;strong&gt;XnView ([\\d.]+)&lt;/strong&gt; for Windows&quot;,
+    &quot;autoupdate&quot;: {
+        &quot;url&quot;: &quot;https://download.xnview.com/XnView-win-full.zip&quot;,
+        &quot;hash&quot;: {
+            &quot;url&quot;: &quot;https://www.xnview.com/en/xnview/&quot;,
+            &quot;find&quot;: &quot;XnView-win-full.zip: ($sha256)&quot;
+        }
+    }
+}
+</code></pre><script src=/js/post.js></script></div><div class=taxonomy></div><div class=pagination><a href=/posts/the-principle-of-git-credentials/ class="left arrow">上一篇：<br>Git Credentials 原理</a>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-06-17 05:40:37.049062464 &#43;0000 UTC m=&#43;0.108998538">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
