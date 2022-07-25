@@ -17,7 +17,7 @@ IsDevelopmentMode : False
 NonRemovable      : True
 IsPartiallyStaged : False
 SignatureKind     : System
-</code></pre><p>其中 <code>NonRemovable</code> 的值为 <code>True</code>，这意味着如果我们直接用 <code>get-appxpackage *XboxGameCallableUI* | remove-appxpackage</code> 命令是无法删除该 package 的。</p><p>必须需要修改系统配置才能实现删除内置应用。在一切开始前，我们需要准备如下工具：</p><ul><li><a href=https://docs.microsoft.com/en-us/sysinternals/downloads/psexec target=_blank>PsExec</a></li><li><a href=https://www.python.org/ target=_blank>Python</a></li></ul><p>首先，在开始菜单中输入 “CMD” 找到命令提示符，点击“以管理员身份运行”。</p><p>{{<figure src=cmd.png>}}</p><p>运行如下命令：</p><pre><code class=language-powershell>/path/to/psexec.exe -i -s -d python.exe
+</code></pre><p>其中 <code>NonRemovable</code> 的值为 <code>True</code>，这意味着如果我们直接用 <code>get-appxpackage *XboxGameCallableUI* | remove-appxpackage</code> 命令是无法删除该 package 的。</p><p>必须需要修改系统配置才能实现删除内置应用。在一切开始前，我们需要准备如下工具：</p><ul><li><a href=https://docs.microsoft.com/en-us/sysinternals/downloads/psexec target=_blank>PsExec</a></li><li><a href=https://www.python.org/ target=_blank>Python</a></li></ul><p>首先，在开始菜单中输入 “CMD” 找到命令提示符，点击“以管理员身份运行”。</p><figure><img src=cmd.png></figure><p>运行如下命令：</p><pre><code class=language-powershell>/path/to/psexec.exe -i -s -d python.exe
 </code></pre><p>该命令会启动一个以 system 权限运行的 Python 解释器。</p><p>在 Python 解释器中逐行输入：</p><pre><code class=language-python>import os,sqlite3
 conn = sqlite3.connect(os.path.expandvars(r'%ProgramData%\Microsoft\Windows\AppRepository\StateRepository-Machine.srd'))
 def is_srjournal_enabled(): return False
@@ -34,4 +34,4 @@ conn.commit()
 exit()
 </code></pre><blockquote><p>代码也可以直接保存为 Python 脚本后用 PsExec 执行。</p></blockquote><p>如果脚本运行成功，则所有 Package 都已经解锁，可以用 <code>remove-appxpackage</code> 命令删除。在 PowerShell 下尝试删除 <code>Microsoft.XboxGameCallableUI</code>：</p><pre><code class=language-powershell>get-appxpackage *XboxGameCallableUI* | remove-appxpackage
 </code></pre><script src=/js/post.js></script></div><div class=taxonomy><div class=taxonomy-tags><ul class=tags><li>#<a href=https://www.fournoas.com/tags/Windows/>Windows</a></li></ul></div></div><div class=pagination><a href=/moments/202207/1657968812/ class="left arrow">上一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-07-25 09:28:02.048982553 &#43;0000 UTC m=&#43;0.136586796">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-07-25 09:34:10.042423289 &#43;0000 UTC m=&#43;0.136958733">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
