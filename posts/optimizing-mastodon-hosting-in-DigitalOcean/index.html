@@ -9,9 +9,12 @@ swapon /swap
 echo '/swap none swap sw 0 0' | tee -a /etc/fstab
 </code></pre><h1 id=禁用-unattended-upgrades-服务>禁用 unattended-upgrades 服务</h1><p>Droplet 实例启动后，CPU 占用马上就 100% 了。用 top 命令一查，发现一个叫 unattended-upgrades 进程丧心病狂地跑满了 CPU。禁用该服务：</p><pre><code class=language-bash>systemctl stop unattended-upgrades
 systemctl disable unattended-upgrades
-</code></pre><h1 id=限制-journal-日志大小>限制 Journal 日志大小</h1><p>使用 <code>journalctl --disk-usage</code> 命令查看日志使用的硬盘空间。系统长期运行时，Journal 日志日积月累会占用硬盘空间大小非常可观。必须限制 Journal 日志大小：</p><pre><code class=language-bash>journalctl --vacuum-time=7d
+</code></pre><h1 id=限制-journal-日志大小>限制 Journal 日志大小</h1><p>使用 <code>journalctl --disk-usage</code> 命令查看日志使用的硬盘空间。系统长期运行时，Journal 日志日积月累会占用硬盘空间大小非常可观。可以按时间或大小保留 Journal 日志。下面命令让日志最多保留 7 天、占用 100 MB 空间：</p><pre><code class=language-bash>journalctl --vacuum-time=7d
 journalctl --vacuum-size=100M
-</code></pre><p>日志最多保留 7 天、占用 100 MB 空间。</p><h1 id=ruby-使用-jemalloc-内存分配器>Ruby 使用 Jemalloc 内存分配器</h1><p>Ruby 进程是占用内存的大头。<a href=https://jemalloc.net/ target=_blank>Jemalloc</a> 是一款通用的内存分配器，支持对包括 Ruby 在内的多种语言进行内存使用的优化。</p><pre><code class=language-bash>apt install libjemalloc-dev
+</code></pre><p>也可以开启日志的持久化限制。编辑配置文件 <code>/etc/systemd/journald.conf</code>，开启如下任一配置即可：</p><pre><code class=language-ini>MaxRetentionSec=7day
+SystemMaxUse=100M
+</code></pre><p>重启 journal 服务使配置生效：</p><pre><code class=language-bash>systemctl restart systemd-journald
+</code></pre><h1 id=ruby-使用-jemalloc-内存分配器>Ruby 使用 Jemalloc 内存分配器</h1><p>Ruby 进程是占用内存的大头。<a href=https://jemalloc.net/ target=_blank>Jemalloc</a> 是一款通用的内存分配器，支持对包括 Ruby 在内的多种语言进行内存使用的优化。</p><pre><code class=language-bash>apt install libjemalloc-dev
 su - mastodon
 RUBY_CONFIGURE_OPTS=--with-jemalloc rbenv install 2.6.6
 rbenv global 2.6.6
@@ -56,4 +59,4 @@ WantedBy=timers.target
 systemctl enable mastodon-clear.timer
 </code></pre><h1 id=其他>其他</h1><h2 id=全文检索>全文检索</h2><p>Mastodon 使用 ElasticSearch 作为搜索引擎，需要安装插件才能支持中文搜索。ES 的内存和硬盘占用也很可观，小型实例建议不要开启。</p><h2 id=媒体文件>媒体文件</h2><p>用户上传的图片视频等媒体文件保存在 <code>~/live/public/system/</code> 路径下。为了节省本地硬盘空间，可以将媒体文件迁移到云存储服务器，支持 Amazon S3、Google Cloud 或 Wasabi 等。有人推荐使用 Scaleway 云存储，因为有 75G 的免费空间和每月 75G 的免费流量，但是超额仍需付费。如果对每个月流量没有把握，还是谨慎开启。详细配置可以参考<a href=https://pullopen.github.io/%E7%AB%99%E7%82%B9%E7%BB%B4%E6%8A%A4/2020/07/22/Move-mastodon-media-to-Scaleway.html target=_blank>这篇</a>文章。</p><h2 id=中继>中继</h2><p>开启中继会导致硬盘空间使用率快速上涨，需要谨慎开启。下面两个是可用的中文长毛象中继：</p><ul><li><a href=https://relay.nya.one/inbox target=_blank>https://relay.nya.one/inbox</a></li><li><a href=https://relay.acg.mn/inbox target=_blank>https://relay.acg.mn/inbox</a></li></ul><h2 id=群组>群组</h2><p>群组是一种长毛象机器人，它会转发所有 @ 它的嘟文，相当于一个关注即可参与的公共讨论区。<a href=https://ovo.st/club/board target=_blank>@board@ovo.st</a> 是最常用的中文群组，也可以在 <a href=https://ovo.st/ target=_blank>https://ovo.st/</a> 找到其他热门群组。</p><script src=/js/post.js></script></div><div class=taxonomy><div class=taxonomy-tags><ul class=tags><li>#<a href=https://www.fournoas.com/tags/%E7%AC%94%E8%AE%B0/>笔记</a></li></ul></div></div><div class=pagination><a href=/posts/carmina-burana/ class="left arrow">上一篇：<br>布兰诗歌</a>
 <a href=/moments/202209/1662011753/ class="right arrow">下一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-09-26 06:57:45.367558508 &#43;0000 UTC m=&#43;0.385321774">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-09-27 02:05:13.300882189 &#43;0000 UTC m=&#43;0.321472016">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
