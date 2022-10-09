@@ -1,0 +1,32 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>JavaScript 的原型继承 &middot; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script>hljs.highlightAll();</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main><div class=post><h1 class=post-title>JavaScript 的原型继承</h1><div class=post-line></div><div class=post-info><span>作者</span>
+Fournoas
+<span>于&nbsp;</span><time datetime="2022-10-09 00:00:00 &#43;0000 UTC">2022年10月9日</time>
+<span>发布在</span><ul class=categories><li><a href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><figure><img src=prototype.jpg alt=经常被使用的原型关系图><figcaption><p>经常被使用的原型关系图</p></figcaption></figure><p>JavaScript 中的每个对象都有一个 <code>[[Prototype]]</code> 的内部属性，该属性指向的对象就是当前对象的<strong>原型</strong>。每个原型对象也有自己的原型，从而形成<strong>原型链</strong>。当我们访问一个对象的属性或者方法时，如果在当前对象中没有找到该属性或者方法，会通过原型链依次从原型对象中查找，从而实现对象继承的功能。我们可以通过 <code>__proto__</code> 属性或者 <code>Object.getPrototypeOf()</code> / <code>Object.setPrototypeOf()</code>方法来访问对象的原型：</p><pre><code class=language-javascript>let obj = {};
+obj.__proto__ == Object.getPrototypeOf(obj) // true
+</code></pre><blockquote><p>虽然 <code>__proto__</code> 属性并不是 ECMAScript 标准，但是大部分 JavaScript 引擎都实现了该方法。</p></blockquote><p>JavaScript 通过 <code>new Constructor()</code> 语句创建对象，而 <code>Constructor</code> 是对象的构造函数。JavaScript 标准内置对象，比如 <code>Object</code>、<code>Function</code>、<code>Boolean</code>、<code>Number</code>、<code>String</code>、<code>Array</code> 等，都是函数类型：</p><pre><code class=language-javascript>typeof Object == 'function'   //true
+typeof Function == 'function' //true
+typeof Boolean == 'function'  //true
+typeof Number == 'function'   //true
+typeof String == 'function'   //true
+typeof Array == 'function'    //true
+</code></pre><p>在 JavaScript 中，函数类型同时也是对象，因此也能拥有属性和方法。即便我们没有在代码中显式声明，每个函数也都会有 <code>prototype</code> 属性。如果该属性指向一个对象，那么 <code>new</code> 操作符会将其设置为新对象的原型：</p><pre><code class=language-javascript>function Constructor() {}
+let obj = new Constructor()
+obj.__proto__ == Constructor.prototype // true
+</code></pre><p>函数默认的 <code>prototype</code> 是一个包含 <code>constructor</code> 属性的对象，而 <code>constructor</code> 指向这个函数自身：</p><pre><code class=language-javascript>function Constructor() {}
+Constructor.prototype.constructor == Constructor // true
+</code></pre><p>而创建的对象通过原型链继承，可以访问到原型的 <code>constructor</code> 函数：</p><pre><code class=language-javascript>function Constructor() {}
+let obj = new Constructor()
+obj.constructor == Constructor // true
+</code></pre><p>在运行时，我们可以通过对象的 <code>constructor</code> 属性来 <code>new</code> 一个同类型的对象：</p><pre><code class=language-javascript>function Constructor() {}
+let obj1 = new Constructor()
+let obj2 = new obj1.constructor()
+obj2 instanceof Constructor // true
+</code></pre><p>但是 JavaScript 并不保证原型对象存在 <code>constructor</code> 属性。如果显示指定构造函数的 <code>prototype</code> 属性或者对象的 <code>__proto__</code> 属性，会覆盖原型默认的 <code>constructor</code> 属性，此时通过 <code>obj.constructor</code> 是无法获取到 <code>obj</code> 对象真正的构造函数的：</p><pre><code class=language-javascript>function Constructor() {}
+let Prototype = {}
+Constructor.prototype = Prototype
+let obj = new Constructor()
+(new obj.constructor) instanceof Constructor // false
+obj.__proto__.__proto__.constructor == obj.constructor // true
+</code></pre><p>此时的 <code>obj.constructor</code> 实际指向 <code>Prototype.__proto__</code> 对象的 <code>constructor</code>。</p><script src=/js/post.js></script></div><div class=taxonomy><div class=taxonomy-tags><ul class=tags><li>#<a href=https://www.fournoas.com/tags/%E7%AC%94%E8%AE%B0/>笔记</a></li></ul></div></div><div class=pagination><a href=/posts/the-crowd-on-the-internet/ class="left arrow">上一篇：<br>网络乌合之众</a>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-10-09 10:01:11.594062578 &#43;0000 UTC m=&#43;0.127995155">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
