@@ -10,9 +10,21 @@ Fournoas
   -#%span= t 'about.status_count_before'
   -#%strong= number_with_delimiter @instance_presenter.status_count
   -#%span= t 'about.status_count_after', count: @instance_presenter.status_count
+</code></pre><p>另编辑 <code>app/views/about/show.html.haml</code> 文件，将 68 行至 79 行的代码注释：</p><pre><code class=language-text>-#.hero-widget__footer__column
+  -#%h4= t 'about.server_stats'
+
+  -#%div{ style: 'display: flex' }
+    -#.hero-widget__counter{ style: 'width: 50%' }
+      -#%strong= number_to_human  @instance_presenter.user_count, strip_insignificant_zeros: true
+      -#%span= t 'about.user_count_after', count: @instance_presenter.user_count
+    -#.hero-widget__counter{ style: 'width: 50%' }
+      -#%strong= number_to_human @instance_presenter.active_user_count, strip_insignificant_zeros: true
+      -#%span
+        -#= t 'about.active_count_after'
+        -#%abbr{ title: t('about.active_footnote') } *
 </code></pre><p>重启 Web 进程使修改生效：</p><pre><code class=language-bash>sudo systemctl restart mastodon-web
 </code></pre><h1 id=隐藏用户嘟文列表>隐藏用户嘟文列表</h1><p>当从通过网页访问<a href=https://mastodon.social/@Gargron target=_blank>用户主页</a>，默认会显示该用户所有的公开嘟文。通过修改代码可以对未登录用户隐藏嘟文列表。使用编辑器打开 <code>app/views/accounts/show.html.haml</code> 文件，定位到第 32 行代码：</p><pre><code class=language-text>- if user_signed_in? &amp;&amp; @account.blocking?(current_account)
-</code></pre><p>将此行代码改为：</p><pre><code class=language-text>- if !user_signed_in? || user_signed_in? &amp;&amp; @account.blocking?(current_account)
+</code></pre><p>将此行代码改为：</p><pre><code class=language-text>- if !user_signed_in? || @account.blocking?(current_account)
 </code></pre><p>重启 Web 进程使修改生效：</p><pre><code class=language-bash>sudo systemctl restart mastodon-web
 </code></pre><hr><p>需要注意的是，本文是通过修改网页模板来实现隐藏信息的，仅对当前站点的网页生效，对 Mastodon 的实际业务逻辑并没有影响。</p><script src=/js/post.js></script></div><div class=taxonomy><div class=taxonomy-tags><ul class=tags><li>#<a href=https://www.fournoas.com/tags/%E7%AC%94%E8%AE%B0/>笔记</a></li><li>#<a href=https://www.fournoas.com/tags/Mastodon/>Mastodon</a></li></ul></div></div><div class=pagination><a href=/posts/anonymous-creator-license/ class="left arrow">上一篇：<br>佚名创作者许可</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-10-14 04:37:56.350451942 &#43;0000 UTC m=&#43;0.376806756">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-10-17 06:13:08.978128251 &#43;0000 UTC m=&#43;0.362433956">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
