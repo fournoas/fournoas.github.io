@@ -1,0 +1,85 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>为何 Python 进程在 Windows 命令行下无法用 Ctrl&#43;C 终止 &middot; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script>hljs.highlightAll();</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>为何 Python 进程在 Windows 命令行下无法用 Ctrl&#43;C 终止</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas</span>
+<span>于&nbsp;</span><time datetime="2022-10-28 00:00:00 &#43;0000 UTC" data-pagefind-meta=日期>2022年10月28日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p>在 Windows 命令行中按下 <code>Ctrl+C</code> 或者 <code>Ctrl+Break</code> 可以结束当前正在执行的命令。通常情况下，这个方法同样适用于 Python 的控制台进程。特别地，Python 内置了一个 <code>KeyboardInterrupt</code> 异常专门用于捕获按下 <code>Ctrl+C</code> 而触发的程序退出：</p><pre><code class=language-python>try:
+    while True:
+        print('running...')
+except KeyboardInterrupt:
+    print('keyboard interrupt received')
+    # 退出前清理现场，释放资源
+</code></pre><p>Python 触发 <code>KeyboardInterrupt</code> 异常的底层实现原理依赖于 signal 机制<sup class=footnote-ref id=fnref:1><a href=#fn:1>1</a></sup>。使用信号处理器也可以捕获按下 <code>Ctrl+C</code> 而触发的程序退出：</p><pre><code class=language-python>import signal
+
+def signal_handler(signum, frame):
+    raise KeyboardInterrupt
+
+signal.signal(signal.SIGINT, signal_handler)
+
+try:
+    while True:
+        print('running...')
+except KeyboardInterrupt:
+    print('keyboard interrupt received')
+    # 退出前清理现场，释放资源
+</code></pre><p>但是在某些情况下，Windows 的 Python 命令行程序无法用 <code>Ctrl+C</code> 或者 <code>Ctrl+Break</code> 终止。比如在 <a href=https://bugs.python.org/issue41437 target=_blank>issue 41437: SIGINT blocked by socket operations like recv on Windows</a> 中提到：在 Windows 中，当 <code>socket.recv()</code> 操作阻塞时，无法响应 <code>SIGINT</code>。类似的，当 <code>thread.join()</code> 操作阻塞时，也无法用 <code>Ctrl+C</code> 终止。要解释这个现象，先要搞清楚 Windows 的信号处理机制和 Python 的信号处理机制的区别。</p><p>在 Windows 命令行中，当用户按下 <code>Ctrl+C</code> 时，Console 会向所有关联到当前 Console 的命令行进程发送 <code>SIGINT</code> 信号，而命令行进程内会创建一个新线程来处理接收到的信号<sup class=footnote-ref id=fnref:2><a href=#fn:2>2</a></sup>。下面是一段 C++ 写的演示代码：</p><pre><code class=language-c++>#include &lt;iostream&gt;
+#include &lt;signal.h&gt;
+#include &lt;Windows.h&gt;
+
+void SignalHandler(int signal)
+{
+    if (signal == SIGINT) {
+        std::cout &lt;&lt; &quot;Signal Handler Thread Id:&quot; &lt;&lt; GetCurrentThreadId() &lt;&lt; &quot;\n&quot;;
+    }
+}
+
+int main()
+{
+    signal(SIGINT, SignalHandler);
+    std::cout &lt;&lt; &quot;Main Thread Id:&quot; &lt;&lt; GetCurrentThreadId() &lt;&lt; &quot;\n&quot;;
+    while (true) {
+        Sleep(1000);
+    }
+}	
+</code></pre><p>上面的代码运行结果为：</p><pre><code class=language-text>Main Thread Id:28476
+Signal Handler Thread Id:20392
+</code></pre><p>观察结果可以发现，信号处理器运行的线程 ID 和主线程 ID 不一致，说明 <code>SignalHandler</code> 运行在新线程中。然而我们回过头观察本文第二段 Python 代码发现：在 <code>signal_handler</code> 中抛出的 <code>KeyboardInterrupt</code> 异常可以被主线程的代码捕获到。这是不是说明 Python 的信号处理机制和 Windows 底层的不一致？我们用下面的代码来验证猜想：</p><pre><code class=language-python>import signal
+import time
+import threading
+
+def signal_handler(signum, frame):
+    print('Signal Handler Thread Id: {0}'.format(threading.current_thread().ident))
+    raise KeyboardInterrupt
+
+print('Main Thread Id: {0}'.format(threading.current_thread().ident))
+signal.signal(signal.SIGINT, signal_handler)
+
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    pass
+</code></pre><p>上面的代码运行结果为：</p><pre><code class=language-text>Main Thread Id: 19644
+Signal Handler Thread Id: 19644
+</code></pre><p>信号处理器运行的线程 ID 和主线程 ID 一致，说明 <code>signal_handler</code> 运行在主线程中。Python 文档中对此的解释如下：</p><blockquote><p>A Python signal handler does not get executed inside the low-level &copy; signal handler. Instead, the low-level signal handler sets a flag which tells the <a href=https://docs.python.org/3/glossary.html#term-virtual-machine target=_blank>virtual machine</a> to execute the corresponding Python signal handler at a later point(for example at the next <a href=https://docs.python.org/3/glossary.html#term-bytecode target=_blank>bytecode</a> instruction).</p><p>A long-running calculation implemented purely in C (such as regular expression matching on a large body of text) may run uninterrupted for an arbitrary amount of time, regardless of any signals received. The Python signal handlers will be called when the calculation finishes.</p><p>Python signal handlers are always executed in the main Python thread of the main interpreter, even if the signal was received in another thread.</p></blockquote><p><strong>当 Python 接收到信号后，新线程仅设置一个标志来告知 VM 有待处理的信号。在运行于主线程中的 VM 执行下一条 bytecode 前，会先调用信号处理器。也就是说，调用信号处理器只能发生在执行任意两条 bytecode 之间，如果 Python 主线程阻塞在 Windows API 或其他 Native 代码里，是无法中断阻塞状态来调用信号处理器的。那么对用户来说，就发生了使用 <code>Ctrl+C</code> 无法终止 Python 命令行进程的现象。</strong></p><p>下面给出一种方案来解决这个问题：</p><pre><code class=language-python>import threading
+import socket
+
+class BlockingOperation(threading.Thread):
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.bind(('', 8964))
+        s.recvfrom(1) # 阻塞直到收到数据
+    
+try:
+    task = BlockingOperation()
+    task.start()
+    while True:
+        task.join(1) # 阻塞一秒后返回，给信号处理器一个执行的机会
+except KeyboardInterrupt:
+    pass
+</code></pre><p>其原理为：创建一个新线程，用于执行会引起 Python 虚拟机阻塞的代码。另外，在主线程中，避免使用会引起阻塞的 <code>task.join()</code>，而用 <code>task.join(1)</code> 循环代替。这样可以保证 Python 命令行进程能在一秒内响应信号。</p><div class=footnotes><hr><ol><li id=fn:1><a href=https://docs.python.org/zh-cn/3/library/signal.html#handlers-and-exceptions target=_blank>signal &mdash; 设置异步事件处理程序 — Python 3.11.0 文档</a>
+<a class=footnote-return href=#fnref:1>↩</a></li><li id=fn:2><a href=https://learn.microsoft.com/zh-cn/windows/console/ctrl-c-and-ctrl-break-signals target=_blank>Ctrl+C 和 Ctrl+Break 信号 - Windows Console | Microsoft Learn</a>
+<a class=footnote-return href=#fnref:2>↩</a></li></ol></div><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202210/1666674494/ class="left arrow">上一篇</a>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-10-28 10:27:02.087004865 &#43;0000 UTC m=&#43;0.206177375">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
