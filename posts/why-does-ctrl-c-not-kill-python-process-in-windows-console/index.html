@@ -21,7 +21,15 @@ try:
 except KeyboardInterrupt:
     print('keyboard interrupt received')
     # 退出前清理现场，释放资源
-</code></pre><p>但是在某些情况下，Windows 的 Python 命令行程序无法用 <code>Ctrl+C</code> 或者 <code>Ctrl+Break</code> 终止。比如在 <a href=https://bugs.python.org/issue41437 target=_blank>issue 41437: SIGINT blocked by socket operations like recv on Windows</a> 中提到：在 Windows 中，当 <code>socket.recv()</code> 操作阻塞时，无法响应 <code>SIGINT</code>。类似的，当 <code>thread.join()</code> 操作阻塞时，也无法用 <code>Ctrl+C</code> 终止。要解释这个现象，先要搞清楚 Windows 的信号处理机制和 Python 的信号处理机制的区别。</p><p>在 Windows 命令行中，当用户按下 <code>Ctrl+C</code> 时，Console 会向所有关联到当前 Console 的命令行进程发送 <code>SIGINT</code> 信号，而命令行进程内会创建一个新线程来处理接收到的信号<sup class=footnote-ref id=fnref:2><a href=#fn:2>2</a></sup>。下面是一段 C++ 写的演示代码：</p><pre><code class=language-c++>#include &lt;iostream&gt;
+</code></pre><p>但是在某些情况下，Windows 的 Python 命令行程序无法用 <code>Ctrl+C</code> 或者 <code>Ctrl+Break</code> 终止。比如在 <a href=https://bugs.python.org/issue41437 target=_blank>issue 41437: SIGINT blocked by socket operations like recv on Windows</a> 中提到：在 Windows 中，当 <code>socket.recv()</code> 操作阻塞时，无法响应 <code>SIGINT</code>。类似的，当 <code>thread.join()</code> 操作阻塞时，也无法用 <code>Ctrl+C</code> 终止。例如下面代码在 Windows 下运行就无法使用 <code>Ctrl+C</code> 来退出：</p><pre><code class=language-python>import socket
+
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.bind(('', 8964))
+    s.recvfrom(1)
+except KeyboardInterrupt:
+    pass
+</code></pre><p>而上面的代码如果在 <a href=https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux target=_blank>WSL</a> 下运行，是可以用 <code>Ctrl+C</code> 终止的。要解释这个现象，先要搞清楚 Windows 的信号处理机制和 Python 的信号处理机制的区别。</p><p>在 Windows 命令行中，当用户按下 <code>Ctrl+C</code> 时，Console 会向所有关联到当前 Console 的命令行进程发送 <code>SIGINT</code> 信号，而命令行进程内会创建一个新线程来处理接收到的信号<sup class=footnote-ref id=fnref:2><a href=#fn:2>2</a></sup>。下面是一段 C++ 写的演示代码：</p><pre><code class=language-c++>#include &lt;iostream&gt;
 #include &lt;signal.h&gt;
 #include &lt;Windows.h&gt;
 
@@ -83,4 +91,4 @@ except KeyboardInterrupt:
 <a class=footnote-return href=#fnref:1>↩</a></li><li id=fn:2><a href=https://learn.microsoft.com/zh-cn/windows/console/ctrl-c-and-ctrl-break-signals target=_blank>Ctrl+C 和 Ctrl+Break 信号 - Windows Console | Microsoft Learn</a>
 <a class=footnote-return href=#fnref:2>↩</a></li></ol></div><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202210/1666674494/ class="left arrow">上一篇</a>
 <a href=/moments/202210/1667136126/ class="right arrow">下一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-10-31 05:38:10.894870776 &#43;0000 UTC m=&#43;0.478489250">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-10-31 10:09:35.821822604 &#43;0000 UTC m=&#43;0.322524410">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
