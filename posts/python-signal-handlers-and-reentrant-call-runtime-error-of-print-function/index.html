@@ -2,7 +2,7 @@
 gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>Python 的 signal 处理与 print() 的 reentrant call 运行时错误</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2022-10-31 00:00:00 &#43;0000 UTC" data-pagefind-meta=日期>2022年10月31日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p>在前文《<a href=../why-does-ctrl-c-not-kill-python-process-in-windows-console/>为何 Windows 下无法用 Ctrl+C 终止 Python 进程</a>》中，讲解了 Python 信号处理的基本原理。我为了撰写文章而编写了一些测试代码，在运行某例测试代码时，发生了奇怪的 reentrant call 运行时错误。代码如下：</p><pre><code class=language-python>import signal
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p>在前文《<a href=../why-does-ctrl-c-not-kill-python-process-in-windows-console/>为何 Windows 下无法用 Ctrl+C 终止 Python 进程</a>》中，讲解了 Python 信号处理的基本原理。当时为了撰写文章而编写了一些测试代码，在运行某例测试代码时，发生了奇怪的 reentrant call 运行时错误。代码如下：</p><pre><code class=language-python>import signal
 
 signal.signal(signal.SIGINT, lambda signum, frame: print('test'))
 while True: print('test')
@@ -14,7 +14,7 @@ while True: print('test')
     signal.signal(signal.SIGINT, lambda signum, frame: print('test'))
                                                        ^^^^^^^^^^^^^
 RuntimeError: reentrant call inside &lt;_io.BufferedWriter name='&lt;stdout&gt;'&gt;
-</code></pre><p>错误信息中所提到的 reentrant call 是一个计算机术语，它的意思是程序或者子例程（subroutine）在执行过程中被中断，此时再次调用该程序或者子例程。由于 Python 的信号处理器是运行在主线程中，所以不存在多线程冲突的可能。我猜想错误可能是如下的代码引起的：</p><pre><code class=language-python>entrant_status = 0
+</code></pre><p>错误信息中所提到的 reentrant call 是一个计算机术语，它的意思是程序或者子例程（subroutine）在执行过程中被中断，此时再次调用该程序或者子例程。由于 Python 的信号处理器是运行在主线程中，所以不存在多线程冲突的可能。因此，猜想错误可能是由如下的代码引起的：</p><pre><code class=language-python>entrant_status = 0
 
 def print(text):
     if (entrant_status &gt; 0):
@@ -37,7 +37,7 @@ def signal_handler(signum, frame):
     print('test')
     
 print('test')
-</code></pre><p>但是根据 Python 官方文档的描述，Python VM 是在两条 bytecode 指令之间调用信号处理器的。而 <code>print()</code> 属于 builtin function，调用 <code>print()</code> 只需要一条 <code>CALL_FUNCTION</code> 指令。那么唯一的可能就是，官方文档的描述并不准确，Python 还有其他唤起信号处理器的方式。看来只能从 Python 源代码中去寻找答案了。</p><p>根据错误提示，我在 Python 的源代码中搜索「<a href="https://github.com/python/cpython/search?l=C&amp;q=reentrant+call+inside" target=_blank>reentrant call inside</a>」，发现 <a href=https://github.com/python/cpython/blob/774ef28814d0d9d57ec813cb31b0a7af6c476127/Modules/_io/bufferedio.c target=_blank>Modules/_io/bufferedio.c</a> 文件的<a href=https://github.com/python/cpython/blob/774ef28814d0d9d57ec813cb31b0a7af6c476127/Modules/_io/bufferedio.c#L262 target=_blank>第 262 行</a>高度疑似为抛出异常的代码。此处附近完整的代码如下：</p><pre><code class=language-c>static int
+</code></pre><p>但是根据 Python 官方文档的描述，Python VM 是在两条 bytecode 指令之间调用信号处理器的。而 <code>print()</code> 属于 builtin function，调用 <code>print()</code> 只需要一条 <code>CALL_FUNCTION</code> 指令。那么唯一的可能就是，官方文档的描述并不准确，Python 还有其他唤起信号处理器的方式。看来只能从 Python 源代码中去寻找答案了。</p><p>根据错误提示，在 Python 的源代码中搜索「<a href="https://github.com/python/cpython/search?l=C&amp;q=reentrant+call+inside" target=_blank>reentrant call inside</a>」，发现 <a href=https://github.com/python/cpython/blob/774ef28814d0d9d57ec813cb31b0a7af6c476127/Modules/_io/bufferedio.c target=_blank>Modules/_io/bufferedio.c</a> 文件的<a href=https://github.com/python/cpython/blob/774ef28814d0d9d57ec813cb31b0a7af6c476127/Modules/_io/bufferedio.c#L262 target=_blank>第 262 行</a>高度疑似为抛出异常的代码。此处附近完整的代码如下：</p><pre><code class=language-c>static int
 _enter_buffered_busy(buffered *self)
 {
     int relax_locking;
@@ -230,5 +230,5 @@ error:
    blocking another time, possibly indefinitely. */
 if (PyErr_CheckSignals() &lt; 0)
     goto error;
-</code></pre><p>显然，这里就是 Python 唤起信号处理器的地方。<code>PyErr_CheckSignals()</code> 的作用就是检查信号标志位，如果设置了标志位就立即调用信号处理器。在 Python 源代码中的搜索「<a href="https://github.com/python/cpython/search?l=C&amp;q=PyErr_CheckSignals" target=_blank>PyErr_CheckSignals</a>」，能找到20多处调用。果然，官方文档中的描述是有问题的——事实上，Python 不仅仅在两次 bytecode 执行之间会调用信号处理，在内置函数中也可能会调用信号处理。</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202210/1667136126/ class="left arrow">上一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-10-31 05:16:43.494957993 &#43;0000 UTC m=&#43;0.159499795">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+</code></pre><p>显然，这里就是 Python 唤起信号处理器的地方。<code>PyErr_CheckSignals()</code> 的作用就是检查信号标志位，如果设置了标志位就立即调用信号处理器。在 Python 源代码中的搜索「<a href="https://github.com/python/cpython/search?l=C&amp;q=PyErr_CheckSignals" target=_blank>PyErr_CheckSignals</a>」，能找到20多处调用。果然，官方文档中的描述是有问题的——事实上，Python 不仅仅在两次 bytecode 执行之间会调用信号处理器，在内置函数中也可能会调用信号处理器。</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202210/1667136126/ class="left arrow">上一篇</a>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-10-31 05:38:10.645974836 &#43;0000 UTC m=&#43;0.229593210">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
