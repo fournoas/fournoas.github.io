@@ -1,0 +1,234 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Python 的 signal 处理与 print() 的 reentrant call 运行时错误 &middot; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script>hljs.highlightAll();</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>Python 的 signal 处理与 print() 的 reentrant call 运行时错误</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas</span>
+<span>于&nbsp;</span><time datetime="2022-10-31 00:00:00 &#43;0000 UTC" data-pagefind-meta=日期>2022年10月31日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p>在前文《<a href=../why-does-ctrl-c-not-kill-python-process-in-windows-console/>为何 Windows 下无法用 Ctrl+C 终止 Python 进程</a>》中，讲解了 Python 信号处理的基本原理。我为了撰写文章而编写了一些测试代码，在运行某例测试代码时，发生了奇怪的 reentrant call 运行时错误。代码如下：</p><pre><code class=language-python>import signal
+
+signal.signal(signal.SIGINT, lambda signum, frame: print('test'))
+while True: print('test')
+</code></pre><p>在程序运行中按下 Ctrl+C，程序抛出 RuntimeError 异常。完整错误信息如下：</p><pre><code class=language-text>Traceback (most recent call last):
+  File &quot;test.py&quot;, line 4, in &lt;module&gt;
+    while True: print('test')
+                ^^^^^^^^^^^^^
+  File &quot;D:\Projects\dnspooh\test.py&quot;, line 3, in &lt;lambda&gt;
+    signal.signal(signal.SIGINT, lambda signum, frame: print('test'))
+                                                       ^^^^^^^^^^^^^
+RuntimeError: reentrant call inside &lt;_io.BufferedWriter name='&lt;stdout&gt;'&gt;
+</code></pre><p>错误信息中所提到的 reentrant call 是一个计算机术语，它的意思是程序或者子例程（subroutine）在执行过程中被中断，此时再次调用该程序或者子例程。由于 Python 的信号处理器是运行在主线程中，所以不存在多线程冲突的可能。我猜想错误可能是如下的代码引起的：</p><pre><code class=language-python>entrant_status = 0
+
+def print(text):
+    if (entrant_status &gt; 0):
+        raise RuntimeError(
+            &quot;reentrant call inside &lt;_io.BufferedWriter name='&lt;stdout&gt;'&gt;&quot;)
+
+    entrant_status = 1
+    
+    '''
+    此时因按下 Ctrl+C 而产生软中断
+    Python 中止执行此处代码
+    转而调用 signal_handler()
+    '''
+    signal_handler(signum, frame)
+    
+    entrant_status = 0
+    return
+
+def signal_handler(signum, frame):
+    print('test')
+    
+print('test')
+</code></pre><p>但是根据 Python 官方文档的描述，Python VM 是在两条 bytecode 指令之间调用信号处理器的。而 <code>print()</code> 属于 builtin function，调用 <code>print()</code> 只需要一条 <code>CALL_FUNCTION</code> 指令。那么唯一的可能就是，官方文档的描述并不准确，Python 还有其他唤起信号处理器的方式。看来只能从 Python 源代码中去寻找答案了。</p><p>根据错误提示，我在 Python 的源代码中搜索「<a href="https://github.com/python/cpython/search?l=C&amp;q=reentrant+call+inside" target=_blank>reentrant call inside</a>」，发现 <a href=https://github.com/python/cpython/blob/774ef28814d0d9d57ec813cb31b0a7af6c476127/Modules/_io/bufferedio.c target=_blank>Modules/_io/bufferedio.c</a> 文件的<a href=https://github.com/python/cpython/blob/774ef28814d0d9d57ec813cb31b0a7af6c476127/Modules/_io/bufferedio.c#L262 target=_blank>第 262 行</a>高度疑似为抛出异常的代码。此处附近完整的代码如下：</p><pre><code class=language-c>static int
+_enter_buffered_busy(buffered *self)
+{
+    int relax_locking;
+    PyLockStatus st;
+    if (self-&gt;owner == PyThread_get_thread_ident()) {
+        PyErr_Format(PyExc_RuntimeError,
+                     &quot;reentrant call inside %R&quot;, self);
+        return 0;
+    }
+    relax_locking = _Py_IsFinalizing();
+    Py_BEGIN_ALLOW_THREADS
+    if (!relax_locking)
+        st = PyThread_acquire_lock(self-&gt;lock, 1);
+    else {
+        /* When finalizing, we don't want a deadlock to happen with daemon
+         * threads abruptly shut down while they owned the lock.
+         * Therefore, only wait for a grace period (1 s.).
+         * Note that non-daemon threads have already exited here, so this
+         * shouldn't affect carefully written threaded I/O code.
+         */
+        st = PyThread_acquire_lock_timed(self-&gt;lock, (PY_TIMEOUT_T)1e6, 0);
+    }
+    Py_END_ALLOW_THREADS
+    if (relax_locking &amp;&amp; st != PY_LOCK_ACQUIRED) {
+        PyObject *ascii = PyObject_ASCII((PyObject*)self);
+        _Py_FatalErrorFormat(__func__,
+            &quot;could not acquire lock for %s at interpreter &quot;
+            &quot;shutdown, possibly due to daemon threads&quot;,
+            ascii ? PyUnicode_AsUTF8(ascii) : &quot;&lt;ascii(self) failed&gt;&quot;);
+    }
+    return 1;
+}
+
+#define ENTER_BUFFERED(self) \
+    ( (PyThread_acquire_lock(self-&gt;lock, 0) ? \
+       1 : _enter_buffered_busy(self)) \
+     &amp;&amp; (self-&gt;owner = PyThread_get_thread_ident(), 1) )
+</code></pre><p>RuntimeError 是在 <code>_enter_buffered_busy</code> 函数中被抛出的，而该函数被 <code>ENTER_BUFFERED</code> 宏所调用：当使用 <code>PyThread_acquire_lock()</code> 获取锁失败时便会抛出异常。进一步在当前文件中搜索<code>ENTER_BUFFERED</code>，发现<a href=https://github.com/python/cpython/blob/774ef28814d0d9d57ec813cb31b0a7af6c476127/Modules/_io/bufferedio.c#L1916 target=_blank>第 1916 行</a>处的调用可能是抛出异常的上层函数，该函数名为 <code>io_BufferedWriter_write_impl</code>，正好和错误信息中的 <code>&lt;_io.BufferedWriter name='&lt;stdout&gt;'&gt;</code> 相对应。该函数的完整代码如下：</p><pre><code class=language-c>/*[clinic input]
+_io.BufferedWriter.write
+    buffer: Py_buffer
+    /
+[clinic start generated code]*/
+
+static PyObject *
+_io_BufferedWriter_write_impl(buffered *self, Py_buffer *buffer)
+/*[clinic end generated code: output=7f8d1365759bfc6b input=dd87dd85fc7f8850]*/
+{
+    PyObject *res = NULL;
+    Py_ssize_t written, avail, remaining;
+    Py_off_t offset;
+
+    CHECK_INITIALIZED(self)
+
+    if (!ENTER_BUFFERED(self))
+        return NULL;
+
+    /* Issue #31976: Check for closed file after acquiring the lock. Another
+       thread could be holding the lock while closing the file. */
+    if (IS_CLOSED(self)) {
+        PyErr_SetString(PyExc_ValueError, &quot;write to closed file&quot;);
+        goto error;
+    }
+
+    /* Fast path: the data to write can be fully buffered. */
+    if (!VALID_READ_BUFFER(self) &amp;&amp; !VALID_WRITE_BUFFER(self)) {
+        self-&gt;pos = 0;
+        self-&gt;raw_pos = 0;
+    }
+    avail = Py_SAFE_DOWNCAST(self-&gt;buffer_size - self-&gt;pos, Py_off_t, Py_ssize_t);
+    if (buffer-&gt;len &lt;= avail) {
+        memcpy(self-&gt;buffer + self-&gt;pos, buffer-&gt;buf, buffer-&gt;len);
+        if (!VALID_WRITE_BUFFER(self) || self-&gt;write_pos &gt; self-&gt;pos) {
+            self-&gt;write_pos = self-&gt;pos;
+        }
+        ADJUST_POSITION(self, self-&gt;pos + buffer-&gt;len);
+        if (self-&gt;pos &gt; self-&gt;write_end)
+            self-&gt;write_end = self-&gt;pos;
+        written = buffer-&gt;len;
+        goto end;
+    }
+
+    /* First write the current buffer */
+    res = _bufferedwriter_flush_unlocked(self);
+    if (res == NULL) {
+        Py_ssize_t *w = _buffered_check_blocking_error();
+        if (w == NULL)
+            goto error;
+        if (self-&gt;readable)
+            _bufferedreader_reset_buf(self);
+        /* Make some place by shifting the buffer. */
+        assert(VALID_WRITE_BUFFER(self));
+        memmove(self-&gt;buffer, self-&gt;buffer + self-&gt;write_pos,
+                Py_SAFE_DOWNCAST(self-&gt;write_end - self-&gt;write_pos,
+                                 Py_off_t, Py_ssize_t));
+        self-&gt;write_end -= self-&gt;write_pos;
+        self-&gt;raw_pos -= self-&gt;write_pos;
+        self-&gt;pos -= self-&gt;write_pos;
+        self-&gt;write_pos = 0;
+        avail = Py_SAFE_DOWNCAST(self-&gt;buffer_size - self-&gt;write_end,
+                                 Py_off_t, Py_ssize_t);
+        if (buffer-&gt;len &lt;= avail) {
+            /* Everything can be buffered */
+            PyErr_Clear();
+            memcpy(self-&gt;buffer + self-&gt;write_end, buffer-&gt;buf, buffer-&gt;len);
+            self-&gt;write_end += buffer-&gt;len;
+            self-&gt;pos += buffer-&gt;len;
+            written = buffer-&gt;len;
+            goto end;
+        }
+        /* Buffer as much as possible. */
+        memcpy(self-&gt;buffer + self-&gt;write_end, buffer-&gt;buf, avail);
+        self-&gt;write_end += avail;
+        self-&gt;pos += avail;
+        /* XXX Modifying the existing exception e using the pointer w
+           will change e.characters_written but not e.args[2].
+           Therefore we just replace with a new error. */
+        _set_BlockingIOError(&quot;write could not complete without blocking&quot;,
+                             avail);
+        goto error;
+    }
+    Py_CLEAR(res);
+
+    /* Adjust the raw stream position if it is away from the logical stream
+       position. This happens if the read buffer has been filled but not
+       modified (and therefore _bufferedwriter_flush_unlocked() didn't rewind
+       the raw stream by itself).
+       Fixes issue #6629.
+    */
+    offset = RAW_OFFSET(self);
+    if (offset != 0) {
+        if (_buffered_raw_seek(self, -offset, 1) &lt; 0)
+            goto error;
+        self-&gt;raw_pos -= offset;
+    }
+
+    /* Then write buf itself. At this point the buffer has been emptied. */
+    remaining = buffer-&gt;len;
+    written = 0;
+    while (remaining &gt; self-&gt;buffer_size) {
+        Py_ssize_t n = _bufferedwriter_raw_write(
+            self, (char *) buffer-&gt;buf + written, buffer-&gt;len - written);
+        if (n == -1) {
+            goto error;
+        } else if (n == -2) {
+            /* Write failed because raw file is non-blocking */
+            if (remaining &gt; self-&gt;buffer_size) {
+                /* Can't buffer everything, still buffer as much as possible */
+                memcpy(self-&gt;buffer,
+                       (char *) buffer-&gt;buf + written, self-&gt;buffer_size);
+                self-&gt;raw_pos = 0;
+                ADJUST_POSITION(self, self-&gt;buffer_size);
+                self-&gt;write_end = self-&gt;buffer_size;
+                written += self-&gt;buffer_size;
+                _set_BlockingIOError(&quot;write could not complete without &quot;
+                                     &quot;blocking&quot;, written);
+                goto error;
+            }
+            PyErr_Clear();
+            break;
+        }
+        written += n;
+        remaining -= n;
+        /* Partial writes can return successfully when interrupted by a
+           signal (see write(2)).  We must run signal handlers before
+           blocking another time, possibly indefinitely. */
+        if (PyErr_CheckSignals() &lt; 0)
+            goto error;
+    }
+    if (self-&gt;readable)
+        _bufferedreader_reset_buf(self);
+    if (remaining &gt; 0) {
+        memcpy(self-&gt;buffer, (char *) buffer-&gt;buf + written, remaining);
+        written += remaining;
+    }
+    self-&gt;write_pos = 0;
+    /* TODO: sanity check (remaining &gt;= 0) */
+    self-&gt;write_end = remaining;
+    ADJUST_POSITION(self, remaining);
+    self-&gt;raw_pos = 0;
+
+end:
+    res = PyLong_FromSsize_t(written);
+
+error:
+    LEAVE_BUFFERED(self)
+    return res;
+}
+</code></pre><p>在写入 Buffer 的 <code>while</code> 循环中发现如下注释和代码：</p><pre><code class=language-c>/* Partial writes can return successfully when interrupted by a
+   signal (see write(2)).  We must run signal handlers before
+   blocking another time, possibly indefinitely. */
+if (PyErr_CheckSignals() &lt; 0)
+    goto error;
+</code></pre><p>显然，这里就是 Python 唤起信号处理器的地方。<code>PyErr_CheckSignals()</code> 的作用就是检查信号标志位，如果设置了标志位就立即调用信号处理器。在 Python 源代码中的搜索「<a href="https://github.com/python/cpython/search?l=C&amp;q=PyErr_CheckSignals" target=_blank>PyErr_CheckSignals</a>」，能找到20多处调用。果然，官方文档中的描述是有问题的——事实上，Python 不仅仅在两次 bytecode 执行之间会调用信号处理，在内置函数中也可能会调用信号处理。</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202210/1667136126/ class="left arrow">上一篇</a>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-10-31 05:15:18.387383635 &#43;0000 UTC m=&#43;0.141591001">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
