@@ -1,59 +1,68 @@
-<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>从 APNIC 获取中国大陆地区的 IP 地址数据库 &middot; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js></script><script>hljs.highlightAll();hljs.initLineNumbersOnLoad();</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
-gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>从 APNIC 获取中国大陆地区的 IP 地址数据库</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>从 APNIC 获取中国大陆地区的 IP 地址数据库 &#183; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>从 APNIC 获取中国大陆地区的 IP 地址数据库</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
-<span>于&nbsp;</span><time datetime="2020-12-21 00:00:00 &#43;0000 UTC" data-pagefind-meta=日期>2020年12月21日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/using/>Using</a></li></ul></div><p>全球互联网 IP 地址分配由<a href=https://www.iana.org/ target=_blank>互联网号码分配局</a>（IANA）机构负责。IANA 将分配工作委托给五大区域互联网机构管理（RIR），其中<a href=https://www.apnic.net/ target=_blank>亚太网络信息中心</a>（APNIC）负责管理亚太地区的事务。我们可以在 APNIC 的网站上找到所有分配给亚太地区的 IPv4/IPv6 地址数据库。通过该数据库，可以准确地知道某个 IP 地被分配给了哪个国家或地区。</p><p>打开 APNIC 网站首页，在导航菜单中选择「Insights -&gt; Raw Data」，进入 ftp 数据下载站点。也可以通过 <a href=http://ftp.apnic.net/stats/apnic/ target=_blank>http 接口</a>访问 ftp 目录。下载最新数据文件：<a href=http://ftp.apnic.net/stats/apnic/delegated-apnic-latest target=_blank>delegated-apnic-latest</a>。</p><p>数据文件是竖线分隔的 CSV 文件，其格式如下：</p><pre><code class=language-plaintext>registry|cc|type|start|value|date|status
-</code></pre><p>各字段的含义如下：</p><pre><code class=language-plaintext>registry    The registry from which the data is taken.
-            For APNIC resources, this will be:
-                apnic
-
-cc          ISO 3166 2-letter code of the organisation to
-            which the allocation or assignment was made. 
-
-type        Type of Internet number resource represented
-            in this record. One value from the set of 
-            defined strings:
-                {asn,ipv4,ipv6}
-
-start       In the case of records of type 'ipv4' or
-            'ipv6' this is the IPv4 or IPv6 'first
-            address' of the	range.
-            In the case of an 16 bit AS number, the
-            format is the integer value in the range:
-                0 - 65535
-            In the case of a 32 bit ASN,  the value is
-            in the range:
-                0 - 4294967296
-            No distinction is drawn between 16 and 32
-            bit ASN values in the range 0 to 65535.
-
-value       In the case of IPv4 address the count of
-            hosts for this range. This count does not 
-            have to represent a CIDR range.
-            In the case of an IPv6 address the value 
-            will be the CIDR prefix length from the 
-            'first address'	value of &lt;start&gt;.
-            In the case of records of type 'asn' the 
-            number is the count of AS from this start 
-            value.
-
-date        Date on this allocation/assignment was made
-            by the RIR in the format:
-                YYYYMMDD
-            Where the allocation or assignment has been
-            transferred from another registry, this date
-            represents the date of first assignment or
-            allocation as received in from the original
-            RIR.
-            It is noted that where records do not show a 
-            date of	first assignment, this can take the 
-            0000/00/00 value.
-
-status      Type of allocation from the set:
-                {allocated, assigned}
-            This is the allocation or assignment made by 
-            the registry producing the file and not any
-            sub-assignment by other agencies.
-</code></pre><p>其中 <code>cc</code> 字段就是代表国家或地区的代码，若此字段为 <code>CN</code>，则代表中国大陆。此外，<code>HK</code> 代表香港，<code>TW</code> 代表台湾，<code>MO</code> 代表澳门。</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore></div><div class=pagination data-pagefind-ignore><a href=/moments/202012/1607916804/ class="left arrow">上一篇</a>
+<span>于&nbsp;</span><time datetime="2020-12-21 00:00:00 +0000 UTC" data-pagefind-meta=日期>2020年12月21日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/using/>Using</a></li></ul></div><p>全球互联网 IP 地址分配由<a href=https://www.iana.org/>互联网号码分配局</a>（IANA）机构负责。IANA 将分配工作委托给五大区域互联网机构管理（RIR），其中<a href=https://www.apnic.net/>亚太网络信息中心</a>（APNIC）负责管理亚太地区的事务。我们可以在 APNIC 的网站上找到所有分配给亚太地区的 IPv4/IPv6 地址数据库。通过该数据库，可以准确地知道某个 IP 地被分配给了哪个国家或地区。</p><p>打开 APNIC 网站首页，在导航菜单中选择「Insights -> Raw Data」，进入 ftp 数据下载站点。也可以通过 <a href=http://ftp.apnic.net/stats/apnic/>http 接口</a>访问 ftp 目录。下载最新数据文件：<a href=http://ftp.apnic.net/stats/apnic/delegated-apnic-latest>delegated-apnic-latest</a>。</p><p>数据文件是竖线分隔的 CSV 文件，其格式如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-plaintext data-lang=plaintext><span style=display:flex><span>registry|cc|type|start|value|date|status
+</span></span></code></pre></div><p>各字段的含义如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-plaintext data-lang=plaintext><span style=display:flex><span>registry    The registry from which the data is taken.
+</span></span><span style=display:flex><span>            For APNIC resources, this will be:
+</span></span><span style=display:flex><span>                apnic
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>cc          ISO 3166 2-letter code of the organisation to
+</span></span><span style=display:flex><span>            which the allocation or assignment was made. 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>type        Type of Internet number resource represented
+</span></span><span style=display:flex><span>            in this record. One value from the set of 
+</span></span><span style=display:flex><span>            defined strings:
+</span></span><span style=display:flex><span>                {asn,ipv4,ipv6}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>start       In the case of records of type &#39;ipv4&#39; or
+</span></span><span style=display:flex><span>            &#39;ipv6&#39; this is the IPv4 or IPv6 &#39;first
+</span></span><span style=display:flex><span>            address&#39; of the	range.
+</span></span><span style=display:flex><span>            In the case of an 16 bit AS number, the
+</span></span><span style=display:flex><span>            format is the integer value in the range:
+</span></span><span style=display:flex><span>                0 - 65535
+</span></span><span style=display:flex><span>            In the case of a 32 bit ASN,  the value is
+</span></span><span style=display:flex><span>            in the range:
+</span></span><span style=display:flex><span>                0 - 4294967296
+</span></span><span style=display:flex><span>            No distinction is drawn between 16 and 32
+</span></span><span style=display:flex><span>            bit ASN values in the range 0 to 65535.
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>value       In the case of IPv4 address the count of
+</span></span><span style=display:flex><span>            hosts for this range. This count does not 
+</span></span><span style=display:flex><span>            have to represent a CIDR range.
+</span></span><span style=display:flex><span>            In the case of an IPv6 address the value 
+</span></span><span style=display:flex><span>            will be the CIDR prefix length from the 
+</span></span><span style=display:flex><span>            &#39;first address&#39;	value of &lt;start&gt;.
+</span></span><span style=display:flex><span>            In the case of records of type &#39;asn&#39; the 
+</span></span><span style=display:flex><span>            number is the count of AS from this start 
+</span></span><span style=display:flex><span>            value.
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>date        Date on this allocation/assignment was made
+</span></span><span style=display:flex><span>            by the RIR in the format:
+</span></span><span style=display:flex><span>                YYYYMMDD
+</span></span><span style=display:flex><span>            Where the allocation or assignment has been
+</span></span><span style=display:flex><span>            transferred from another registry, this date
+</span></span><span style=display:flex><span>            represents the date of first assignment or
+</span></span><span style=display:flex><span>            allocation as received in from the original
+</span></span><span style=display:flex><span>            RIR.
+</span></span><span style=display:flex><span>            It is noted that where records do not show a 
+</span></span><span style=display:flex><span>            date of	first assignment, this can take the 
+</span></span><span style=display:flex><span>            0000/00/00 value.
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>status      Type of allocation from the set:
+</span></span><span style=display:flex><span>                {allocated, assigned}
+</span></span><span style=display:flex><span>            This is the allocation or assignment made by 
+</span></span><span style=display:flex><span>            the registry producing the file and not any
+</span></span><span style=display:flex><span>            sub-assignment by other agencies.
+</span></span></code></pre></div><p>其中 <code>cc</code> 字段就是代表国家或地区的代码，若此字段为 <code>CN</code>，则代表中国大陆。此外，<code>HK</code> 代表香港，<code>TW</code> 代表台湾，<code>MO</code> 代表澳门。</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore></div><div class=pagination data-pagefind-ignore><a href=/moments/202012/1607916804/ class="left arrow">上一篇</a>
 <a href=/posts/how-to-pay-for-Apple-App-Store-purchases-without-a-credit-card/ class="right arrow">下一篇：<br>未绑定信用卡的海外苹果应用商店帐号如何支付</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-02 07:33:13.941594762 &#43;0000 UTC m=&#43;0.468548278">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-03 07:21:10.957207577 +0000 UTC m=+0.422474764">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>

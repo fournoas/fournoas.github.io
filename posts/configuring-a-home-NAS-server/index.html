@@ -1,181 +1,190 @@
-<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>配置家用 NAS 服务器 &middot; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js></script><script>hljs.highlightAll();hljs.initLineNumbersOnLoad();</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
-gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>配置家用 NAS 服务器</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>配置家用 NAS 服务器 &#183; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>配置家用 NAS 服务器</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
-<span>于&nbsp;</span><time datetime="2017-01-28 00:00:00 &#43;0000 UTC" data-pagefind-meta=日期>2017年1月28日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/using/>Using</a></li></ul></div><p>服务器采用占美主机（N3150/4G RAM/64G SSD）外挂 USB 硬盘柜。该方案和普通 NAS 主机或 Gen8 服务器相比，具有功耗低、易扩展的优点。</p><p>本来想使用 ESXi 虚拟技术，但是 ESXi 不支持 N3150 的 Braswell 架构。此外，考虑到主机本身配置不高，承担虚拟机开销的损耗显得并不划算。</p><h2 id=实现目标>实现目标</h2><ul><li>VPN</li><li>加速代理</li><li>视频点播</li><li>私有云</li><li>开发环境</li></ul><h2 id=安装系统>安装系统</h2><p>第一次安装 Ubuntu 失败，创建分区时提示错误：『尝试将SCSI(0, 0, 0) , 第一分区(sda)设备上的一个vfat文件系统挂载到/boot/efi上失败，您可以返回分区菜单重新进行分区。』，原因不明。而后改为安装 CentOS 成功。</p><h3 id=下载镜像>下载镜像</h3><p><a href=https://www.centos.org/download/ target=_blank>下载</a>最新版 CentOS 安装镜像文件。这里选择 <a href=http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso target=_blank>Minimal ISO</a>。</p><h3 id=创建安装盘>创建安装盘</h3><p>Windows 下使用 <a href=https://rufus.akeo.ie/ target=_blank>Rufus</a> 制作 USB 启动盘。</p><h3 id=安装>安装</h3><p>插入 U 盘后启动系统，按照提示完成系统安装。</p><h2 id=配置系统>配置系统</h2><h3 id=安装基础软件>安装基础软件</h3><pre><code class=language-shell>yum install -y wget telnet net-tools nano lm_sensors smartmontools httpd yum-utils python-pip unzip
-</code></pre><h3 id=添加第三方软件库>添加第三方软件库</h3><pre><code class=language-shell>yum install -y epel-release
-yum localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
-rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
-rpm -Uvh https://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
-</code></pre><h3 id=升级内核>升级内核</h3><p>默认安装的 Centos 7 的内核版本是 3.x，实在太低了。从 elrepo 源安装最新的稳定版内核：</p><pre><code class=language-shell>yum --enablerepo=elrepo-kernel install kernel-ml
-</code></pre><p>也可以安装 <code>kernel-lt</code>。其中的 &ldquo;ml&rdquo; 代表 &ldquo;mainline stable&rdquo;，&rdquo;lt&rdquo; 代表 &ldquo;long term support&rdquo;。&rdquo;lt&rdquo; 的版本比较低，现在只有4.4，很多新特性无法使用，所以安装 &ldquo;ml&rdquo; 版本。最新的 &ldquo;ml&rdquo; 版本是 4.19。</p><p>默认启动新内核：</p><pre><code class=language-shell>grub2-set-default 0
-reboot
-</code></pre><p>删除旧内核：</p><pre><code class=language-shell>yum -y remove kernel kernel-tools
-</code></pre><h3 id=网络优化>网络优化</h3><p>开启 bbr 拥塞算法（内核版本4.9及以上）：</p><pre><code class=language-shell>tee -a /etc/sysctl.conf &lt;&lt;-EOF
-  net.core.default_qdisc=fq
-  net.ipv4.tcp_congestion_control=bbr
-  EOF
-sysctl -p
-</code></pre><h3 id=ssd-优化>SSD 优化</h3><h4 id=禁用文件最后访问时间>禁用文件最后访问时间</h4><p>编辑配置文件 <code>/etc/fstab</code>，为其中所有 <code>xfs</code> 的分区添加挂载参数。
-将类似以下的配置</p><pre><code>......    xfs   defaults   0 0
-</code></pre><p>改为</p><pre><code>......    xfs   defaults,noatime,nodiratime   0 0    
-</code></pre><h4 id=启用-trim>启用 Trim</h4><p>开启 fstrim 服务：</p><pre><code class=language-shell>systemctl enable --now fstrim.timer
-</code></pre><p>或者定期执行任务：</p><pre><code class=language-shell>fstrim /
-fstrim /home
-fstrim /boot
-</code></pre><p>不推荐使用 *Online Discard*，即在 <code>/etc/fstab</code> 中添加 <code>discard</code> 选项。</p><h4 id=限制交换分区的使用>限制交换分区的使用</h4><p>添加系统参数：</p><pre><code class=language-shell>tee -a /etc/sysctl.conf &lt;&lt;-EOF
-  vm.swappiness=1
-  vm.vfs_cache_pressure=50
-  EOF
-sysctl -p
-</code></pre><h4 id=优化-i-o-调度器>优化 I/O 调度器</h4><p>在启动脚本中运行：</p><pre><code class=language-shell>echo deadline &gt; /sys/block/sda/queue/scheduler
-</code></pre><p>或者，创建文件 <code>/etc/udev/rules.d/60-ssd-scheduler.rules</code>，包含内容：</p><pre><code class=language-ini># set deadline scheduler for non-rotating disks
-ACTION==&quot;add|change&quot;, KERNEL==&quot;sda&quot;, ATTR{queue/rotational}==&quot;0&quot;, ATTR{queue/scheduler}=&quot;deadline&quot;
-</code></pre><h4 id=使用-tmpfs-保存临时文件>使用 tmpfs 保存临时文件</h4><pre><code class=language-shell>systemctl enable --now tmp.mount
-</code></pre><h3 id=启动脚本>启动脚本</h3><p>系统启动脚本 <code>rc.local</code> 默认不可执行。运行命令开启：</p><pre><code class=language-shell>chmod +x /etc/rc.local
-</code></pre><h3 id=挂载外接硬盘>挂载外接硬盘</h3><p>假设外置磁盘设备路径为 <code>/dev/sdb</code>。编辑配置文件 <code>/etc/fstab</code>，添加如下行：</p><pre><code>/dev/sdb    /data    ext4    defaults,nofail    0  0
-</code></pre><h2 id=安装软件>安装软件</h2><h3 id=webmin>Webmin</h3><p><a href=http://www.webmin.com/download/rpm/webmin-current.rpm target=_blank>下载</a>最新版 rpm 安装包。</p><pre><code class=language-shell>rpm --import http://www.webmin.com/jcameron-key.asc
-rpm -ivh webmin-*.rpm
-</code></pre><p>如果提示缺少 <em>Perl(Net::SSLeay)</em> 则用以下命令安装：</p><pre><code class=language-shell>yum install -y perl-Net-SSLeay
-</code></pre><p>添加防火墙规则：</p><pre><code class=language-shell>firewall-cmd --zone=public --add-port=1000/tcp --permanent
-firewall-cmd --reload
-</code></pre><blockquote><p>防火墙规则亦可以通过 Webmin 的 FirewallD 模块进行添加。</p></blockquote><h3 id=cockpit>Cockpit</h3><pre><code class=language-shell>yum install cockpit
-systemctl enable --now cockpit.socket
-sudo firewall-cmd --permanent --zone=public --add-service=cockpit
-sudo firewall-cmd --reload
-</code></pre><h3 id=samba-server>Samba Server</h3><p>安装：</p><pre><code class=language-shell>yum install -y samba
-</code></pre><p>开启服务：</p><pre><code class=language-shell>systemctl enable --now smb.service
-systemctl enable --now nmb.service
-</code></pre><p>添加防火墙规则：</p><pre><code class=language-shell>firewall-cmd --zone=public --add-service=samba --permanent
-firewall-cmd --reload
-</code></pre><p>修改配置文件：</p><pre><code class=language-shell>sudo nano /etc/samba/smb.conf
-</code></pre><p>内容为：</p><pre><code class=language-ini>[global]
-        workgroup = WORKGROUP
-        security = user
-
-        passdb backend = tdbsam
-
-[data]
-        comment = Shared Directories
-        path = /data
-        public = yes
-        browseable = yes
-        writable = no
-        #create mask = 0777
-        #directory mask = 0777
-        #force directory mode = 0777
-        #force create mode = 0777
-</code></pre><p>添加 Samba 用户：</p><pre><code class=language-shell>pdbedit -a samba_user
-</code></pre><p>另外，在默认情况下，SELinux会阻止通过Samba访问本地文件系统。方法一是用命令<code>setenforce 0</code>关闭SELinux，或者执行命令：</p><pre><code class=language-shell>chcon --reference=/etc/samba/smb.conf -R /data
-</code></pre><h3 id=aria2-yaaw>Aria2 &amp; YAAW</h3><pre><code class=language-shell>yum install -y aria2
-</code></pre><h3 id=plex-media-server>Plex Media Server</h3><p><a href=https://www.plex.tv/downloads/ target=_blank>下载</a>最新版的 rpm 安装包。</p><pre><code># rpm -ivh plexmediaserver-*.rpm
-# systemctl start plexmediaserver.service
-</code></pre><p>添加防火墙规则：</p><pre><code class=language-shell>firewall-cmd --zone=public --add-port=32400/tcp --permanent
-firewall-cmd --reload
-</code></pre><p>访问 http://&lt;服务器地址&gt;:32400/web 进行设置。</p><p>其他媒体中心服务有：Kodi, Emby</p><h4 id=iscsi-target>iSCSI Target</h4><pre><code class=language-shell>yum install -y scsi-target-utils
-systemctl enable --now tgtd.service
-</code></pre><h4 id=minidlna>MiniDLNA</h4><pre><code class=language-shell>yum install -y minidlna
-</code></pre><p>编辑配置文件 <code>/etc/minidlna.conf</code>：</p><pre><code class=language-ini>port=8200
-media_dir=/data/media   # 设置媒体文件路径
-db_dir=/var/cache/minidlna
-inotify=yes
-</code></pre><p>启动服务：</p><pre><code class=language-shell>systemctl enable --now minidlna.service
-</code></pre><p>添加防火墙规则：</p><pre><code class=language-shell>firewall-cmd --zone=public --add-port=1900/udp --permanent
-firewall-cmd --zone=public --add-port=8200/tcp --permanent
-firewall-cmd --reload
-</code></pre><p>访问 http://&lt;服务器地址&gt;:8200/ 返回信息则表示服务成功运行。</p><p>如果服务没有正常启动，可能是软件缺少相关的依赖库。尝试运行如下命令来获取错误信息：</p><pre><code class=language-shell>minidlnad -f /etc/minidlna.conf
-</code></pre><p>此处报错信息为：*error while loading shared libraries: libva.so.1*。安装依赖库：</p><pre><code>yum install -y libva
-</code></pre><h4 id=owncloud>ownCloud</h4><p><a href=https://owncloud.org/install/#instructions-server target=_blank>下载</a>最新版的 rpm 安装包。</p><h4 id=xfce>Xfce</h4><pre><code class=language-shell>yum groupinstall -y &quot;X Window System&quot;
-yum groupinstall -y xfce
-</code></pre><p>安装中文字体：</p><pre><code class=language-shell>yum install -y wqy-*
-</code></pre><p>切换开机进入图形模式：</p><pre><code class=language-shell>systemctl set-default graphical.target
-</code></pre><p>或切换开机进入命令行模式：</p><pre><code class=language-shell>systemctl set-default multi-user.target
-</code></pre><p>命令行模式下，手动进入图形模式：</p><pre><code class=language-shell>startx
-init 5
-</code></pre><p>或</p><pre><code class=language-shell># systemctl isolate graphical.target
-</code></pre><p>安装中文输入法：</p><pre><code class=language-shell>yum install im-chooser
-yum install ibus-libpinyin
-</code></pre><h4 id=vnc-server>VNC Server</h4><p>安装：</p><pre><code class=language-shell>yum install -y tigervnc-server
-</code></pre><p>启动：</p><pre><code class=language-shell>vncserver
-</code></pre><p>由于使用 Xfce 桌面，还需要修改启动脚本 <code>~/.vnc/xstartup</code>：</p><pre><code class=language-bash>#!/bin/sh
-unset SESSION_MANAGER
-unset DBUS_SESSION_BUS_ADDRESS
-#exec /etc/X11/xinit/xinitrc
-exec /bin/sh /etc/xdg/xfce4/xinitrc
-</code></pre><p>重启服务后能正常登录。</p><p>添加防火墙规则：</p><pre><code class=language-shell>firewall-cmd --zone=public --add-service=vnc-server --permanent
-firewall-cmd --reload
-</code></pre><h4 id=php>PHP</h4><p>由于默认安装的版本只有 5.4，非常陈旧。建议安装 PHP 5.6 或者 PHP 7。此处安装 PHP 7：</p><pre><code class=language-shell>yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
-yum install yum-utils
-yum-config-manager --enable remi-php73
-yum install -y php
-</code></pre><h4 id=mysql-mariadb>MySQL(MariaDB)</h4><p>安装 MariaDB：</p><pre><code class=language-shell>yum install -y mariadb
-</code></pre><p>默认安装的版本只有 5.5，比较陈旧。建议从官网下载最新版本。此处以安装 MariaDB 10.1 Stable 为例，创建文件 <code>/etc/yum.repos.d/mariadb.repo</code>，内容如下：</p><pre><code class=language-ini># MariaDB 10.1 CentOS repository list
-# http://downloads.mariadb.org/mariadb/repositories/
-[mariadb]
-name = MariaDB
-baseurl = http://yum.mariadb.org/10.1/centos7-amd64
-gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
-gpgcheck=1
-</code></pre><p>安装：</p><pre><code class=language-shell>yum install -y MariaDB-server MariaDB-client
-</code></pre><p>或者<a href="https://downloads.mariadb.org/mariadb/10.1.21/#bits=64&amp;file_type=rpm" target=_blank>下载</a> rpm 安装包手动安装。</p><p>运行：</p><pre><code class=language-shell>systemctl start mariadb.service
-</code></pre><p>如果无法启动服务，运行 <code>journalctl -xe</code> 查看错误。此处显示错误为：<em>error while loading shared libraries: libjemalloc.so.1: cannot open shared object file: No such file or directory</em></p><p>安装依赖库：</p><pre><code>yum install -y jemalloc
-</code></pre><p>重新安装 MaraiDB：</p><pre><code>yum remove -y MariaDB-server
+<span>于&nbsp;</span><time datetime="2017-01-28 00:00:00 +0000 UTC" data-pagefind-meta=日期>2017年1月28日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/using/>Using</a></li></ul></div><p>服务器采用占美主机（N3150/4G RAM/64G SSD）外挂 USB 硬盘柜。该方案和普通 NAS 主机或 Gen8 服务器相比，具有功耗低、易扩展的优点。</p><p>本来想使用 ESXi 虚拟技术，但是 ESXi 不支持 N3150 的 Braswell 架构。此外，考虑到主机本身配置不高，承担虚拟机开销的损耗显得并不划算。</p><h3 id=实现目标>实现目标</h3><ul><li>VPN</li><li>加速代理</li><li>视频点播</li><li>私有云</li><li>开发环境</li></ul><h3 id=安装系统>安装系统</h3><p>第一次安装 Ubuntu 失败，创建分区时提示错误：『尝试将SCSI(0, 0, 0) , 第一分区(sda)设备上的一个vfat文件系统挂载到/boot/efi上失败，您可以返回分区菜单重新进行分区。』，原因不明。而后改为安装 CentOS 成功。</p><h4 id=下载镜像>下载镜像</h4><p><a href=https://www.centos.org/download/>下载</a>最新版 CentOS 安装镜像文件。这里选择 <a href=http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1611.iso>Minimal ISO</a>。</p><h4 id=创建安装盘>创建安装盘</h4><p>Windows 下使用 <a href=https://rufus.akeo.ie/>Rufus</a> 制作 USB 启动盘。</p><h4 id=安装>安装</h4><p>插入 U 盘后启动系统，按照提示完成系统安装。</p><h3 id=配置系统>配置系统</h3><h4 id=安装基础软件>安装基础软件</h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y wget telnet net-tools nano lm_sensors smartmontools httpd yum-utils python-pip unzip
+</span></span></code></pre></div><h4 id=添加第三方软件库>添加第三方软件库</h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y epel-release
+</span></span><span style=display:flex><span>yum localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm
+</span></span><span style=display:flex><span>rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+</span></span><span style=display:flex><span>rpm -Uvh https://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+</span></span></code></pre></div><h4 id=升级内核>升级内核</h4><p>默认安装的 Centos 7 的内核版本是 3.x，实在太低了。从 elrepo 源安装最新的稳定版内核：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum --enablerepo<span style=color:#f92672>=</span>elrepo-kernel install kernel-ml
+</span></span></code></pre></div><p>也可以安装 <code>kernel-lt</code>。其中的 &ldquo;ml&rdquo; 代表 &ldquo;mainline stable&rdquo;，&ldquo;lt&rdquo; 代表 &ldquo;long term support&rdquo;。&ldquo;lt&rdquo; 的版本比较低，现在只有4.4，很多新特性无法使用，所以安装 &ldquo;ml&rdquo; 版本。最新的 &ldquo;ml&rdquo; 版本是 4.19。</p><p>默认启动新内核：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>grub2-set-default <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>reboot
+</span></span></code></pre></div><p>删除旧内核：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum -y remove kernel kernel-tools
+</span></span></code></pre></div><h4 id=网络优化>网络优化</h4><p>开启 bbr 拥塞算法（内核版本4.9及以上）：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>tee -a /etc/sysctl.conf <span style=color:#e6db74>&lt;&lt;-EOF
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  net.core.default_qdisc=fq
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  net.ipv4.tcp_congestion_control=bbr
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  EOF</span>
+</span></span><span style=display:flex><span>sysctl -p
+</span></span></code></pre></div><h4 id=ssd-优化>SSD 优化</h4><h5 id=禁用文件最后访问时间>禁用文件最后访问时间</h5><p>编辑配置文件 <code>/etc/fstab</code>，为其中所有 <code>xfs</code> 的分区添加挂载参数。
+将类似以下的配置</p><pre tabindex=0><code>......    xfs   defaults   0 0
+</code></pre><p>改为</p><pre tabindex=0><code>......    xfs   defaults,noatime,nodiratime   0 0    
+</code></pre><h5 id=启用-trim>启用 Trim</h5><p>开启 fstrim 服务：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>systemctl enable --now fstrim.timer
+</span></span></code></pre></div><p>或者定期执行任务：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>fstrim /
+</span></span><span style=display:flex><span>fstrim /home
+</span></span><span style=display:flex><span>fstrim /boot
+</span></span></code></pre></div><p>不推荐使用 <em>Online Discard</em>，即在 <code>/etc/fstab</code> 中添加 <code>discard</code> 选项。</p><h5 id=限制交换分区的使用>限制交换分区的使用</h5><p>添加系统参数：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>tee -a /etc/sysctl.conf <span style=color:#e6db74>&lt;&lt;-EOF
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  vm.swappiness=1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  vm.vfs_cache_pressure=50
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  EOF</span>
+</span></span><span style=display:flex><span>sysctl -p
+</span></span></code></pre></div><h5 id=优化-io-调度器>优化 I/O 调度器</h5><p>在启动脚本中运行：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>echo deadline &gt; /sys/block/sda/queue/scheduler
+</span></span></code></pre></div><p>或者，创建文件 <code>/etc/udev/rules.d/60-ssd-scheduler.rules</code>，包含内容：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#75715e>## set deadline scheduler for non-rotating disks</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>ACTION</span><span style=color:#f92672>=</span><span style=color:#e6db74>=&#34;add|change&#34;, KERNEL==&#34;sda&#34;, ATTR{queue/rotational}==&#34;0&#34;, ATTR{queue/scheduler}=&#34;deadline&#34;</span>
+</span></span></code></pre></div><h5 id=使用-tmpfs-保存临时文件>使用 tmpfs 保存临时文件</h5><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>systemctl enable --now tmp.mount
+</span></span></code></pre></div><h4 id=启动脚本>启动脚本</h4><p>系统启动脚本 <code>rc.local</code> 默认不可执行。运行命令开启：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>chmod +x /etc/rc.local
+</span></span></code></pre></div><h4 id=挂载外接硬盘>挂载外接硬盘</h4><p>假设外置磁盘设备路径为 <code>/dev/sdb</code>。编辑配置文件 <code>/etc/fstab</code>，添加如下行：</p><pre tabindex=0><code>/dev/sdb    /data    ext4    defaults,nofail    0  0
+</code></pre><h3 id=安装软件>安装软件</h3><h4 id=webmin>Webmin</h4><p><a href=http://www.webmin.com/download/rpm/webmin-current.rpm>下载</a>最新版 rpm 安装包。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>rpm --import http://www.webmin.com/jcameron-key.asc
+</span></span><span style=display:flex><span>rpm -ivh webmin-*.rpm
+</span></span></code></pre></div><p>如果提示缺少 <em>Perl(Net::SSLeay)</em> 则用以下命令安装：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y perl-Net-SSLeay
+</span></span></code></pre></div><p>添加防火墙规则：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>firewall-cmd --zone<span style=color:#f92672>=</span>public --add-port<span style=color:#f92672>=</span>1000/tcp --permanent
+</span></span><span style=display:flex><span>firewall-cmd --reload
+</span></span></code></pre></div><blockquote><p>防火墙规则亦可以通过 Webmin 的 FirewallD 模块进行添加。</p></blockquote><h4 id=cockpit>Cockpit</h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install cockpit
+</span></span><span style=display:flex><span>systemctl enable --now cockpit.socket
+</span></span><span style=display:flex><span>sudo firewall-cmd --permanent --zone<span style=color:#f92672>=</span>public --add-service<span style=color:#f92672>=</span>cockpit
+</span></span><span style=display:flex><span>sudo firewall-cmd --reload
+</span></span></code></pre></div><h4 id=samba-server>Samba Server</h4><p>安装：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y samba
+</span></span></code></pre></div><p>开启服务：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>systemctl enable --now smb.service
+</span></span><span style=display:flex><span>systemctl enable --now nmb.service
+</span></span></code></pre></div><p>添加防火墙规则：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>firewall-cmd --zone<span style=color:#f92672>=</span>public --add-service<span style=color:#f92672>=</span>samba --permanent
+</span></span><span style=display:flex><span>firewall-cmd --reload
+</span></span></code></pre></div><p>修改配置文件：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>sudo nano /etc/samba/smb.conf
+</span></span></code></pre></div><p>内容为：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#66d9ef>[global]</span>
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>workgroup</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>WORKGROUP
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        security = user</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>passdb backend</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>tdbsam</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[data]</span>
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>comment</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>Shared Directories
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        path = /data
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        public = yes
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        browseable = yes
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        writable = no
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        #create mask = 0777
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        #directory mask = 0777
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        #force directory mode = 0777
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>        #force create mode = 0777</span>
+</span></span></code></pre></div><p>添加 Samba 用户：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>pdbedit -a samba_user
+</span></span></code></pre></div><p>另外，在默认情况下，SELinux会阻止通过Samba访问本地文件系统。方法一是用命令<code>setenforce 0</code>关闭SELinux，或者执行命令：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>chcon --reference<span style=color:#f92672>=</span>/etc/samba/smb.conf -R /data
+</span></span></code></pre></div><h4 id=aria2--yaaw>Aria2 & YAAW</h4><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y aria2
+</span></span></code></pre></div><h4 id=plex-media-server>Plex Media Server</h4><p><a href=https://www.plex.tv/downloads/>下载</a>最新版的 rpm 安装包。</p><pre tabindex=0><code>## rpm -ivh plexmediaserver-*.rpm
+## systemctl start plexmediaserver.service
+</code></pre><p>添加防火墙规则：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>firewall-cmd --zone<span style=color:#f92672>=</span>public --add-port<span style=color:#f92672>=</span>32400/tcp --permanent
+</span></span><span style=display:flex><span>firewall-cmd --reload
+</span></span></code></pre></div><p>访问 http://&lt;服务器地址>:32400/web 进行设置。</p><p>其他媒体中心服务有：Kodi, Emby</p><h5 id=iscsi-target>iSCSI Target</h5><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y scsi-target-utils
+</span></span><span style=display:flex><span>systemctl enable --now tgtd.service
+</span></span></code></pre></div><h5 id=minidlna>MiniDLNA</h5><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y minidlna
+</span></span></code></pre></div><p>编辑配置文件 <code>/etc/minidlna.conf</code>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#a6e22e>port</span><span style=color:#f92672>=</span><span style=color:#e6db74>8200</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>media_dir</span><span style=color:#f92672>=</span><span style=color:#e6db74>/data/media   ## 设置媒体文件路径</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>db_dir</span><span style=color:#f92672>=</span><span style=color:#e6db74>/var/cache/minidlna</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>inotify</span><span style=color:#f92672>=</span><span style=color:#e6db74>yes</span>
+</span></span></code></pre></div><p>启动服务：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>systemctl enable --now minidlna.service
+</span></span></code></pre></div><p>添加防火墙规则：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>firewall-cmd --zone<span style=color:#f92672>=</span>public --add-port<span style=color:#f92672>=</span>1900/udp --permanent
+</span></span><span style=display:flex><span>firewall-cmd --zone<span style=color:#f92672>=</span>public --add-port<span style=color:#f92672>=</span>8200/tcp --permanent
+</span></span><span style=display:flex><span>firewall-cmd --reload
+</span></span></code></pre></div><p>访问 http://&lt;服务器地址>:8200/ 返回信息则表示服务成功运行。</p><p>如果服务没有正常启动，可能是软件缺少相关的依赖库。尝试运行如下命令来获取错误信息：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>minidlnad -f /etc/minidlna.conf
+</span></span></code></pre></div><p>此处报错信息为：<em>error while loading shared libraries: libva.so.1</em>。安装依赖库：</p><pre tabindex=0><code>yum install -y libva
+</code></pre><h5 id=owncloud>ownCloud</h5><p><a href=https://owncloud.org/install/#instructions-server>下载</a>最新版的 rpm 安装包。</p><h5 id=xfce>Xfce</h5><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum groupinstall -y <span style=color:#e6db74>&#34;X Window System&#34;</span>
+</span></span><span style=display:flex><span>yum groupinstall -y xfce
+</span></span></code></pre></div><p>安装中文字体：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y wqy-*
+</span></span></code></pre></div><p>切换开机进入图形模式：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>systemctl set-default graphical.target
+</span></span></code></pre></div><p>或切换开机进入命令行模式：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>systemctl set-default multi-user.target
+</span></span></code></pre></div><p>命令行模式下，手动进入图形模式：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>startx
+</span></span><span style=display:flex><span>init <span style=color:#ae81ff>5</span>
+</span></span></code></pre></div><p>或</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span><span style=color:#75715e>## systemctl isolate graphical.target</span>
+</span></span></code></pre></div><p>安装中文输入法：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install im-chooser
+</span></span><span style=display:flex><span>yum install ibus-libpinyin
+</span></span></code></pre></div><h5 id=vnc-server>VNC Server</h5><p>安装：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y tigervnc-server
+</span></span></code></pre></div><p>启动：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>vncserver
+</span></span></code></pre></div><p>由于使用 Xfce 桌面，还需要修改启动脚本 <code>~/.vnc/xstartup</code>：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/bin/sh
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>unset SESSION_MANAGER
+</span></span><span style=display:flex><span>unset DBUS_SESSION_BUS_ADDRESS
+</span></span><span style=display:flex><span><span style=color:#75715e>#exec /etc/X11/xinit/xinitrc</span>
+</span></span><span style=display:flex><span>exec /bin/sh /etc/xdg/xfce4/xinitrc
+</span></span></code></pre></div><p>重启服务后能正常登录。</p><p>添加防火墙规则：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>firewall-cmd --zone<span style=color:#f92672>=</span>public --add-service<span style=color:#f92672>=</span>vnc-server --permanent
+</span></span><span style=display:flex><span>firewall-cmd --reload
+</span></span></code></pre></div><h5 id=php>PHP</h5><p>由于默认安装的版本只有 5.4，非常陈旧。建议安装 PHP 5.6 或者 PHP 7。此处安装 PHP 7：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+</span></span><span style=display:flex><span>yum install yum-utils
+</span></span><span style=display:flex><span>yum-config-manager --enable remi-php73
+</span></span><span style=display:flex><span>yum install -y php
+</span></span></code></pre></div><h5 id=mysqlmariadb>MySQL(MariaDB)</h5><p>安装 MariaDB：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y mariadb
+</span></span></code></pre></div><p>默认安装的版本只有 5.5，比较陈旧。建议从官网下载最新版本。此处以安装 MariaDB 10.1 Stable 为例，创建文件 <code>/etc/yum.repos.d/mariadb.repo</code>，内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#75715e>## MariaDB 10.1 CentOS repository list</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>## http://downloads.mariadb.org/mariadb/repositories/</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>[mariadb]</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>name</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>MariaDB</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>baseurl</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>http://yum.mariadb.org/10.1/centos7-amd64</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>gpgkey</span><span style=color:#f92672>=</span><span style=color:#e6db74>https://yum.mariadb.org/RPM-GPG-KEY-MariaDB</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>gpgcheck</span><span style=color:#f92672>=</span><span style=color:#e6db74>1</span>
+</span></span></code></pre></div><p>安装：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y MariaDB-server MariaDB-client
+</span></span></code></pre></div><p>或者<a href="https://downloads.mariadb.org/mariadb/10.1.21/#bits=64&file_type=rpm">下载</a> rpm 安装包手动安装。</p><p>运行：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>systemctl start mariadb.service
+</span></span></code></pre></div><p>如果无法启动服务，运行 <code>journalctl -xe</code> 查看错误。此处显示错误为：<em>error while loading shared libraries: libjemalloc.so.1: cannot open shared object file: No such file or directory</em></p><p>安装依赖库：</p><pre tabindex=0><code>yum install -y jemalloc
+</code></pre><p>重新安装 MaraiDB：</p><pre tabindex=0><code>yum remove -y MariaDB-server
 rm -rf /var/lib/mysql
 yum install -y MariaDB-server
-</code></pre><p>添加防火墙规则：</p><pre><code class=language-shell>firewall-cmd --zone=public --add-service=mysql --permanent
-firewall-cmd --reload
-</code></pre><h4 id=openvpn>OpenVPN</h4><p>先安装 OpenVPN 和 EasyRSA：</p><pre><code class=language-shell>yum install -y openvpn easy-rsa
-</code></pre><h5 id=第一步-生成证书>第一步，生成证书</h5><p>将 EasyRSA 脚本复制到 OpenVPN 的配置目录下：</p><pre><code class=language-shell>mkdir -p /etc/openvpn/easy-rsa/keys
-cp -rf /usr/share/easy-rsa/2.0/* /etc/openvpn/easy-rsa
-</code></pre><p>编辑文件 <code>/etc/openvpn/easy-rsa/vars</code>，修改或新增如下配置：</p><pre><code class=language-bash>export EASY_RSA=&quot;/etc/openvpn/easy-rsa&quot;
-export KEY_SIZE=2048
-export KEY_NAME=&quot;server&quot;
-</code></pre><p>此处 <code>KEY_NAME</code> 也可以取其他的名字。另外可酌情修改如下的配置信息：</p><pre><code class=language-bash>export KEY_COUNTRY=&quot;US&quot;
-export KEY_PROVINCE=&quot;CA&quot;
-export KEY_CITY=&quot;SanFrancisco&quot;
-export KEY_ORG=&quot;Fort-Funston&quot;
-export KEY_EMAIL=&quot;me@myhost.mydomain&quot;
-export KEY_OU=&quot;MyOrganizationalUnit&quot;
-export KEY_CN=&quot;CommonName&quot;
-</code></pre><p>在创建证书前，先导入变量：</p><pre><code class=language-shell>cd /etc/openvpn/easy-rsa
-source ./vars
-</code></pre><p>执行清理工作：</p><pre><code class=language-shell>./clean-all
-</code></pre><p>创建 CA 证书：</p><pre><code class=language-shell>./build-ca
-</code></pre><p>如果创建成功，会在 <code>/etc/openvpn/easy-rsa/keys</code> 路径下生成 <code>ca.crt</code> 和 <code>ca.key</code> 两个文件。其中 <code>ca.key</code> 文件需要妥善保存不能泄露。</p><p>创建服务器证书：</p><pre><code class=language-shell>./build-key-server server
-</code></pre><p>此处的脚本参数 <code>server</code> 就是之前设置的 <code>KEY_NAME</code>。创建成功后会在 <code>/etc/openvpn/easy-rsa/keys</code> 路径下生成 <code>server.crt</code> 和 <code>server.key</code> 两个文件。</p><p>创建 Diffie-Hellman key exchange：</p><pre><code class=language-shell>./build-dh
-</code></pre><p>这步操作耗时比较久，耐心等待几分钟。执行完毕后，会在 <code>/etc/openvpn/easy-rsa/keys</code> 路径下生成 <code>dh2048.pem</code> 文件。</p><p>创建客户端证书：</p><pre><code class=language-shell>./build-key client
-</code></pre><p>创建成功后会在 <code>/etc/openvpn/easy-rsa/keys</code> 路径下生成 <code>client.crt</code> 和 <code>client.key</code> 两个文件。</p><p>将刚才生成的证书和服务器私钥文件复制到 <code>/etc/openvpn</code> 目录下：</p><pre><code class=language-shell>cd keys/
-cp dh2048.pem ca.crt server.crt server.key /etc/openvpn
-</code></pre><h5 id=第二步-配置-openvpn-服务器>第二步，配置 OpenVPN 服务器：</h5><p>复制配置文件样本：</p><pre><code class=language-shell>cp /usr/share/doc/openvpn-*/sample/sample-config-files/server.conf /etc/openvpn
-</code></pre><p>默认配置文件样本无须做任何修改便可使用。为了确保配置的正确性，打开配置文件 <code>/etc/openvpn/server.conf</code>，确认存在如下配置：</p><pre><code>ca ca.crt
+</code></pre><p>添加防火墙规则：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>firewall-cmd --zone<span style=color:#f92672>=</span>public --add-service<span style=color:#f92672>=</span>mysql --permanent
+</span></span><span style=display:flex><span>firewall-cmd --reload
+</span></span></code></pre></div><h5 id=openvpn>OpenVPN</h5><p>先安装 OpenVPN 和 EasyRSA：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y openvpn easy-rsa
+</span></span></code></pre></div><h6 id=第一步生成证书>第一步，生成证书</h6><p>将 EasyRSA 脚本复制到 OpenVPN 的配置目录下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>mkdir -p /etc/openvpn/easy-rsa/keys
+</span></span><span style=display:flex><span>cp -rf /usr/share/easy-rsa/2.0/* /etc/openvpn/easy-rsa
+</span></span></code></pre></div><p>编辑文件 <code>/etc/openvpn/easy-rsa/vars</code>，修改或新增如下配置：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>export EASY_RSA<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;/etc/openvpn/easy-rsa&#34;</span>
+</span></span><span style=display:flex><span>export KEY_SIZE<span style=color:#f92672>=</span><span style=color:#ae81ff>2048</span>
+</span></span><span style=display:flex><span>export KEY_NAME<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;server&#34;</span>
+</span></span></code></pre></div><p>此处 <code>KEY_NAME</code> 也可以取其他的名字。另外可酌情修改如下的配置信息：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>export KEY_COUNTRY<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;US&#34;</span>
+</span></span><span style=display:flex><span>export KEY_PROVINCE<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;CA&#34;</span>
+</span></span><span style=display:flex><span>export KEY_CITY<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;SanFrancisco&#34;</span>
+</span></span><span style=display:flex><span>export KEY_ORG<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;Fort-Funston&#34;</span>
+</span></span><span style=display:flex><span>export KEY_EMAIL<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;me@myhost.mydomain&#34;</span>
+</span></span><span style=display:flex><span>export KEY_OU<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;MyOrganizationalUnit&#34;</span>
+</span></span><span style=display:flex><span>export KEY_CN<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;CommonName&#34;</span>
+</span></span></code></pre></div><p>在创建证书前，先导入变量：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>cd /etc/openvpn/easy-rsa
+</span></span><span style=display:flex><span>source ./vars
+</span></span></code></pre></div><p>执行清理工作：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>./clean-all
+</span></span></code></pre></div><p>创建 CA 证书：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>./build-ca
+</span></span></code></pre></div><p>如果创建成功，会在 <code>/etc/openvpn/easy-rsa/keys</code> 路径下生成 <code>ca.crt</code> 和 <code>ca.key</code> 两个文件。其中 <code>ca.key</code> 文件需要妥善保存不能泄露。</p><p>创建服务器证书：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>./build-key-server server
+</span></span></code></pre></div><p>此处的脚本参数 <code>server</code> 就是之前设置的 <code>KEY_NAME</code>。创建成功后会在 <code>/etc/openvpn/easy-rsa/keys</code> 路径下生成 <code>server.crt</code> 和 <code>server.key</code> 两个文件。</p><p>创建 Diffie-Hellman key exchange：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>./build-dh
+</span></span></code></pre></div><p>这步操作耗时比较久，耐心等待几分钟。执行完毕后，会在 <code>/etc/openvpn/easy-rsa/keys</code> 路径下生成 <code>dh2048.pem</code> 文件。</p><p>创建客户端证书：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>./build-key client
+</span></span></code></pre></div><p>创建成功后会在 <code>/etc/openvpn/easy-rsa/keys</code> 路径下生成 <code>client.crt</code> 和 <code>client.key</code> 两个文件。</p><p>将刚才生成的证书和服务器私钥文件复制到 <code>/etc/openvpn</code> 目录下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>cd keys/
+</span></span><span style=display:flex><span>cp dh2048.pem ca.crt server.crt server.key /etc/openvpn
+</span></span></code></pre></div><h6 id=第二步配置-openvpn-服务器>第二步，配置 OpenVPN 服务器：</h6><p>复制配置文件样本：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>cp /usr/share/doc/openvpn-*/sample/sample-config-files/server.conf /etc/openvpn
+</span></span></code></pre></div><p>默认配置文件样本无须做任何修改便可使用。为了确保配置的正确性，打开配置文件 <code>/etc/openvpn/server.conf</code>，确认存在如下配置：</p><pre tabindex=0><code>ca ca.crt
 cert server.crt
 key server.key
 dh dh2048.pem
-</code></pre><h5 id=第三步-配置-dnsmasq>第三步 配置 Dnsmasq</h5><p>编辑配置文件 <code>/etc/dnsmasq.conf</code>，编辑或添加如下配置：</p><pre><code class=language-ini>listen-address=0.0.0.0
-bind-interfaces
-</code></pre><p>重启服务：</p><pre><code class=language-shell>systemctl restart dnsmasq.service
-</code></pre><h5 id=第四步-开启路由功能>第四步 开启路由功能</h5><p>运行命令检查路由功能是否已开启：</p><pre><code class=language-shell>cat /proc/sys/net/ipv4/ip_forward
-</code></pre><p>如果命令显示 <code>1</code>，说明路由功能已被开启，否则手动开启：</p><pre><code class=language-shell>echo 1 &gt; /proc/sys/net/ipv4/ip_forward
-</code></pre><p>或编辑配置文件 <code>/etc/sysctl.conf</code>，修改或添加如下配置：</p><pre><code class=language-ini>net.ipv4.ip_forward=1
-</code></pre><p>运行命令使更改生效：</p><pre><code class=language-ini>sysctl -p
-</code></pre><p>添加防火墙规则：</p><pre><code class=language-shell>firewall-cmd --zone=external --add-masquerade
-</code></pre><h5 id=第五步-启动服务>第五步 启动服务</h5><p>运行命令：</p><pre><code class=language-shell>systemctl enable --now openvpn@server.service
-</code></pre><h5 id=第六步-配置客户端>第六步 配置客户端</h5><p>最后，添加防火墙规则：</p><pre><code class=language-shell>firewall-cmd --zone=public --add-service=openvpn --permanent
-firewall-cmd --reload
-</code></pre><h4 id=docker>Docker</h4><p>安装必要的组件：</p><pre><code class=language-shell>yum install -y yum-utils \
-    device-mapper-persistent-data \
-    lvm2
-</code></pre><p>设置软件仓库：</p><pre><code class=language-shell>yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-</code></pre><p>安装 Docker：</p><pre><code class=language-shell>yum install -y docker-ce
-</code></pre><p>添加系统参数：</p><pre><code class=language-shell>tee -a /etc/sysctl.conf &lt;&lt;-EOF
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-EOF
-sysctl -p
-</code></pre><p>开启服务：</p><pre><code class=language-shell>systemctl enable --now docker
-</code></pre><p>检查安装是否正确：</p><pre><code class=language-shell>docker info
-</code></pre><p>运行测试：</p><pre><code class=language-shell>docker run hello-world
-</code></pre><h1 id=配置无线上网>配置无线上网</h1><pre><code class=language-shell>nmtui
-</code></pre><p>（待续）</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/NAS/>NAS</a></li><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/%E7%BD%91%E7%BB%9C/>网络</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/OpenSSH-for-Windows-could-not-create-directory/ class="left arrow">上一篇：<br>OpenSSH for Windows 错误提示:“Could not create directory &#39;/home/username/.ssh&#39;.”</a>
+</code></pre><h6 id=第三步-配置-dnsmasq>第三步 配置 Dnsmasq</h6><p>编辑配置文件 <code>/etc/dnsmasq.conf</code>，编辑或添加如下配置：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#a6e22e>listen-address</span><span style=color:#f92672>=</span><span style=color:#e6db74>0.0.0.0</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>bind-interfaces</span>
+</span></span></code></pre></div><p>重启服务：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>systemctl restart dnsmasq.service
+</span></span></code></pre></div><h6 id=第四步-开启路由功能>第四步 开启路由功能</h6><p>运行命令检查路由功能是否已开启：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>cat /proc/sys/net/ipv4/ip_forward
+</span></span></code></pre></div><p>如果命令显示 <code>1</code>，说明路由功能已被开启，否则手动开启：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>echo <span style=color:#ae81ff>1</span> &gt; /proc/sys/net/ipv4/ip_forward
+</span></span></code></pre></div><p>或编辑配置文件 <code>/etc/sysctl.conf</code>，修改或添加如下配置：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#a6e22e>net.ipv4.ip_forward</span><span style=color:#f92672>=</span><span style=color:#e6db74>1</span>
+</span></span></code></pre></div><p>运行命令使更改生效：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ini data-lang=ini><span style=display:flex><span><span style=color:#a6e22e>sysctl -p</span>
+</span></span></code></pre></div><p>添加防火墙规则：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>firewall-cmd --zone<span style=color:#f92672>=</span>external --add-masquerade
+</span></span></code></pre></div><h6 id=第五步-启动服务>第五步 启动服务</h6><p>运行命令：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>systemctl enable --now openvpn@server.service
+</span></span></code></pre></div><h6 id=第六步-配置客户端>第六步 配置客户端</h6><p>最后，添加防火墙规则：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>firewall-cmd --zone<span style=color:#f92672>=</span>public --add-service<span style=color:#f92672>=</span>openvpn --permanent
+</span></span><span style=display:flex><span>firewall-cmd --reload
+</span></span></code></pre></div><h5 id=docker>Docker</h5><p>安装必要的组件：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y yum-utils <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    device-mapper-persistent-data <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>    lvm2
+</span></span></code></pre></div><p>设置软件仓库：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+</span></span></code></pre></div><p>安装 Docker：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>yum install -y docker-ce
+</span></span></code></pre></div><p>添加系统参数：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>tee -a /etc/sysctl.conf <span style=color:#e6db74>&lt;&lt;-EOF
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>net.bridge.bridge-nf-call-ip6tables = 1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>net.bridge.bridge-nf-call-iptables = 1
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span><span style=display:flex><span>sysctl -p
+</span></span></code></pre></div><p>开启服务：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>systemctl enable --now docker
+</span></span></code></pre></div><p>检查安装是否正确：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>docker info
+</span></span></code></pre></div><p>运行测试：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>docker run hello-world
+</span></span></code></pre></div><h2 id=配置无线上网>配置无线上网</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=display:flex><span>nmtui
+</span></span></code></pre></div><p>（待续）</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/NAS/>NAS</a></li><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/%E7%BD%91%E7%BB%9C/>网络</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/OpenSSH-for-Windows-could-not-create-directory/ class="left arrow">上一篇：<br>OpenSSH for Windows 错误提示:“Could not create directory '/home/username/.ssh'.”</a>
 <a href=/posts/my-Buddhism-notes/ class="right arrow">下一篇：<br>佛学笔记</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-02 07:33:14.023853668 &#43;0000 UTC m=&#43;0.550807184">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-03 07:21:11.326414151 +0000 UTC m=+0.791681438">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>

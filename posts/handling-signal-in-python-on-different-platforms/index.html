@@ -1,278 +1,287 @@
-<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Python 信号处理在不同平台上的差异 &middot; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js></script><script>hljs.highlightAll();hljs.initLineNumbersOnLoad();</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
-gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>Python 信号处理在不同平台上的差异</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Python 信号处理在不同平台上的差异 &#183; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>Python 信号处理在不同平台上的差异</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
-<span>于&nbsp;</span><time datetime="2022-10-31 00:00:00 &#43;0000 UTC" data-pagefind-meta=日期>2022年10月31日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p>在前文《<a href=https://www.fournoas.com/posts/why-does-ctrl-c-not-kill-python-process-in-windows-console/ target=_blank>为何 Windows 下无法用 Ctrl+C 终止 Python 进程</a>》中，虽然解释了产生该现象的原因，但却没有解释为何同样的代码在 Linux 下就可以用 Ctrl+C 来中止。究其原因，是由于在操作系统层面，Linux 和 Windows 对 SIGINT 的信号处理方式不同所导致的。</p><h1 id=python-的底层实现原理>Python 的底层实现原理</h1><p>Python 将操作系统或 C 标准库提供的信号处理器称作 Low-level signal handler，Python 内建的 signal 模块在其基础上进行了封装。在 <a href=https://github.com/python/cpython/blob/05e48865be69e1e5824f6915b588ff054717bb42/Python/pylifecycle.c#L3045 target=_blank>Python/pylifecycle.c</a> 文件中找到 <code>PyOS_setsig()</code> 函数：</p><pre><code class=language-c>/*
- * All of the code in this function must only use async-signal-safe functions,
- * listed at `man 7 signal` or
- * http://www.opengroup.org/onlinepubs/009695399/functions/xsh_chap02_04.html.
- */
-PyOS_sighandler_t
-PyOS_setsig(int sig, PyOS_sighandler_t handler)
-{
-#ifdef HAVE_SIGACTION
-    /* Some code in Modules/signalmodule.c depends on sigaction() being
-     * used here if HAVE_SIGACTION is defined.  Fix that if this code
-     * changes to invalidate that assumption.
-     */
-    struct sigaction context, ocontext;
-    context.sa_handler = handler;
-    sigemptyset(&amp;context.sa_mask);
-    /* Using SA_ONSTACK is friendlier to other C/C++/Golang-VM code that
-     * extension module or embedding code may use where tiny thread stacks
-     * are used.  https://bugs.python.org/issue43390 */
-    context.sa_flags = SA_ONSTACK;
-    if (sigaction(sig, &amp;context, &amp;ocontext) == -1)
-        return SIG_ERR;
-    return ocontext.sa_handler;
-#else
-    PyOS_sighandler_t oldhandler;
-    oldhandler = signal(sig, handler);
-#ifdef HAVE_SIGINTERRUPT
-    siginterrupt(sig, 1);
-#endif
-    return oldhandler;
-#endif
-}
-</code></pre><p>如果编译时定义了 <code>HAVE_SIGACTION</code> 宏，则调用 POSIX 标准的 <a href=https://pubs.opengroup.org/onlinepubs/007904875/functions/sigaction.html target=_blank><code>sigaction()</code></a> 函数注册信号处理器，否则使用 ANSI C 标准库的 <code>signal()</code> 函数。由于 Windows 下的 <code>&lt;signal.h&gt;</code> 没有提供 <code>sigaction()</code> 函数，所以在 Windows 平台上，Python 使用 <a href=https://learn.microsoft.com/zh-cn/cpp/c-runtime-library/reference/signal target=_blank><code>signal()</code></a> 函数来注册信号处理器；而 Linux 内核兼容 POSIX 标准，所以在 Linux 平台上，Python 使用 <code>sigaction()</code> 函数。关于 Python 信号处理的进一步封装代码可以在 <a href=https://github.com/python/cpython/blob/main/Modules/signalmodule.c target=_blank>Modules/signalmodule.c</a> 文件内找到。</p><h1 id=windows-下的实现原理>Windows 下的实现原理</h1><p>先来看 Windows 下的 <code>signal()</code> 函数是如何实现的。如果安装了 <a href=https://developer.microsoft.com/zh-cn/windows/downloads/windows-sdk/ target=_blank>Windows SDK</a>，则可以在本地路径 <code>C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\ucrt\misc\signal.cpp</code> （此处以版本 10.0.22621 为例，不同版本安装路径不同）找到实现代码：</p><pre><code class=language-c++>extern &quot;C&quot; __crt_signal_handler_t __cdecl signal(int signum, __crt_signal_handler_t sigact)
-{
-    // Check for signal actions that are supported on other platforms but not on
-    // this one, and make sure the action is not SIG_DIE:
-    if (is_unsupported_signal(signum, sigact))
-        return signal_failed(signum);
-
-    // First, handle the case where the signal does not correspond to an
-    // exception in the host OS:
-    if (signum == SIGINT         ||
-        signum == SIGBREAK       ||
-        signum == SIGABRT        ||
-        signum == SIGABRT_COMPAT ||
-        signum == SIGTERM)
-    {
-        bool set_console_ctrl_error = false;
-        __crt_signal_handler_t old_action = nullptr;
-
-        __acrt_lock(__acrt_signal_lock);
-        __try
-        {
-            // If the signal is SIGINT or SIGBREAK make sure the handler is
-            // installed to capture ^C and ^Break events:
-            // C4127: conditional expression is constant
-#pragma warning( suppress: 4127 )
-            if (is_console_signal(signum) &amp;&amp; !console_ctrl_handler_installed)
-            {
-                if (SetConsoleCtrlHandler(ctrlevent_capture, TRUE))
-                {
-                    console_ctrl_handler_installed = true;
-                }
-                else
-                {
-                    _doserrno = GetLastError();
-                    set_console_ctrl_error = true;
-                }
-            }
-
-            __crt_signal_handler_t* const action_pointer = get_global_action_nolock(signum);
-            if (action_pointer != nullptr)
-            {
-                old_action = __crt_fast_decode_pointer(*action_pointer);
-                if (sigact != SIG_GET)
-                    *action_pointer = __crt_fast_encode_pointer(sigact);
-            }
-        }
-        __finally
-        {
-            __acrt_unlock(__acrt_signal_lock);
-        }
-
-        if (set_console_ctrl_error)
-            return signal_failed(signum);
-
-        return old_action;
-    }
-
-
-    // If we reach here, signum is supposed to be one of the signals which
-    // correspond to exceptions on the host OS.  If it's not one of these,
-    // fail and return immediately:
-    if (signum != SIGFPE &amp;&amp; signum != SIGILL &amp;&amp; signum != SIGSEGV)
-        return signal_failed(signum);
-
-    __acrt_ptd* const ptd = __acrt_getptd_noexit();
-    if (ptd == nullptr)
-        return signal_failed(signum);
-
-    // Check that there is a per-thread instance of the exception-action table
-    // for this thread.  If there isn't, create one:
-    if (ptd-&gt;_pxcptacttab == __acrt_exception_action_table)
-    {
-        // Allocate space for an exception-action table:
-        ptd-&gt;_pxcptacttab = static_cast&lt;__crt_signal_action_t*&gt;(_malloc_crt(__acrt_signal_action_table_size));
-        if (ptd-&gt;_pxcptacttab == nullptr)
-            return signal_failed(signum);
-
-        // Initialize the table by copying the contents of __acrt_exception_action_table:
-        memcpy(ptd-&gt;_pxcptacttab, __acrt_exception_action_table, __acrt_signal_action_table_size);
-    }
-
-    // Look up the proper entry in the exception-action table. Note that if
-    // several exceptions are mapped to the same signal, this returns the
-    // pointer to first such entry in the exception action table. It is assumed
-    // that the other entries immediately follow this one.
-    __crt_signal_action_t* const xcpt_action = siglookup(signum, ptd-&gt;_pxcptacttab);
-    if (xcpt_action == nullptr)
-        return signal_failed(signum);
-
-    // SIGSEGV, SIGILL and SIGFPE all have more than one exception mapped to
-    // them.  The code below depends on the exceptions corresponding to the same
-    // signal being grouped together in the exception-action table.
-
-    __crt_signal_handler_t const old_action = xcpt_action-&gt;_action;
-
-    // If we are not just getting the currently installed action, loop through
-    // all the entries corresponding to the given signal and update them as
-    // appropriate:
-    if (sigact != SIG_GET)
-    {
-        __crt_signal_action_t* const last = ptd-&gt;_pxcptacttab + __acrt_signal_action_table_count;
-
-        // Iterate until we reach the end of the table or we reach the end of
-        // the range of actions for this signal, whichever comes first:
-        for (__crt_signal_action_t* p = xcpt_action; p != last &amp;&amp; p-&gt;_signal_number == signum; ++p)
-        {
-            p-&gt;_action = sigact;
-        }
-    }
-
-    return old_action;
-}
-</code></pre><p>通过代码得知，Windows 下 <code>signal()</code> 函数的 <code>signum</code> 参数仅允许以下信号：</p><ul><li><code>SIGINT</code></li><li><code>SIGBREAK</code></li><li><code>SIGABRT</code></li><li><code>SIGABRT_COMPAT</code></li><li><code>SIGTERM</code></li><li><code>SIGFPE</code></li><li><code>SIGILL</code></li><li><code>SIGSEGV</code></li></ul><p>由于 Windows 内核本身并不支持 signal，所以不同的信号处理方式也是不同的。其中，<code>SIGINT</code>、<code>SIGBREAK</code>、<code>SIGABRT</code>、<code>SIGABRT_COMPAT</code> 和 <code>SIGTERM</code> 通过调用 Windows API <a href=https://learn.microsoft.com/zh-cn/windows/console/setconsolectrlhandler target=_blank><code>SetConsoleCtrlHandler()</code></a> 实现；而 <code>SIGFPE</code>、<code>SIGILL</code> 和 <code>SIGSEGV</code> 的信号处理则由 CRT 自己维护。使用 <code>SetConsoleCtrlHandler()</code> 注册一个 <a href=https://learn.microsoft.com/zh-cn/windows/console/handlerroutine target=_blank><code>HandlerRoutine</code></a> 类型的回调函数后，当控制台收到信号时，系统会在进程中创建一个新线程来执行回调函数（未经证实的猜测：这一步操作可能是由 ConHost 或者 OpenConsole 来完成的）。默认的回调函数在接收到 <code>SIGINT</code> 信号时，会直接使用 <code>ExitProcess()</code> 来退出当前进程。相当于如下代码：</p><pre><code class=language-c>#include &lt;windows.h&gt;
-#include &lt;stdio.h&gt;
-
-BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
-{
-    if (fdwCtrlType == CTRL_C_EVENT) {
-        ExitProcess();
-    }
-    return TRUE;
-}
-
-int main(void)
-{
-    SetConsoleCtrlHandler(CtrlHandler, TRUE)
-    while (1) {}
-    return 0;
-}
-</code></pre><p>由于 <code>CtrlHandler()</code> 是在新线程中被调用的，所以即便程序的主线程处于阻塞状态，也可以实现立即退出进程。然而 Windows 下的 Python 重写了这一行为，它注册的 low-level signal hander 只是修改了 VM 的一个标志位，用于告知 VM 有待处理的信号。而在 Python 代码中注册的 signal handler，必须等到主线程返回到 VM 内才有机会被调用。如果此时主线程阻塞在 VM 之外的代码上，比如 Windows API 或者其他 Native 代码，那么主线程就不能对信号做出响应。这就为什么是在某些情况下，Windows 下的 Python 程序不响应 Ctrl+C 的原因。</p><h2 id=time-sleep-的特殊处理><code>time.sleep()</code> 的特殊处理</h2><p>可能你会奇怪，下面的代码明明在 Windows 下工作得很正常，会立即响应 <code>SIGINT</code> 信号：</p><pre><code class=language-python>import time
-
-try:
-    while True: time.sleep(100000)
-except KeyboardInterrupt:
-    print('keyboard interrupt received')
-</code></pre><p>那是因为 Python 对 Windows 下的 <code>time.sleep()</code> 做了特殊处理，并非通过调用 Windows API <code>Sleep()</code> 来实现线程休眠功能。在 <a href=https://github.com/python/cpython/blob/342b1151ae7e6ae849c1ed7c8a2cbfdb4edcf51c/Modules/timemodule.c#L2196 target=_blank>Modules/timemodule.c</a> 查看 Windows 下的 <code>time.sleep()</code> 实现：</p><pre><code class=language-c>#else  // MS_WINDOWS
-    _PyTime_t timeout_100ns = _PyTime_As100Nanoseconds(timeout,
-                                                       _PyTime_ROUND_CEILING);
-
-    // Maintain Windows Sleep() semantics for time.sleep(0)
-    if (timeout_100ns == 0) {
-        Py_BEGIN_ALLOW_THREADS
-        // A value of zero causes the thread to relinquish the remainder of its
-        // time slice to any other thread that is ready to run. If there are no
-        // other threads ready to run, the function returns immediately, and
-        // the thread continues execution.
-        Sleep(0);
-        Py_END_ALLOW_THREADS
-        return 0;
-    }
-
-    LARGE_INTEGER relative_timeout;
-    // No need to check for integer overflow, both types are signed
-    assert(sizeof(relative_timeout) == sizeof(timeout_100ns));
-    // SetWaitableTimer(): a negative due time indicates relative time
-    relative_timeout.QuadPart = -timeout_100ns;
-
-    HANDLE timer = CreateWaitableTimerExW(NULL, NULL, timer_flags,
-                                          TIMER_ALL_ACCESS);
-    if (timer == NULL) {
-        PyErr_SetFromWindowsErr(0);
-        return -1;
-    }
-
-    if (!SetWaitableTimerEx(timer, &amp;relative_timeout,
-                            0, // no period; the timer is signaled once
-                            NULL, NULL, // no completion routine
-                            NULL,  // no wake context; do not resume from suspend
-                            0)) // no tolerable delay for timer coalescing
-    {
-        PyErr_SetFromWindowsErr(0);
-        goto error;
-    }
-
-    // Only the main thread can be interrupted by SIGINT.
-    // Signal handlers are only executed in the main thread.
-    if (_PyOS_IsMainThread()) {
-        HANDLE sigint_event = _PyOS_SigintEvent();
-
-        while (1) {
-            // Check for pending SIGINT signal before resetting the event
-            if (PyErr_CheckSignals()) {
-                goto error;
-            }
-            ResetEvent(sigint_event);
-
-            HANDLE events[] = {timer, sigint_event};
-            DWORD rc;
-
-            Py_BEGIN_ALLOW_THREADS
-            rc = WaitForMultipleObjects(Py_ARRAY_LENGTH(events), events,
-                                        // bWaitAll
-                                        FALSE,
-                                        // No wait timeout
-                                        INFINITE);
-            Py_END_ALLOW_THREADS
-
-            if (rc == WAIT_FAILED) {
-                PyErr_SetFromWindowsErr(0);
-                goto error;
-            }
-
-            if (rc == WAIT_OBJECT_0) {
-                // Timer signaled: we are done
-                break;
-            }
-
-            assert(rc == (WAIT_OBJECT_0 + 1));
-            // The sleep was interrupted by SIGINT: restart sleeping
-        }
-    }
-    else {
-        DWORD rc;
-
-        Py_BEGIN_ALLOW_THREADS
-        rc = WaitForSingleObject(timer, INFINITE);
-        Py_END_ALLOW_THREADS
-
-        if (rc == WAIT_FAILED) {
-            PyErr_SetFromWindowsErr(0);
-            goto error;
-        }
-
-        assert(rc == WAIT_OBJECT_0);
-        // Timer signaled: we are done
-    }
-
-    CloseHandle(timer);
-    return 0;
-
-error:
-    CloseHandle(timer);
-    return -1;
-#endif
-</code></pre><p>Windows 下的 Python 使用 <code>CreateWaitableTimerExW()</code> 创建了一个可等待的计时器对象，通过 <code>WaitForMultipleObjects()</code> 实现线程休眠。而在 <a href=https://github.com/python/cpython/blob/342b1151ae7e6ae849c1ed7c8a2cbfdb4edcf51c/Modules/signalmodule.c#L410 target=_blank>Modules/signalmodule.c</a> 中，Python low-level <code>signal_handler()</code> 遇到 <code>SIGINT</code> 信号时，通过 <code>SetEvent()</code> 让计时器结束等待：</p><pre><code class=language-c>#ifdef MS_WINDOWS
-    if (sig_num == SIGINT) {
-        signal_state_t *state = &amp;signal_global_state;
-        SetEvent(state-&gt;sigint_event);
-    }
-#endif
-</code></pre><h1 id=linux-下的实现原理>Linux 下的实现原理</h1><p>Python 在 Linux 下使用 POSIX 标准的 <a href=https://pubs.opengroup.org/onlinepubs/007904875/functions/sigaction.html target=_blank><code>sigaction()</code></a> 函数来实现信号机制。由于 Linux 的 POSIX 兼容是内核提供的，所以实现原理和 Windows 完全不同。最本质的区别是，Linux 下的信号是真正的软中断，由内核触发信号处理，其原理有点类似 Windows 下的<a href=https://learn.microsoft.com/zh-cn/windows/win32/sync/asynchronous-procedure-calls target=_blank>异步过程调用</a>。区别是，Linux 的 signal 在收到信号时就进行异步调用；而 Windows 的 <code>QueueUserAPC()</code> 是将异步过程的函数加入当前线程的 APC 队列，等到线程执行到特定的 API 函数时再触发执行异步过程，这一点倒是和 Python 的 signal 机制有些类似。</p><p>Linux 下的信号由内核处理，当内核收到信号后，会将信号放入目标进程的信号队列中，并且向目标进程发生一个中断，使目标进程进入内核态。如果目标进程的主线程此时正被 IO 操作阻塞，相当于处于休眠状态，则休眠的主线程会被唤醒进行信号处理。接下来内核会将数据复制到进程的用户空间，并将 EIP 指令寄存器指向信号处理器的函数地址。然后返回到用户态中，执行相应的信号处理函数。因此，Linux 下的 Python 进程总是会响应 <code>SIGINT</code> 信号。</p><h1 id=windows-补丁>Windows 补丁</h1><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/python-signal-handlers-and-reentrant-call-runtime-error-of-print-function/ class="left arrow">上一篇：<br>Python 的 signal 处理与 print() 的 reentrant call 运行时错误</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-02 07:33:13.617341947 &#43;0000 UTC m=&#43;0.144295563">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+<span>于&nbsp;</span><time datetime="2022-10-31 00:00:00 +0000 UTC" data-pagefind-meta=日期>2022年10月31日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p>在前文《<a href=https://www.fournoas.com/posts/why-does-ctrl-c-not-kill-python-process-in-windows-console/>为何 Windows 下无法用 Ctrl+C 终止 Python 进程</a>》中，虽然解释了产生该现象的原因，但却没有解释为何同样的代码在 Linux 下就可以用 Ctrl+C 来中止。究其原因，是由于在操作系统层面，Linux 和 Windows 对 SIGINT 的信号处理方式不同所导致的。</p><h2 id=python-的底层实现原理>Python 的底层实现原理</h2><p>Python 将操作系统或 C 标准库提供的信号处理器称作 Low-level signal handler，Python 内建的 signal 模块在其基础上进行了封装。在 <a href=https://github.com/python/cpython/blob/05e48865be69e1e5824f6915b588ff054717bb42/Python/pylifecycle.c#L3045>Python/pylifecycle.c</a> 文件中找到 <code>PyOS_setsig()</code> 函数：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e> * All of the code in this function must only use async-signal-safe functions,
+</span></span></span><span style=display:flex><span><span style=color:#75715e> * listed at `man 7 signal` or
+</span></span></span><span style=display:flex><span><span style=color:#75715e> * http://www.opengroup.org/onlinepubs/009695399/functions/xsh_chap02_04.html.
+</span></span></span><span style=display:flex><span><span style=color:#75715e> */</span>
+</span></span><span style=display:flex><span>PyOS_sighandler_t
+</span></span><span style=display:flex><span><span style=color:#a6e22e>PyOS_setsig</span>(<span style=color:#66d9ef>int</span> sig, PyOS_sighandler_t handler)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifdef HAVE_SIGACTION
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>/* Some code in Modules/signalmodule.c depends on sigaction() being
+</span></span></span><span style=display:flex><span><span style=color:#75715e>     * used here if HAVE_SIGACTION is defined.  Fix that if this code
+</span></span></span><span style=display:flex><span><span style=color:#75715e>     * changes to invalidate that assumption.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>     */</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>struct</span> sigaction context, ocontext;
+</span></span><span style=display:flex><span>    context.sa_handler <span style=color:#f92672>=</span> handler;
+</span></span><span style=display:flex><span>    sigemptyset(<span style=color:#f92672>&amp;</span>context.sa_mask);
+</span></span><span style=display:flex><span>    <span style=color:#75715e>/* Using SA_ONSTACK is friendlier to other C/C++/Golang-VM code that
+</span></span></span><span style=display:flex><span><span style=color:#75715e>     * extension module or embedding code may use where tiny thread stacks
+</span></span></span><span style=display:flex><span><span style=color:#75715e>     * are used.  https://bugs.python.org/issue43390 */</span>
+</span></span><span style=display:flex><span>    context.sa_flags <span style=color:#f92672>=</span> SA_ONSTACK;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (sigaction(sig, <span style=color:#f92672>&amp;</span>context, <span style=color:#f92672>&amp;</span>ocontext) <span style=color:#f92672>==</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> SIG_ERR;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> ocontext.sa_handler;
+</span></span><span style=display:flex><span><span style=color:#75715e>#else
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    PyOS_sighandler_t oldhandler;
+</span></span><span style=display:flex><span>    oldhandler <span style=color:#f92672>=</span> signal(sig, handler);
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifdef HAVE_SIGINTERRUPT
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    siginterrupt(sig, <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>return</span> oldhandler;
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>}
+</span></span></code></pre></div><p>如果编译时定义了 <code>HAVE_SIGACTION</code> 宏，则调用 POSIX 标准的 <a href=https://pubs.opengroup.org/onlinepubs/007904875/functions/sigaction.html><code>sigaction()</code></a> 函数注册信号处理器，否则使用 ANSI C 标准库的 <code>signal()</code> 函数。由于 Windows 下的 <code>&lt;signal.h></code> 没有提供 <code>sigaction()</code> 函数，所以在 Windows 平台上，Python 使用 <a href=https://learn.microsoft.com/zh-cn/cpp/c-runtime-library/reference/signal><code>signal()</code></a> 函数来注册信号处理器；而 Linux 内核兼容 POSIX 标准，所以在 Linux 平台上，Python 使用 <code>sigaction()</code> 函数。关于 Python 信号处理的进一步封装代码可以在 <a href=https://github.com/python/cpython/blob/main/Modules/signalmodule.c>Modules/signalmodule.c</a> 文件内找到。</p><h2 id=windows-下的实现原理>Windows 下的实现原理</h2><p>先来看 Windows 下的 <code>signal()</code> 函数是如何实现的。如果安装了 <a href=https://developer.microsoft.com/zh-cn/windows/downloads/windows-sdk/>Windows SDK</a>，则可以在本地路径 <code>C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\ucrt\misc\signal.cpp</code> （此处以版本 10.0.22621 为例，不同版本安装路径不同）找到实现代码：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c++ data-lang=c++><span style=display:flex><span><span style=color:#66d9ef>extern</span> <span style=color:#e6db74>&#34;C&#34;</span> __crt_signal_handler_t <span style=color:#66d9ef>__cdecl</span> signal(<span style=color:#66d9ef>int</span> signum, __crt_signal_handler_t sigact)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Check for signal actions that are supported on other platforms but not on
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// this one, and make sure the action is not SIG_DIE:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>if</span> (is_unsupported_signal(signum, sigact))
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> signal_failed(signum);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// First, handle the case where the signal does not correspond to an
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// exception in the host OS:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>if</span> (signum <span style=color:#f92672>==</span> SIGINT         <span style=color:#f92672>||</span>
+</span></span><span style=display:flex><span>        signum <span style=color:#f92672>==</span> SIGBREAK       <span style=color:#f92672>||</span>
+</span></span><span style=display:flex><span>        signum <span style=color:#f92672>==</span> SIGABRT        <span style=color:#f92672>||</span>
+</span></span><span style=display:flex><span>        signum <span style=color:#f92672>==</span> SIGABRT_COMPAT <span style=color:#f92672>||</span>
+</span></span><span style=display:flex><span>        signum <span style=color:#f92672>==</span> SIGTERM)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>bool</span> set_console_ctrl_error <span style=color:#f92672>=</span> false;
+</span></span><span style=display:flex><span>        __crt_signal_handler_t old_action <span style=color:#f92672>=</span> <span style=color:#66d9ef>nullptr</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        __acrt_lock(__acrt_signal_lock);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>__try</span>
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// If the signal is SIGINT or SIGBREAK make sure the handler is
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// installed to capture ^C and ^Break events:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// C4127: conditional expression is constant
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#75715e>#pragma warning( suppress: 4127 )
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#66d9ef>if</span> (is_console_signal(signum) <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>!</span>console_ctrl_handler_installed)
+</span></span><span style=display:flex><span>            {
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>if</span> (SetConsoleCtrlHandler(ctrlevent_capture, TRUE))
+</span></span><span style=display:flex><span>                {
+</span></span><span style=display:flex><span>                    console_ctrl_handler_installed <span style=color:#f92672>=</span> true;
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>else</span>
+</span></span><span style=display:flex><span>                {
+</span></span><span style=display:flex><span>                    _doserrno <span style=color:#f92672>=</span> GetLastError();
+</span></span><span style=display:flex><span>                    set_console_ctrl_error <span style=color:#f92672>=</span> true;
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            __crt_signal_handler_t<span style=color:#f92672>*</span> <span style=color:#66d9ef>const</span> action_pointer <span style=color:#f92672>=</span> get_global_action_nolock(signum);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>if</span> (action_pointer <span style=color:#f92672>!=</span> <span style=color:#66d9ef>nullptr</span>)
+</span></span><span style=display:flex><span>            {
+</span></span><span style=display:flex><span>                old_action <span style=color:#f92672>=</span> __crt_fast_decode_pointer(<span style=color:#f92672>*</span>action_pointer);
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>if</span> (sigact <span style=color:#f92672>!=</span> SIG_GET)
+</span></span><span style=display:flex><span>                    <span style=color:#f92672>*</span>action_pointer <span style=color:#f92672>=</span> __crt_fast_encode_pointer(sigact);
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>__finally</span>
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>            __acrt_unlock(__acrt_signal_lock);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (set_console_ctrl_error)
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> signal_failed(signum);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> old_action;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// If we reach here, signum is supposed to be one of the signals which
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// correspond to exceptions on the host OS.  If it&#39;s not one of these,
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// fail and return immediately:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>if</span> (signum <span style=color:#f92672>!=</span> SIGFPE <span style=color:#f92672>&amp;&amp;</span> signum <span style=color:#f92672>!=</span> SIGILL <span style=color:#f92672>&amp;&amp;</span> signum <span style=color:#f92672>!=</span> SIGSEGV)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> signal_failed(signum);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    __acrt_ptd<span style=color:#f92672>*</span> <span style=color:#66d9ef>const</span> ptd <span style=color:#f92672>=</span> __acrt_getptd_noexit();
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (ptd <span style=color:#f92672>==</span> <span style=color:#66d9ef>nullptr</span>)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> signal_failed(signum);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Check that there is a per-thread instance of the exception-action table
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// for this thread.  If there isn&#39;t, create one:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>if</span> (ptd<span style=color:#f92672>-&gt;</span>_pxcptacttab <span style=color:#f92672>==</span> __acrt_exception_action_table)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Allocate space for an exception-action table:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        ptd<span style=color:#f92672>-&gt;</span>_pxcptacttab <span style=color:#f92672>=</span> <span style=color:#66d9ef>static_cast</span><span style=color:#f92672>&lt;</span>__crt_signal_action_t<span style=color:#f92672>*&gt;</span>(_malloc_crt(__acrt_signal_action_table_size));
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (ptd<span style=color:#f92672>-&gt;</span>_pxcptacttab <span style=color:#f92672>==</span> <span style=color:#66d9ef>nullptr</span>)
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> signal_failed(signum);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Initialize the table by copying the contents of __acrt_exception_action_table:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        memcpy(ptd<span style=color:#f92672>-&gt;</span>_pxcptacttab, __acrt_exception_action_table, __acrt_signal_action_table_size);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Look up the proper entry in the exception-action table. Note that if
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// several exceptions are mapped to the same signal, this returns the
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// pointer to first such entry in the exception action table. It is assumed
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// that the other entries immediately follow this one.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    __crt_signal_action_t<span style=color:#f92672>*</span> <span style=color:#66d9ef>const</span> xcpt_action <span style=color:#f92672>=</span> siglookup(signum, ptd<span style=color:#f92672>-&gt;</span>_pxcptacttab);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (xcpt_action <span style=color:#f92672>==</span> <span style=color:#66d9ef>nullptr</span>)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> signal_failed(signum);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// SIGSEGV, SIGILL and SIGFPE all have more than one exception mapped to
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// them.  The code below depends on the exceptions corresponding to the same
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// signal being grouped together in the exception-action table.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>    __crt_signal_handler_t <span style=color:#66d9ef>const</span> old_action <span style=color:#f92672>=</span> xcpt_action<span style=color:#f92672>-&gt;</span>_action;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// If we are not just getting the currently installed action, loop through
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// all the entries corresponding to the given signal and update them as
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// appropriate:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>if</span> (sigact <span style=color:#f92672>!=</span> SIG_GET)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        __crt_signal_action_t<span style=color:#f92672>*</span> <span style=color:#66d9ef>const</span> last <span style=color:#f92672>=</span> ptd<span style=color:#f92672>-&gt;</span>_pxcptacttab <span style=color:#f92672>+</span> __acrt_signal_action_table_count;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Iterate until we reach the end of the table or we reach the end of
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// the range of actions for this signal, whichever comes first:
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>for</span> (__crt_signal_action_t<span style=color:#f92672>*</span> p <span style=color:#f92672>=</span> xcpt_action; p <span style=color:#f92672>!=</span> last <span style=color:#f92672>&amp;&amp;</span> p<span style=color:#f92672>-&gt;</span>_signal_number <span style=color:#f92672>==</span> signum; <span style=color:#f92672>++</span>p)
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>            p<span style=color:#f92672>-&gt;</span>_action <span style=color:#f92672>=</span> sigact;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> old_action;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>通过代码得知，Windows 下 <code>signal()</code> 函数的 <code>signum</code> 参数仅允许以下信号：</p><ul><li><code>SIGINT</code></li><li><code>SIGBREAK</code></li><li><code>SIGABRT</code></li><li><code>SIGABRT_COMPAT</code></li><li><code>SIGTERM</code></li><li><code>SIGFPE</code></li><li><code>SIGILL</code></li><li><code>SIGSEGV</code></li></ul><p>由于 Windows 内核本身并不支持 signal，所以不同的信号处理方式也是不同的。其中，<code>SIGINT</code>、<code>SIGBREAK</code>、<code>SIGABRT</code>、<code>SIGABRT_COMPAT</code> 和 <code>SIGTERM</code> 通过调用 Windows API <a href=https://learn.microsoft.com/zh-cn/windows/console/setconsolectrlhandler><code>SetConsoleCtrlHandler()</code></a> 实现；而 <code>SIGFPE</code>、<code>SIGILL</code> 和 <code>SIGSEGV</code> 的信号处理则由 CRT 自己维护。使用 <code>SetConsoleCtrlHandler()</code> 注册一个 <a href=https://learn.microsoft.com/zh-cn/windows/console/handlerroutine><code>HandlerRoutine</code></a> 类型的回调函数后，当控制台收到信号时，系统会在进程中创建一个新线程来执行回调函数（未经证实的猜测：这一步操作可能是由 ConHost 或者 OpenConsole 来完成的）。默认的回调函数在接收到 <code>SIGINT</code> 信号时，会直接使用 <code>ExitProcess()</code> 来退出当前进程。相当于如下代码：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;windows.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdio.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>BOOL WINAPI <span style=color:#a6e22e>CtrlHandler</span>(DWORD fdwCtrlType)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (fdwCtrlType <span style=color:#f92672>==</span> CTRL_C_EVENT) {
+</span></span><span style=display:flex><span>        ExitProcess();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> TRUE;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span> <span style=color:#a6e22e>main</span>(<span style=color:#66d9ef>void</span>)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    SetConsoleCtrlHandler(CtrlHandler, TRUE)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> (<span style=color:#ae81ff>1</span>) {}
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>由于 <code>CtrlHandler()</code> 是在新线程中被调用的，所以即便程序的主线程处于阻塞状态，也可以实现立即退出进程。然而 Windows 下的 Python 重写了这一行为，它注册的 low-level signal hander 只是修改了 VM 的一个标志位，用于告知 VM 有待处理的信号。而在 Python 代码中注册的 signal handler，必须等到主线程返回到 VM 内才有机会被调用。如果此时主线程阻塞在 VM 之外的代码上，比如 Windows API 或者其他 Native 代码，那么主线程就不能对信号做出响应。这就为什么是在某些情况下，Windows 下的 Python 程序不响应 Ctrl+C 的原因。</p><h3 id=timesleep-的特殊处理><code>time.sleep()</code> 的特殊处理</h3><p>可能你会奇怪，下面的代码明明在 Windows 下工作得很正常，会立即响应 <code>SIGINT</code> 信号：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>import</span> time
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>try</span>:
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> <span style=color:#66d9ef>True</span>: time<span style=color:#f92672>.</span>sleep(<span style=color:#ae81ff>100000</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>except</span> <span style=color:#a6e22e>KeyboardInterrupt</span>:
+</span></span><span style=display:flex><span>    print(<span style=color:#e6db74>&#39;keyboard interrupt received&#39;</span>)
+</span></span></code></pre></div><p>那是因为 Python 对 Windows 下的 <code>time.sleep()</code> 做了特殊处理，并非通过调用 Windows API <code>Sleep()</code> 来实现线程休眠功能。在 <a href=https://github.com/python/cpython/blob/342b1151ae7e6ae849c1ed7c8a2cbfdb4edcf51c/Modules/timemodule.c#L2196>Modules/timemodule.c</a> 查看 Windows 下的 <code>time.sleep()</code> 实现：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>#else  </span><span style=color:#75715e>// MS_WINDOWS
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    _PyTime_t timeout_100ns <span style=color:#f92672>=</span> _PyTime_As100Nanoseconds(timeout,
+</span></span><span style=display:flex><span>                                                       _PyTime_ROUND_CEILING);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Maintain Windows Sleep() semantics for time.sleep(0)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>if</span> (timeout_100ns <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>) {
+</span></span><span style=display:flex><span>        Py_BEGIN_ALLOW_THREADS
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// A value of zero causes the thread to relinquish the remainder of its
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// time slice to any other thread that is ready to run. If there are no
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// other threads ready to run, the function returns immediately, and
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// the thread continues execution.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        Sleep(<span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>        Py_END_ALLOW_THREADS
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    LARGE_INTEGER relative_timeout;
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// No need to check for integer overflow, both types are signed
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    assert(<span style=color:#66d9ef>sizeof</span>(relative_timeout) <span style=color:#f92672>==</span> <span style=color:#66d9ef>sizeof</span>(timeout_100ns));
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// SetWaitableTimer(): a negative due time indicates relative time
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    relative_timeout.QuadPart <span style=color:#f92672>=</span> <span style=color:#f92672>-</span>timeout_100ns;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    HANDLE timer <span style=color:#f92672>=</span> CreateWaitableTimerExW(NULL, NULL, timer_flags,
+</span></span><span style=display:flex><span>                                          TIMER_ALL_ACCESS);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (timer <span style=color:#f92672>==</span> NULL) {
+</span></span><span style=display:flex><span>        PyErr_SetFromWindowsErr(<span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>SetWaitableTimerEx(timer, <span style=color:#f92672>&amp;</span>relative_timeout,
+</span></span><span style=display:flex><span>                            <span style=color:#ae81ff>0</span>, <span style=color:#75715e>// no period; the timer is signaled once
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                            NULL, NULL, <span style=color:#75715e>// no completion routine
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                            NULL,  <span style=color:#75715e>// no wake context; do not resume from suspend
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                            <span style=color:#ae81ff>0</span>)) <span style=color:#75715e>// no tolerable delay for timer coalescing
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    {
+</span></span><span style=display:flex><span>        PyErr_SetFromWindowsErr(<span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>goto</span> error;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Only the main thread can be interrupted by SIGINT.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// Signal handlers are only executed in the main thread.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>if</span> (_PyOS_IsMainThread()) {
+</span></span><span style=display:flex><span>        HANDLE sigint_event <span style=color:#f92672>=</span> _PyOS_SigintEvent();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>while</span> (<span style=color:#ae81ff>1</span>) {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// Check for pending SIGINT signal before resetting the event
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#66d9ef>if</span> (PyErr_CheckSignals()) {
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>goto</span> error;
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>            ResetEvent(sigint_event);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            HANDLE events[] <span style=color:#f92672>=</span> {timer, sigint_event};
+</span></span><span style=display:flex><span>            DWORD rc;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            Py_BEGIN_ALLOW_THREADS
+</span></span><span style=display:flex><span>            rc <span style=color:#f92672>=</span> WaitForMultipleObjects(Py_ARRAY_LENGTH(events), events,
+</span></span><span style=display:flex><span>                                        <span style=color:#75715e>// bWaitAll
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                                        FALSE,
+</span></span><span style=display:flex><span>                                        <span style=color:#75715e>// No wait timeout
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                                        INFINITE);
+</span></span><span style=display:flex><span>            Py_END_ALLOW_THREADS
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>if</span> (rc <span style=color:#f92672>==</span> WAIT_FAILED) {
+</span></span><span style=display:flex><span>                PyErr_SetFromWindowsErr(<span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>goto</span> error;
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>if</span> (rc <span style=color:#f92672>==</span> WAIT_OBJECT_0) {
+</span></span><span style=display:flex><span>                <span style=color:#75715e>// Timer signaled: we are done
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>                <span style=color:#66d9ef>break</span>;
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            assert(rc <span style=color:#f92672>==</span> (WAIT_OBJECT_0 <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>));
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// The sleep was interrupted by SIGINT: restart sleeping
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>        DWORD rc;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        Py_BEGIN_ALLOW_THREADS
+</span></span><span style=display:flex><span>        rc <span style=color:#f92672>=</span> WaitForSingleObject(timer, INFINITE);
+</span></span><span style=display:flex><span>        Py_END_ALLOW_THREADS
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>if</span> (rc <span style=color:#f92672>==</span> WAIT_FAILED) {
+</span></span><span style=display:flex><span>            PyErr_SetFromWindowsErr(<span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>goto</span> error;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        assert(rc <span style=color:#f92672>==</span> WAIT_OBJECT_0);
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// Timer signaled: we are done
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    CloseHandle(timer);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>error:
+</span></span><span style=display:flex><span>    CloseHandle(timer);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span></code></pre></div><p>Windows 下的 Python 使用 <code>CreateWaitableTimerExW()</code> 创建了一个可等待的计时器对象，通过 <code>WaitForMultipleObjects()</code> 实现线程休眠。而在 <a href=https://github.com/python/cpython/blob/342b1151ae7e6ae849c1ed7c8a2cbfdb4edcf51c/Modules/signalmodule.c#L410>Modules/signalmodule.c</a> 中，Python low-level <code>signal_handler()</code> 遇到 <code>SIGINT</code> 信号时，通过 <code>SetEvent()</code> 让计时器结束等待：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>#ifdef MS_WINDOWS
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>if</span> (sig_num <span style=color:#f92672>==</span> SIGINT) {
+</span></span><span style=display:flex><span>        signal_state_t <span style=color:#f92672>*</span>state <span style=color:#f92672>=</span> <span style=color:#f92672>&amp;</span>signal_global_state;
+</span></span><span style=display:flex><span>        SetEvent(state<span style=color:#f92672>-&gt;</span>sigint_event);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span></code></pre></div><h2 id=linux-下的实现原理>Linux 下的实现原理</h2><p>Python 在 Linux 下使用 POSIX 标准的 <a href=https://pubs.opengroup.org/onlinepubs/007904875/functions/sigaction.html><code>sigaction()</code></a> 函数来实现信号机制。由于 Linux 的 POSIX 兼容是内核提供的，所以实现原理和 Windows 完全不同。最本质的区别是，Linux 下的信号是真正的软中断，由内核触发信号处理，其原理有点类似 Windows 下的<a href=https://learn.microsoft.com/zh-cn/windows/win32/sync/asynchronous-procedure-calls>异步过程调用</a>。区别是，Linux 的 signal 在收到信号时就进行异步调用；而 Windows 的 <code>QueueUserAPC()</code> 是将异步过程的函数加入当前线程的 APC 队列，等到线程执行到特定的 API 函数时再触发执行异步过程，这一点倒是和 Python 的 signal 机制有些类似。</p><p>Linux 下的信号由内核处理，当内核收到信号后，会将信号放入目标进程的信号队列中，并且向目标进程发生一个中断，使目标进程进入内核态。如果目标进程的主线程此时正被 IO 操作阻塞，相当于处于休眠状态，则休眠的主线程会被唤醒进行信号处理。接下来内核会将数据复制到进程的用户空间，并将 EIP 指令寄存器指向信号处理器的函数地址。然后返回到用户态中，执行相应的信号处理函数。因此，Linux 下的 Python 进程总是会响应 <code>SIGINT</code> 信号。</p><h2 id=windows-补丁>Windows 补丁</h2><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/python-signal-handlers-and-reentrant-call-runtime-error-of-print-function/ class="left arrow">上一篇：<br>Python 的 signal 处理与 print() 的 reentrant call 运行时错误</a>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-03 07:21:10.832500164 +0000 UTC m=+0.297767351">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>

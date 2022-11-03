@@ -1,60 +1,69 @@
-<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Laravel 强制 api 路由组返回 JSON &middot; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js></script><script>hljs.highlightAll();hljs.initLineNumbersOnLoad();</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
-gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>Laravel 强制 api 路由组返回 JSON</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Laravel 强制 api 路由组返回 JSON &#183; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>Laravel 强制 api 路由组返回 JSON</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
-<span>于&nbsp;</span><time datetime="2020-09-01 00:00:00 &#43;0000 UTC" data-pagefind-meta=日期>2020年9月1日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p>Laravel 的默认错误处理器通过 <code>Illuminate\Http\Request</code> 的 <code>expectsJson()</code> 方法来决定是否将错误信息渲染成 JSON 格式输出。这要求将请求头的 <code>Accept</code> 字段设置为 <code>application/json</code>。本文提供一种方法，在尽可能减少代码的情况下，强制让 api 路由组中的所有错误响应变成 JSON 格式，而不依赖于请求的 <code>Accept</code> 头部。</p><p>第一步，新建 <code>ExpectsJson</code> 中间件，内容如下：</p><pre><code class=language-php>&lt;?php
-
-namespace App\Http\Middleware;
-
-use Illuminate\Http\Request;
-
-class ExpectsJson
-{
-    /**
-     * Handle the incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  callable  $next
-     * @return \Illuminate\Http\Response
-     */
-    public function handle(Request $request, $next)
-    {
-        // force $request-&gt;expectsJson() return true
-        ((function () {
-            $this-&gt;acceptableContentTypes = ['application/json'];
-        })-&gt;bindTo($request, Request::class))();
-
-        return $next($request);
-    }
-}
-</code></pre><p>第二步，启用该中间件。修改 <code>app\Http\Kernel.php</code> 文件：</p><pre><code class=language-php>/**
- * The application's route middleware groups.
- *
- * @var array
- */
-protected $middlewareGroups = [
-	... ...
-    'api' =&gt; [
-        ... ...
-        \App\Http\Middleware\ExpectsJson::class,    // 添加中间件到 api 组
-    ],
-];
-
-... ...
-
-/**
- * The priority-sorted list of middleware.
- *
- * Forces non-global middleware to always be in the given order.
- *
- * @var array
- */
-protected $middlewarePriority = [
-    \App\Http\Middleware\ExpectsJson::class,    // 调整中间件顺序在 AuthenticatesRequests 之前
-    ... ...
-    \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
-    ... ...
-];
-</code></pre><p>该方法的原理就是：利用闭包修改 <code>Illuminate\Http\Request</code> 的保护成员，使得 <code>expectsJson()</code> 方法返回 true。</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/PHP/>PHP</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/Dogs-and-Chinese-Not-Admitted-and-Nationalsozialismus/ class="left arrow">上一篇：<br>「犬与华人不准入」与B站UP主的「财富密码」</a>
+<span>于&nbsp;</span><time datetime="2020-09-01 00:00:00 +0000 UTC" data-pagefind-meta=日期>2020年9月1日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p>Laravel 的默认错误处理器通过 <code>Illuminate\Http\Request</code> 的 <code>expectsJson()</code> 方法来决定是否将错误信息渲染成 JSON 格式输出。这要求将请求头的 <code>Accept</code> 字段设置为 <code>application/json</code>。本文提供一种方法，在尽可能减少代码的情况下，强制让 api 路由组中的所有错误响应变成 JSON 格式，而不依赖于请求的 <code>Accept</code> 头部。</p><p>第一步，新建 <code>ExpectsJson</code> 中间件，内容如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#f92672>&lt;?</span><span style=color:#a6e22e>php</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>namespace</span> <span style=color:#a6e22e>App\Http\Middleware</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>use</span> <span style=color:#a6e22e>Illuminate\Http\Request</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>ExpectsJson</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>/**
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * Handle the incoming request.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     *
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * @param  \Illuminate\Http\Request  $request
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * @param  callable  $next
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * @return \Illuminate\Http\Response
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>     */</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>handle</span>(<span style=color:#a6e22e>Request</span> $request, $next)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// force $request-&gt;expectsJson() return true
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        ((<span style=color:#66d9ef>function</span> () {
+</span></span><span style=display:flex><span>            $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>acceptableContentTypes</span> <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#39;application/json&#39;</span>];
+</span></span><span style=display:flex><span>        })<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>bindTo</span>($request, <span style=color:#a6e22e>Request</span><span style=color:#f92672>::</span><span style=color:#a6e22e>class</span>))();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> $next($request);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>第二步，启用该中间件。修改 <code>app\Http\Kernel.php</code> 文件：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#e6db74>/**
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * The application&#39;s route middleware groups.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> *
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @var array
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> */</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>protected</span> $middlewareGroups <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>	<span style=color:#f92672>...</span> <span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;api&#39;</span> <span style=color:#f92672>=&gt;</span> [
+</span></span><span style=display:flex><span>        <span style=color:#f92672>...</span> <span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>\App\Http\Middleware\ExpectsJson</span><span style=color:#f92672>::</span><span style=color:#a6e22e>class</span>,    <span style=color:#75715e>// 添加中间件到 api 组
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    ],
+</span></span><span style=display:flex><span>];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>...</span> <span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#e6db74>/**
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * The priority-sorted list of middleware.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> *
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * Forces non-global middleware to always be in the given order.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> *
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @var array
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> */</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>protected</span> $middlewarePriority <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>\App\Http\Middleware\ExpectsJson</span><span style=color:#f92672>::</span><span style=color:#a6e22e>class</span>,    <span style=color:#75715e>// 调整中间件顺序在 AuthenticatesRequests 之前
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#f92672>...</span> <span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>\Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests</span><span style=color:#f92672>::</span><span style=color:#a6e22e>class</span>,
+</span></span><span style=display:flex><span>    <span style=color:#f92672>...</span> <span style=color:#f92672>...</span>
+</span></span><span style=display:flex><span>];
+</span></span></code></pre></div><p>该方法的原理就是：利用闭包修改 <code>Illuminate\Http\Request</code> 的保护成员，使得 <code>expectsJson()</code> 方法返回 true。</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/PHP/>PHP</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/Dogs-and-Chinese-Not-Admitted-and-Nationalsozialismus/ class="left arrow">上一篇：<br>「犬与华人不准入」与B站UP主的「财富密码」</a>
 <a href=/moments/202009/1600766763/ class="right arrow">下一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-02 07:33:13.945420471 &#43;0000 UTC m=&#43;0.472373987">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-03 07:21:10.784619345 +0000 UTC m=+0.249886532">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>

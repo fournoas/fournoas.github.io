@@ -1,256 +1,263 @@
-<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>特殊的服务器环境引发的 Laravel 框架异常 &middot; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js></script><script>hljs.highlightAll();hljs.initLineNumbersOnLoad();</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
-gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>特殊的服务器环境引发的 Laravel 框架异常</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>特殊的服务器环境引发的 Laravel 框架异常 &#183; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>特殊的服务器环境引发的 Laravel 框架异常</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
-<span>于&nbsp;</span><time datetime="2021-12-07 00:00:00 &#43;0000 UTC" data-pagefind-meta=日期>2021年12月7日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p>一个使用 <a href=https://laravel.com/ target=_blank>Laravel</a> 框架的项目在某次更新生产环境代码后报错：</p><blockquote><p>ErrorException: tempnam(): file created in the system&rsquo;s temporary directory in file /foobar/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php on line 152</p><p>Stack trace:
-1. ErrorException-&gt;() /foobar/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php:152<br>2. tempnam() /foobar/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php:152<br>3. Illuminate\Filesystem\Filesystem-&gt;replace() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php:194<br>4. Illuminate\Foundation\ProviderRepository-&gt;writeManifest() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php:165<br>5. Illuminate\Foundation\ProviderRepository-&gt;compileManifest() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php:61<br>6. Illuminate\Foundation\ProviderRepository-&gt;load() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:604
-7. Illuminate\Foundation\Application-&gt;registerConfiguredProviders() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/RegisterProviders.php:17<br>8. Illuminate\Foundation\Bootstrap\RegisterProviders-&gt;bootstrap() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:230<br>9. Illuminate\Foundation\Application-&gt;bootstrapWith() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:151<br>10. Illuminate\Foundation\Http\Kernel-&gt;bootstrap() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:135<br>11. Illuminate\Foundation\Http\Kernel-&gt;sendRequestThroughRouter() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:109<br>12. Illuminate\Foundation\Http\Kernel-&gt;handle() /foobar/public/index.php:55</p></blockquote><p>因为代码在开发环境和测试环境运行都是正常的，所以首先怀疑是生产环境服务器的配置有问题。然而 Google 搜索关键字没有人报告 Laravel 存在类似的错误。</p><p>先定位到 <em>/foobar/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php</em> 文件 152 行附近的代码：</p><pre><code class=language-php>/**
- * Write the contents of a file, replacing it atomically if it already exists.
- *
- * @param  string  $path
- * @param  string  $content
- * @return void
- */
-public function replace($path, $content)
-{
-    // If the path already exists and is a symlink, get the real path...
-    clearstatcache(true, $path);
-
-    $path = realpath($path) ?: $path;
-
-    $tempPath = tempnam(dirname($path), basename($path));
-
-    // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
-    chmod($tempPath, 0777 - umask());
-
-    file_put_contents($tempPath, $content);
-
-    rename($tempPath, $path);
-}
-</code></pre><p>查看 PHP 的<a href=https://www.php.net/manual/en/function.tempnam.php target=_blank>官方文档</a>发现，如果 <code>tempnam()</code> 函数的 <code>$directory</code> 参数传递的目录不存在或者不可写入，则会在系统临时文件夹下创建临时文件：</p><blockquote><p>If the directory does not exist or is not writable, <strong>tempnam()</strong> may generate a file in the system&rsquo;s temporary directory</p></blockquote><p>并且自 7.1 版本后，如果在系统临时文件夹下创建临时文件，会触发 notice：</p><blockquote><p><strong>tempnam()</strong> now emits a notice when falling back to the temp directory of the system.</p></blockquote><p>看来是 Laravel 框架引导启动时，写入某个缓存失败导致的错误。尝试以下命令手动生成缓存：</p><pre><code class=language-bash>php artisan config:cache
-</code></pre><p>得到和之前相同的错误。看来就是写入 <em>/foobar/bootstrap/cache</em> 目录时出错了，并且和用户权限没有关系。尝试在测试环境中重现该错误，将测服中的 <em>/foobar/bootstrap/cache</em> 的写入权限去除，然而却得到了不一样的错误：</p><blockquote><p>Exception: The /foobar/bootstrap/cache directory must be present and writable. in file /foobar/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php on line 177</p></blockquote><p>这个错误消息一目了然，非常友好，而生产环境中的错误却相当诡异。</p><p>再定位到 <em>/foobar/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php</em> 文件 194 行附近的代码：</p><pre><code class=language-php>/**
- * Write the service manifest file to disk.
- *
- * @param  array  $manifest
- * @return array
- *
- * @throws \Exception
- */
-public function writeManifest($manifest)
-{
-    if (! is_writable($dirname = dirname($this-&gt;manifestPath))) {
-        throw new Exception(&quot;The {$dirname} directory must be present and writable.&quot;);
-    }
-
-    $this-&gt;files-&gt;replace(
-        $this-&gt;manifestPath, '&lt;?php return '.var_export($manifest, true).';'
-    );
-
-    return array_merge(['when' =&gt; []], $manifest);
-}
-</code></pre><p>Laravel 框架先通过 <code>is_writable()</code> 函数判断了目标路径是否可写，然后再通过 <code>Filesystem::replace()</code> 方法写入缓存。而问题就出在 <code>is_writable()</code> 函数认为目录是可写的，返回了 <code>true</code>；而 <code>tempnam()</code> 函数认为目录不存在或者不可写，从而引起了错误异常。</p><p>因为开发人员无法接触到生产环境，排错效率很低，最终也无法定位引发错误的原因，只能将测试环境中生成的 cache 文件上传，草草了事。</p><hr><p>为了进一步排查错误，下载了 <a href=https://github.com/php/php-src/tree/PHP-7.4.27 target=_blank>PHP 7.4 的源代码</a>，试图推断导致问题的原因。</p><p>通过分析 PHP 源代码，在 <em><a href=https://github.com/php/php-src/blob/80d1f4c59a2620ac5b49eb4a2c0840d7d8cd4bc8/ext/standard/filestat.c#L768 target=_blank>/ext/standard/filestat.c</a></em> 文件中找到了内置函数 <code>is_writable()</code> 的实现代码。PHP 实现的伪代码如下：</p><pre><code class=language-php>const S_IWOTH = 2;
-const S_IWGRP = 16;
-const S_IWUSR = 128;
-
-function is_writable($filename)
-{
-    $wmask = S_IWOTH;
-    $stat = stat($fielname);
-    if ($stat['uid'] == posix_getuid()) {
-        $wmask = S_IWUSR;
-    } elseif ($stat['gid'] == posix_getegid()) {
-        $wmask = S_IWGRP;
-    } else {
-        $groups = posix_getgroups();
-        if ($groups &amp;&amp; in_array($stat['gid'], $groups)) {
-            $wmask = S_IWGRP;
-        }
-    }
-    
-    return ($stat['mod'] &amp; $wmask) != 0;
-}
-</code></pre><p>通过代码可以知道，<code>is_writable()</code> 仅仅通过文件权限的 mode 来判断文件是否可以写入。</p><p>接着在 <em><a href=https://github.com/php/php-src/blob/80d1f4c59a2620ac5b49eb4a2c0840d7d8cd4bc8/ext/standard/file.c#L817 target=_blank>/ext/standard/file.c</a></em> 文件中找到内置函数 <code>tempnam()</code> 的实现代码：</p><pre><code class=language-c>/* {{{ proto string tempnam(string dir, string prefix)
-   Create a unique filename in a directory */
-PHP_FUNCTION(tempnam)
-{
-	char *dir, *prefix;
-	size_t dir_len, prefix_len;
-	zend_string *opened_path;
-	int fd;
-	zend_string *p;
-
-	ZEND_PARSE_PARAMETERS_START(2, 2)
-		Z_PARAM_PATH(dir, dir_len)
-		Z_PARAM_PATH(prefix, prefix_len)
-	ZEND_PARSE_PARAMETERS_END();
-
-	p = php_basename(prefix, prefix_len, NULL, 0);
-	if (ZSTR_LEN(p) &gt; 64) {
-		ZSTR_VAL(p)[63] = '\0';
-	}
-
-	RETVAL_FALSE;
-
-	if ((fd = php_open_temporary_fd_ex(dir, ZSTR_VAL(p), &amp;opened_path, PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ALWAYS)) &gt;= 0) {
-		close(fd);
-		RETVAL_STR(opened_path);
-	}
-	zend_string_release_ex(p, 0);
-}
-/* }}} */
-</code></pre><p>继续跟踪到 <em><a href=https://github.com/php/php-src/blob/PHP-7.4.27/main/php_open_temporary_file.c#L288 target=_blank>/main/php_open_temporary_file.c</a></em> 中的 <code>php_open_temporary_fd_ex()</code> 函数：</p><pre><code class=language-c>PHPAPI int php_open_temporary_fd_ex(const char *dir, const char *pfx, zend_string **opened_path_p, uint32_t flags)
-{
-	int fd;
-	const char *temp_dir;
-
-	if (!pfx) {
-		pfx = &quot;tmp.&quot;;
-	}
-	if (opened_path_p) {
-		*opened_path_p = NULL;
-	}
-
-	if (!dir || *dir == '\0') {
-def_tmp:
-		temp_dir = php_get_temporary_directory();
-
-		if (temp_dir &amp;&amp;
-		    *temp_dir != '\0' &amp;&amp;
-		    (!(flags &amp; PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ON_FALLBACK) || !php_check_open_basedir(temp_dir))) {
-			return php_do_open_temporary_file(temp_dir, pfx, opened_path_p);
-		} else {
-			return -1;
-		}
-	}
-
-	if ((flags &amp; PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ON_EXPLICIT_DIR) &amp;&amp; php_check_open_basedir(dir)) {
-		return -1;
-	}
-
-	/* Try the directory given as parameter. */
-	fd = php_do_open_temporary_file(dir, pfx, opened_path_p);
-	if (fd == -1) {
-		/* Use default temporary directory. */
-		if (!(flags &amp; PHP_TMP_FILE_SILENT)) {
-			php_error_docref(NULL, E_NOTICE, &quot;file created in the system's temporary directory&quot;);
-		}
-		goto def_tmp;
-	}
-	return fd;
-}
-</code></pre><p>在这里看到了本文开头抛出的错误消息。显然，是 <code>php_do_open_temporary_file()</code> 函数返回了预料之外的 <code>-1</code> 导致的 。继续跟踪到 <code>php_do_open_temporary_file()</code> 函数内：</p><pre><code class=language-c>static int php_do_open_temporary_file(const char *path, const char *pfx, zend_string **opened_path_p)
-{
-#ifdef PHP_WIN32
-	char *opened_path = NULL;
-	size_t opened_path_len;
-	wchar_t *cwdw, *pfxw, pathw[MAXPATHLEN];
-#else
-	char opened_path[MAXPATHLEN];
-	char *trailing_slash;
-#endif
-	char cwd[MAXPATHLEN];
-	cwd_state new_state;
-	int fd = -1;
-#ifndef HAVE_MKSTEMP
-	int open_flags = O_CREAT | O_TRUNC | O_RDWR
-#ifdef PHP_WIN32
-		| _O_BINARY
-#endif
-		;
-#endif
-
-	if (!path || !path[0]) {
-		return -1;
-	}
-
-#ifdef PHP_WIN32
-	if (!php_win32_check_trailing_space(pfx, strlen(pfx))) {
-		SetLastError(ERROR_INVALID_NAME);
-		return -1;
-	}
-#endif
-
-	if (!VCWD_GETCWD(cwd, MAXPATHLEN)) {
-		cwd[0] = '\0';
-	}
-
-	new_state.cwd = estrdup(cwd);
-	new_state.cwd_length = strlen(cwd);
-
-	if (virtual_file_ex(&amp;new_state, path, NULL, CWD_REALPATH)) {
-		efree(new_state.cwd);
-		return -1;
-	}
-
-#ifndef PHP_WIN32
-	if (IS_SLASH(new_state.cwd[new_state.cwd_length - 1])) {
-		trailing_slash = &quot;&quot;;
-	} else {
-		trailing_slash = &quot;/&quot;;
-	}
-
-	if (snprintf(opened_path, MAXPATHLEN, &quot;%s%s%sXXXXXX&quot;, new_state.cwd, trailing_slash, pfx) &gt;= MAXPATHLEN) {
-		efree(new_state.cwd);
-		return -1;
-	}
-#endif
-
-#ifdef PHP_WIN32
-	cwdw = php_win32_ioutil_any_to_w(new_state.cwd);
-	pfxw = php_win32_ioutil_any_to_w(pfx);
-	if (!cwdw || !pfxw) {
-		free(cwdw);
-		free(pfxw);
-		efree(new_state.cwd);
-		return -1;
-	}
-
-	if (GetTempFileNameW(cwdw, pfxw, 0, pathw)) {
-		opened_path = php_win32_ioutil_conv_w_to_any(pathw, PHP_WIN32_CP_IGNORE_LEN, &amp;opened_path_len);
-		if (!opened_path || opened_path_len &gt;= MAXPATHLEN) {
-			free(cwdw);
-			free(pfxw);
-			efree(new_state.cwd);
-			return -1;
-		}
-		assert(strlen(opened_path) == opened_path_len);
-
-		/* Some versions of windows set the temp file to be read-only,
-		 * which means that opening it will fail... */
-		if (VCWD_CHMOD(opened_path, 0600)) {
-			free(cwdw);
-			free(pfxw);
-			efree(new_state.cwd);
-			free(opened_path);
-			return -1;
-		}
-		fd = VCWD_OPEN_MODE(opened_path, open_flags, 0600);
-	}
-
-	free(cwdw);
-	free(pfxw);
-#elif defined(HAVE_MKSTEMP)
-	fd = mkstemp(opened_path);
-#else
-	if (mktemp(opened_path)) {
-		fd = VCWD_OPEN(opened_path, open_flags);
-	}
-#endif
-
-#ifdef PHP_WIN32
-	if (fd != -1 &amp;&amp; opened_path_p) {
-		*opened_path_p = zend_string_init(opened_path, opened_path_len, 0);
-	}
-	free(opened_path);
-#else
-	if (fd != -1 &amp;&amp; opened_path_p) {
-		*opened_path_p = zend_string_init(opened_path, strlen(opened_path), 0);
-	}
-#endif
-	efree(new_state.cwd);
-	return fd;
-}
-/* }}} */
-</code></pre><p>最有可能出现问题的地方应该就是 <code>mkstemp(opened_path)</code> 执行返回错误。也就是说，不知道运维对服务器做了哪些手脚，导致 <code>is_writable('/foobar/bootstrap/cache')</code> 返回的是 <code>true</code>；而在该路径下创建临时文件却失败了。怀疑是服务器上有某种安全保护机制，禁止动态创建 .php 文件。</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/PHP/>PHP</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202112/1638411712/ class="left arrow">上一篇</a>
+<span>于&nbsp;</span><time datetime="2021-12-07 00:00:00 +0000 UTC" data-pagefind-meta=日期>2021年12月7日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p>一个使用 <a href=https://laravel.com/>Laravel</a> 框架的项目在某次更新生产环境代码后报错：</p><blockquote><p>ErrorException: tempnam(): file created in the system&rsquo;s temporary directory in file /foobar/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php on line 152</p><p>Stack trace:</p><ol><li>ErrorException->() /foobar/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php:152</li><li>tempnam() /foobar/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php:152</li><li>Illuminate\Filesystem\Filesystem->replace() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php:194</li><li>Illuminate\Foundation\ProviderRepository->writeManifest() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php:165</li><li>Illuminate\Foundation\ProviderRepository->compileManifest() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php:61</li><li>Illuminate\Foundation\ProviderRepository->load() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:604</li><li>Illuminate\Foundation\Application->registerConfiguredProviders() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/RegisterProviders.php:17</li><li>Illuminate\Foundation\Bootstrap\RegisterProviders->bootstrap() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/Application.php:230</li><li>Illuminate\Foundation\Application->bootstrapWith() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:151</li><li>Illuminate\Foundation\Http\Kernel->bootstrap() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:135</li><li>Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter() /foobar/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php:109</li><li>Illuminate\Foundation\Http\Kernel->handle() /foobar/public/index.php:55</li></ol></blockquote><p>因为代码在开发环境和测试环境运行都是正常的，所以首先怀疑是生产环境服务器的配置有问题。然而 Google 搜索关键字没有人报告 Laravel 存在类似的错误。</p><p>先定位到 <em>/foobar/vendor/laravel/framework/src/Illuminate/Filesystem/Filesystem.php</em> 文件 152 行附近的代码：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#e6db74>/**
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * Write the contents of a file, replacing it atomically if it already exists.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> *
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @param  string  $path
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @param  string  $content
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @return void
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> */</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>replace</span>($path, $content)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// If the path already exists and is a symlink, get the real path...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>clearstatcache</span>(<span style=color:#66d9ef>true</span>, $path);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $path <span style=color:#f92672>=</span> <span style=color:#a6e22e>realpath</span>($path) <span style=color:#f92672>?:</span> $path;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $tempPath <span style=color:#f92672>=</span> <span style=color:#a6e22e>tempnam</span>(<span style=color:#a6e22e>dirname</span>($path), <span style=color:#a6e22e>basename</span>($path));
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>chmod</span>($tempPath, <span style=color:#ae81ff>0777</span> <span style=color:#f92672>-</span> <span style=color:#a6e22e>umask</span>());
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>file_put_contents</span>($tempPath, $content);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>rename</span>($tempPath, $path);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>查看 PHP 的<a href=https://www.php.net/manual/en/function.tempnam.php>官方文档</a>发现，如果 <code>tempnam()</code> 函数的 <code>$directory</code> 参数传递的目录不存在或者不可写入，则会在系统临时文件夹下创建临时文件：</p><blockquote><p>If the directory does not exist or is not writable, <strong>tempnam()</strong> may generate a file in the system&rsquo;s temporary directory</p></blockquote><p>并且自 7.1 版本后，如果在系统临时文件夹下创建临时文件，会触发 notice：</p><blockquote><p><strong>tempnam()</strong> now emits a notice when falling back to the temp directory of the system.</p></blockquote><p>看来是 Laravel 框架引导启动时，写入某个缓存失败导致的错误。尝试以下命令手动生成缓存：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>php artisan config:cache
+</span></span></code></pre></div><p>得到和之前相同的错误。看来就是写入 <em>/foobar/bootstrap/cache</em> 目录时出错了，并且和用户权限没有关系。尝试在测试环境中重现该错误，将测服中的 <em>/foobar/bootstrap/cache</em> 的写入权限去除，然而却得到了不一样的错误：</p><blockquote><p>Exception: The /foobar/bootstrap/cache directory must be present and writable. in file /foobar/vendor/laravel/framework/src/Illuminate/Foundation/PackageManifest.php on line 177</p></blockquote><p>这个错误消息一目了然，非常友好，而生产环境中的错误却相当诡异。</p><p>再定位到 <em>/foobar/vendor/laravel/framework/src/Illuminate/Foundation/ProviderRepository.php</em> 文件 194 行附近的代码：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#e6db74>/**
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * Write the service manifest file to disk.
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> *
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @param  array  $manifest
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @return array
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> *
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @throws \Exception
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> */</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>writeManifest</span>($manifest)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span> <span style=color:#a6e22e>is_writable</span>($dirname <span style=color:#f92672>=</span> <span style=color:#a6e22e>dirname</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>manifestPath</span>))) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Exception</span>(<span style=color:#e6db74>&#34;The </span><span style=color:#e6db74>{</span>$dirname<span style=color:#e6db74>}</span><span style=color:#e6db74> directory must be present and writable.&#34;</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>files</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>replace</span>(
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>manifestPath</span>, <span style=color:#e6db74>&#39;&lt;?php return &#39;</span><span style=color:#f92672>.</span><span style=color:#a6e22e>var_export</span>($manifest, <span style=color:#66d9ef>true</span>)<span style=color:#f92672>.</span><span style=color:#e6db74>&#39;;&#39;</span>
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>array_merge</span>([<span style=color:#e6db74>&#39;when&#39;</span> <span style=color:#f92672>=&gt;</span> []], $manifest);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Laravel 框架先通过 <code>is_writable()</code> 函数判断了目标路径是否可写，然后再通过 <code>Filesystem::replace()</code> 方法写入缓存。而问题就出在 <code>is_writable()</code> 函数认为目录是可写的，返回了 <code>true</code>；而 <code>tempnam()</code> 函数认为目录不存在或者不可写，从而引起了错误异常。</p><p>因为开发人员无法接触到生产环境，排错效率很低，最终也无法定位引发错误的原因，只能将测试环境中生成的 cache 文件上传，草草了事。</p><hr><p>为了进一步排查错误，下载了 <a href=https://github.com/php/php-src/tree/PHP-7.4.27>PHP 7.4 的源代码</a>，试图推断导致问题的原因。</p><p>通过分析 PHP 源代码，在 <em><a href=https://github.com/php/php-src/blob/80d1f4c59a2620ac5b49eb4a2c0840d7d8cd4bc8/ext/standard/filestat.c#L768>/ext/standard/filestat.c</a></em> 文件中找到了内置函数 <code>is_writable()</code> 的实现代码。PHP 实现的伪代码如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#66d9ef>S_IWOTH</span> <span style=color:#f92672>=</span> <span style=color:#ae81ff>2</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#66d9ef>S_IWGRP</span> <span style=color:#f92672>=</span> <span style=color:#ae81ff>16</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#66d9ef>S_IWUSR</span> <span style=color:#f92672>=</span> <span style=color:#ae81ff>128</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>is_writable</span>($filename)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $wmask <span style=color:#f92672>=</span> <span style=color:#a6e22e>S_IWOTH</span>;
+</span></span><span style=display:flex><span>    $stat <span style=color:#f92672>=</span> <span style=color:#a6e22e>stat</span>($fielname);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> ($stat[<span style=color:#e6db74>&#39;uid&#39;</span>] <span style=color:#f92672>==</span> <span style=color:#a6e22e>posix_getuid</span>()) {
+</span></span><span style=display:flex><span>        $wmask <span style=color:#f92672>=</span> <span style=color:#a6e22e>S_IWUSR</span>;
+</span></span><span style=display:flex><span>    } <span style=color:#66d9ef>elseif</span> ($stat[<span style=color:#e6db74>&#39;gid&#39;</span>] <span style=color:#f92672>==</span> <span style=color:#a6e22e>posix_getegid</span>()) {
+</span></span><span style=display:flex><span>        $wmask <span style=color:#f92672>=</span> <span style=color:#a6e22e>S_IWGRP</span>;
+</span></span><span style=display:flex><span>    } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>        $groups <span style=color:#f92672>=</span> <span style=color:#a6e22e>posix_getgroups</span>();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> ($groups <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>in_array</span>($stat[<span style=color:#e6db74>&#39;gid&#39;</span>], $groups)) {
+</span></span><span style=display:flex><span>            $wmask <span style=color:#f92672>=</span> <span style=color:#a6e22e>S_IWGRP</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> ($stat[<span style=color:#e6db74>&#39;mod&#39;</span>] <span style=color:#f92672>&amp;</span> $wmask) <span style=color:#f92672>!=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>通过代码可以知道，<code>is_writable()</code> 仅仅通过文件权限的 mode 来判断文件是否可以写入。</p><p>接着在 <em><a href=https://github.com/php/php-src/blob/80d1f4c59a2620ac5b49eb4a2c0840d7d8cd4bc8/ext/standard/file.c#L817>/ext/standard/file.c</a></em> 文件中找到内置函数 <code>tempnam()</code> 的实现代码：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>/* {{{ proto string tempnam(string dir, string prefix)
+</span></span></span><span style=display:flex><span><span style=color:#75715e>   Create a unique filename in a directory */</span>
+</span></span><span style=display:flex><span>PHP_FUNCTION(tempnam)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>dir, <span style=color:#f92672>*</span>prefix;
+</span></span><span style=display:flex><span>	size_t dir_len, prefix_len;
+</span></span><span style=display:flex><span>	zend_string <span style=color:#f92672>*</span>opened_path;
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>int</span> fd;
+</span></span><span style=display:flex><span>	zend_string <span style=color:#f92672>*</span>p;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	ZEND_PARSE_PARAMETERS_START(<span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>2</span>)
+</span></span><span style=display:flex><span>		Z_PARAM_PATH(dir, dir_len)
+</span></span><span style=display:flex><span>		Z_PARAM_PATH(prefix, prefix_len)
+</span></span><span style=display:flex><span>	ZEND_PARSE_PARAMETERS_END();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	p <span style=color:#f92672>=</span> php_basename(prefix, prefix_len, NULL, <span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (ZSTR_LEN(p) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>64</span>) {
+</span></span><span style=display:flex><span>		ZSTR_VAL(p)[<span style=color:#ae81ff>63</span>] <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;\0&#39;</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	RETVAL_FALSE;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> ((fd <span style=color:#f92672>=</span> php_open_temporary_fd_ex(dir, ZSTR_VAL(p), <span style=color:#f92672>&amp;</span>opened_path, PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ALWAYS)) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>0</span>) {
+</span></span><span style=display:flex><span>		close(fd);
+</span></span><span style=display:flex><span>		RETVAL_STR(opened_path);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	zend_string_release_ex(p, <span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#75715e>/* }}} */</span>
+</span></span></code></pre></div><p>继续跟踪到 <em><a href=https://github.com/php/php-src/blob/PHP-7.4.27/main/php_open_temporary_file.c#L288>/main/php_open_temporary_file.c</a></em> 中的 <code>php_open_temporary_fd_ex()</code> 函数：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span>PHPAPI <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>php_open_temporary_fd_ex</span>(<span style=color:#66d9ef>const</span> <span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>dir, <span style=color:#66d9ef>const</span> <span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>pfx, zend_string <span style=color:#f92672>**</span>opened_path_p, <span style=color:#66d9ef>uint32_t</span> flags)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>int</span> fd;
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>const</span> <span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>temp_dir;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>pfx) {
+</span></span><span style=display:flex><span>		pfx <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;tmp.&#34;</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (opened_path_p) {
+</span></span><span style=display:flex><span>		<span style=color:#f92672>*</span>opened_path_p <span style=color:#f92672>=</span> NULL;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>dir <span style=color:#f92672>||</span> <span style=color:#f92672>*</span>dir <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;\0&#39;</span>) {
+</span></span><span style=display:flex><span>def_tmp:
+</span></span><span style=display:flex><span>		temp_dir <span style=color:#f92672>=</span> php_get_temporary_directory();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> (temp_dir <span style=color:#f92672>&amp;&amp;</span>
+</span></span><span style=display:flex><span>		    <span style=color:#f92672>*</span>temp_dir <span style=color:#f92672>!=</span> <span style=color:#e6db74>&#39;\0&#39;</span> <span style=color:#f92672>&amp;&amp;</span>
+</span></span><span style=display:flex><span>		    (<span style=color:#f92672>!</span>(flags <span style=color:#f92672>&amp;</span> PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ON_FALLBACK) <span style=color:#f92672>||</span> <span style=color:#f92672>!</span>php_check_open_basedir(temp_dir))) {
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>return</span> php_do_open_temporary_file(temp_dir, pfx, opened_path_p);
+</span></span><span style=display:flex><span>		} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>return</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> ((flags <span style=color:#f92672>&amp;</span> PHP_TMP_FILE_OPEN_BASEDIR_CHECK_ON_EXPLICIT_DIR) <span style=color:#f92672>&amp;&amp;</span> php_check_open_basedir(dir)) {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#75715e>/* Try the directory given as parameter. */</span>
+</span></span><span style=display:flex><span>	fd <span style=color:#f92672>=</span> php_do_open_temporary_file(dir, pfx, opened_path_p);
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (fd <span style=color:#f92672>==</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>) {
+</span></span><span style=display:flex><span>		<span style=color:#75715e>/* Use default temporary directory. */</span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>(flags <span style=color:#f92672>&amp;</span> PHP_TMP_FILE_SILENT)) {
+</span></span><span style=display:flex><span>			php_error_docref(NULL, E_NOTICE, <span style=color:#e6db74>&#34;file created in the system&#39;s temporary directory&#34;</span>);
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>goto</span> def_tmp;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> fd;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>在这里看到了本文开头抛出的错误消息。显然，是 <code>php_do_open_temporary_file()</code> 函数返回了预料之外的 <code>-1</code> 导致的 。继续跟踪到 <code>php_do_open_temporary_file()</code> 函数内：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>php_do_open_temporary_file</span>(<span style=color:#66d9ef>const</span> <span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>path, <span style=color:#66d9ef>const</span> <span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>pfx, zend_string <span style=color:#f92672>**</span>opened_path_p)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifdef PHP_WIN32
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>opened_path <span style=color:#f92672>=</span> NULL;
+</span></span><span style=display:flex><span>	size_t opened_path_len;
+</span></span><span style=display:flex><span>	wchar_t <span style=color:#f92672>*</span>cwdw, <span style=color:#f92672>*</span>pfxw, pathw[MAXPATHLEN];
+</span></span><span style=display:flex><span><span style=color:#75715e>#else
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>char</span> opened_path[MAXPATHLEN];
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>trailing_slash;
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>char</span> cwd[MAXPATHLEN];
+</span></span><span style=display:flex><span>	cwd_state new_state;
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>int</span> fd <span style=color:#f92672>=</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifndef HAVE_MKSTEMP
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>int</span> open_flags <span style=color:#f92672>=</span> O_CREAT <span style=color:#f92672>|</span> O_TRUNC <span style=color:#f92672>|</span> O_RDWR
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifdef PHP_WIN32
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>		<span style=color:#f92672>|</span> _O_BINARY
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>		;
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>path <span style=color:#f92672>||</span> <span style=color:#f92672>!</span>path[<span style=color:#ae81ff>0</span>]) {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifdef PHP_WIN32
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>php_win32_check_trailing_space(pfx, strlen(pfx))) {
+</span></span><span style=display:flex><span>		SetLastError(ERROR_INVALID_NAME);
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>VCWD_GETCWD(cwd, MAXPATHLEN)) {
+</span></span><span style=display:flex><span>		cwd[<span style=color:#ae81ff>0</span>] <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;\0&#39;</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	new_state.cwd <span style=color:#f92672>=</span> estrdup(cwd);
+</span></span><span style=display:flex><span>	new_state.cwd_length <span style=color:#f92672>=</span> strlen(cwd);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (virtual_file_ex(<span style=color:#f92672>&amp;</span>new_state, path, NULL, CWD_REALPATH)) {
+</span></span><span style=display:flex><span>		efree(new_state.cwd);
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifndef PHP_WIN32
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>if</span> (IS_SLASH(new_state.cwd[new_state.cwd_length <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>])) {
+</span></span><span style=display:flex><span>		trailing_slash <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>;
+</span></span><span style=display:flex><span>	} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>		trailing_slash <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;/&#34;</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (snprintf(opened_path, MAXPATHLEN, <span style=color:#e6db74>&#34;%s%s%sXXXXXX&#34;</span>, new_state.cwd, trailing_slash, pfx) <span style=color:#f92672>&gt;=</span> MAXPATHLEN) {
+</span></span><span style=display:flex><span>		efree(new_state.cwd);
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifdef PHP_WIN32
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	cwdw <span style=color:#f92672>=</span> php_win32_ioutil_any_to_w(new_state.cwd);
+</span></span><span style=display:flex><span>	pfxw <span style=color:#f92672>=</span> php_win32_ioutil_any_to_w(pfx);
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>cwdw <span style=color:#f92672>||</span> <span style=color:#f92672>!</span>pfxw) {
+</span></span><span style=display:flex><span>		free(cwdw);
+</span></span><span style=display:flex><span>		free(pfxw);
+</span></span><span style=display:flex><span>		efree(new_state.cwd);
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (GetTempFileNameW(cwdw, pfxw, <span style=color:#ae81ff>0</span>, pathw)) {
+</span></span><span style=display:flex><span>		opened_path <span style=color:#f92672>=</span> php_win32_ioutil_conv_w_to_any(pathw, PHP_WIN32_CP_IGNORE_LEN, <span style=color:#f92672>&amp;</span>opened_path_len);
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>opened_path <span style=color:#f92672>||</span> opened_path_len <span style=color:#f92672>&gt;=</span> MAXPATHLEN) {
+</span></span><span style=display:flex><span>			free(cwdw);
+</span></span><span style=display:flex><span>			free(pfxw);
+</span></span><span style=display:flex><span>			efree(new_state.cwd);
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>return</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>		assert(strlen(opened_path) <span style=color:#f92672>==</span> opened_path_len);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		<span style=color:#75715e>/* Some versions of windows set the temp file to be read-only,
+</span></span></span><span style=display:flex><span><span style=color:#75715e>		 * which means that opening it will fail... */</span>
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> (VCWD_CHMOD(opened_path, <span style=color:#ae81ff>0600</span>)) {
+</span></span><span style=display:flex><span>			free(cwdw);
+</span></span><span style=display:flex><span>			free(pfxw);
+</span></span><span style=display:flex><span>			efree(new_state.cwd);
+</span></span><span style=display:flex><span>			free(opened_path);
+</span></span><span style=display:flex><span>			<span style=color:#66d9ef>return</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>		fd <span style=color:#f92672>=</span> VCWD_OPEN_MODE(opened_path, open_flags, <span style=color:#ae81ff>0600</span>);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	free(cwdw);
+</span></span><span style=display:flex><span>	free(pfxw);
+</span></span><span style=display:flex><span><span style=color:#75715e>#elif defined(HAVE_MKSTEMP)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	fd <span style=color:#f92672>=</span> mkstemp(opened_path);
+</span></span><span style=display:flex><span><span style=color:#75715e>#else
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>if</span> (mktemp(opened_path)) {
+</span></span><span style=display:flex><span>		fd <span style=color:#f92672>=</span> VCWD_OPEN(opened_path, open_flags);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifdef PHP_WIN32
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>if</span> (fd <span style=color:#f92672>!=</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span> <span style=color:#f92672>&amp;&amp;</span> opened_path_p) {
+</span></span><span style=display:flex><span>		<span style=color:#f92672>*</span>opened_path_p <span style=color:#f92672>=</span> zend_string_init(opened_path, opened_path_len, <span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>	free(opened_path);
+</span></span><span style=display:flex><span><span style=color:#75715e>#else
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>if</span> (fd <span style=color:#f92672>!=</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span> <span style=color:#f92672>&amp;&amp;</span> opened_path_p) {
+</span></span><span style=display:flex><span>		<span style=color:#f92672>*</span>opened_path_p <span style=color:#f92672>=</span> zend_string_init(opened_path, strlen(opened_path), <span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	efree(new_state.cwd);
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>return</span> fd;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#75715e>/* }}} */</span>
+</span></span></code></pre></div><p>最有可能出现问题的地方应该就是 <code>mkstemp(opened_path)</code> 执行返回错误。也就是说，不知道运维对服务器做了哪些手脚，导致 <code>is_writable('/foobar/bootstrap/cache')</code> 返回的是 <code>true</code>；而在该路径下创建临时文件却失败了。怀疑是服务器上有某种安全保护机制，禁止动态创建 .php 文件。</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/PHP/>PHP</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202112/1638411712/ class="left arrow">上一篇</a>
 <a href=/moments/202112/1639039629/ class="right arrow">下一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-02 07:33:13.862198262 &#43;0000 UTC m=&#43;0.389151778">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-03 07:21:11.198232993 +0000 UTC m=+0.663500180">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>

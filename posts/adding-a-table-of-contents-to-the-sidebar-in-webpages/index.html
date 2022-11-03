@@ -1,164 +1,173 @@
-<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>为网页添加侧边栏目录导航 &middot; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js></script><script>hljs.highlightAll();hljs.initLineNumbersOnLoad();</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
-gtag('js',new Date());gtag('config','UA-153840298-1');</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>为网页添加侧边栏目录导航</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>为网页添加侧边栏目录导航 &#183; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>为网页添加侧边栏目录导航</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
-<span>于&nbsp;</span><time datetime="2022-03-07 00:00:00 &#43;0000 UTC" data-pagefind-meta=日期>2022年3月7日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><nav id=TableOfContents><ul><li><a href=#起因>起因</a></li><li><a href=#需求>需求</a></li><li><a href=#实现原理>实现原理</a><ul><li><a href=#悬浮侧边栏>悬浮侧边栏</a></li><li><a href=#响应式布局>响应式布局</a></li><li><a href=#目录高亮跟随>目录高亮跟随</a></li></ul></li><li><a href=#演示代码>演示代码</a><ul><li><a href=#html>HTML</a></li><li><a href=#css>CSS</a></li><li><a href=#javascript>JavaScript</a></li></ul></li></ul></nav><div id=collapsed-toc><a class=button><i class="fa-solid fa-bars"></i></a></div><aside id=aside-toc data-pagefind-ignore><div class=header><i class="fa-solid fa-bars"></i>&nbsp;章节目录<a class="button close"><i class="fa-solid fa-xmark"></i></a></div><div class=content></div></aside><h1 id=起因>起因</h1><p>一直很反感那些花里胡哨的博客模板，所以为这个网站选择了一套非常简约的主题，并在此基础上简单地修改。主要是将默认的衬线字体改成了非衬线字体，增加了顶部的导航栏等。</p><p>主题默认的章节目录和正文是顺序堆叠（stacklayout）的。然而，在实际使用过程中发现，当文章内容很长时，如果没有章节目录导航的话，阅读体验相当不好，特别是在触屏移动设备上，体验更加不堪。因此，决定给文章页加上章节目录导航。</p><h1 id=需求>需求</h1><p>现在的文章页是单列布局，正文栏最大宽度为 800 像素，如果要换成左右两列布局，整个模板都需要大改动，不切实际。在不改变现有布局的前提下，章节导航应实现如下需求：</p><ol><li>只有当文章页启用目录（table of contents）时，才会显示导航栏；</li><li>当浏览器 viewport 宽度大于 1280 像素时，导航栏悬浮在网页的左侧空白区域；<br><figure><img src=rendering-1.jpg alt="当浏览器 viewport 宽度大于 1280 像素时"><figcaption><p>当浏览器 viewport 宽度大于 1280 像素时</p></figcaption></figure></li><li>当浏览器 viewport 宽度小于 1280 像素时，导航栏通过悬浮按钮召唤弹出，覆盖浏览器 viewport；<br><figure><img src=rendering-2.jpg alt="当浏览器 viewport 宽度小于 1280 像素时"><figcaption><p>当浏览器 viewport 宽度小于 1280 像素时</p></figcaption></figure><figure><img src=rendering-3.jpg alt=弹出导航栏><figcaption><p>弹出导航栏</p></figcaption></figure></li><li>当导航栏内容高度超出 viewport 高度时，能在垂直方向滚动；</li><li>导航栏目录会跟随当前 viewport 的正文偏移位置自动高亮或加粗。</li></ol><h1 id=实现原理>实现原理</h1><h2 id=悬浮侧边栏>悬浮侧边栏</h2><p>让侧边栏悬浮的原理很简单，使用 CSS 属性 <code>position: sticky</code>。这个属性的作用是，当元素在 viewport 内，表现为 relative；当元素要滑出 viewport 时，表现为 fixed。</p><h2 id=响应式布局>响应式布局</h2><p>利用 CSS 的媒体查询，实现响应式布局。案例中使用了如下几档宽度：</p><ul><li><code>@media (min-width: 1280px)</code> 宽度大于 1280 像素，显示侧边栏，且设置侧边栏宽度为 230 像素；</li><li><code>@media (min-width: 1360px)</code> 宽度大于 1360 像素，显示侧边栏，且设置侧边栏宽度为 270 像素；</li><li><code>@media (min-width: 1680px)</code>宽度大于 1680 像素，显示侧边栏，且设置侧边栏宽度为 430 像素；</li><li><code>@media (max-width: 1279px)</code> 宽度小于 1280 像素，不显示侧边栏，且设置召唤导航栏宽度为 800 像素；</li><li><code>@media (max-width: 800px)</code>宽度小于 800 像素，不显示侧边栏，且设置召唤导航栏宽度为 viewport 宽度。</li></ul><h2 id=目录高亮跟随>目录高亮跟随</h2><p>目录高亮跟随需要通过脚本实现：</p><ol><li>遍历页面中所有的 <code>h1</code>~<code>h6</code> 章节的 DOM 节点，将每个节点的 <code>id</code> 属性和 <code>offsetTop</code> 属性保存到数组 <code>anchorPositions</code> 中，按 <code>offsetTop</code> 大小倒序；</li><li>监听 <code>window.onscroll</code> 事件，在 handler 中顺序遍历 <code>anchorPositions</code> 数组中的节点，当 <code>window.pageYOffset</code> 大于当前节点的 <code>offsetTop</code> 时，高亮显示当前节点对应的目录菜单项并退出遍历；</li><li>由于页面内容变化，比如载入图片或动态生成内容等，章节的 <code>offsetTop</code> 属性会发生变化。监听 <code>window.onresize</code> 事件，在 handler 中更新 <code>anchorPositions</code> 数组的数据。</li></ol><h1 id=演示代码>演示代码</h1><h2 id=html>HTML</h2><p>演示代码为 HUGO 模板。</p><pre><code class=language-html>&lt;!-- 如果文章显示章节目录 --&gt;
-{{- if .Params.toc }}
-
-&lt;!-- 输出章节目录 --&gt;
-{{ .TableOfContents }}
-
-&lt;!-- 导航栏召唤按钮 --&gt;
-&lt;div id=&quot;collapsed-toc&quot;&gt;
-    &lt;a class=&quot;button&quot;&gt;
-        &lt;i class=&quot;fa-solid fa-bars&quot;&gt;&lt;/i&gt;
-    &lt;/a&gt;
-&lt;/div&gt;
-
-&lt;!-- 导航栏 --&gt;
-&lt;aside id=&quot;aside-toc&quot;&gt;
-    &lt;!-- 标题栏 --&gt;
-    &lt;div class=&quot;header&quot;&gt;
-        &lt;span&gt;章节目录&lt;/span&gt;    
-        &lt;!-- 关闭按钮 --&gt;
-        &lt;a class=&quot;button close&quot;&gt;
-            &lt;i class=&quot;fa-solid fa-xmark&quot;&gt;&lt;/i&gt;
-        &lt;/a&gt;
-    &lt;/div&gt;
-    &lt;!-- 章节目录 --&gt;
-    &lt;div class=&quot;content&quot;&gt;&lt;/div&gt;
-&lt;/aside&gt;
-{{- end }}
-
-&lt;!-- 下面是文章的正文 --&gt;
-{{ .Content }}
-</code></pre><h2 id=css>CSS</h2><p>演示代码使用了 SCSS 预处理器。</p><pre><code class=language-scss>.is-clipped {
-  overflow: hidden!important
-}
-
-#aside-toc {
-  z-index: 100;
-  display: none;
-  float: left;
-  top: 0;
-  max-height: 100vh;
-  .header {
-    .button.close {
-      float: right;
-    }
-  }
-  ul {
-    li {
-      a.active {
-        font-weight: bold;
-        color: black;
-      }  
-    }
-  }
-}
-
-#aside-toc:hover {
-  overflow-y: auto;
-}
-
-#collapsed-toc {
-  top: 0;
-  position: sticky;
-  z-index: 10;
-  display: none;
-}
-
-html {
-  @media (min-width: 1280px) {
-    #aside-toc {
-      display: block;
-      position: sticky;
-      margin-left: -240px;
-      width: 230px;
-      .button.close {
-        display: none;
-      }
-    }
-  }
-  @media (min-width: 1360px) {
-    #aside-toc {
-      margin-left: -280px;
-      width: 270px;
-    }
-  }
-  @media (min-width: 1680px) {
-    #aside-toc {
-      margin-left: -440px;
-      width: 430px;
-    }
-  }
-  @media (max-width: 1279px) {
-    #aside-toc {
-      display: none;
-      position: fixed;
-      width: 800px;
-      top: 0;
-      height: 100vh;
-    }
-    #aside-toc.active {
-      display: block;
-    }
-    #collapsed-toc {
-      display: block;
-    }
-  }
-  @media (max-width: 800px) {
-    #aside-toc {
-      width: 100vw;
-    }
-  }
-}
-</code></pre><h2 id=javascript>JavaScript</h2><p>演示代码使用 jQuery 库。</p><pre><code class=language-javascript>$(function(){
-  var $tableOfContents = $('#TableOfContents');
-  if ($tableOfContents.length &gt; 0) {
-    var $rootElement = $(document.documentElement);
-    var $asideBar = $('#aside-toc');
-    var $collapsedTOC = $('#collapsed-toc');
-    var $asideTOC = $asideBar.children('.content');
-    $asideTOC.append($tableOfContents.children('ul').clone());
-
-    var anchorPositions;
-    var loadAnchorPositions = function () {
-      anchorPositions = new Array();
-      $('h1,h2,h3,h4,h5,h6').each(function () {
-        if (!this.id) return;
-        anchorPositions.unshift({id: this.id, top: this.offsetTop});
-      });
-    };
-    loadAnchorPositions();
-
-    $(window).scroll(function () {
-      $(anchorPositions).each(function () {
-        if (window.pageYOffset + 1 &gt;= this.top) {
-          $asideTOC.find('a').removeClass('active');
-          $asideTOC.find('a[href=&quot;#' + this.id + '&quot;]').addClass('active');
-          return false;
-        }
-      });
-    });
-      
-    $(window).resize(function () {
-      loadAnchorPositions();
-    });
-
-    $asideBar.on('click', 'a', function () {
-      $asideBar.removeClass('active');
-      $rootElement.removeClass('is-clipped');
-    });
-
-    $collapsedTOC.children('a').click(function () {
-      $rootElement.addClass('is-clipped');
-      $asideBar.addClass('active');
-      return false;
-    });
-    // end of toc processing
-  }
-});
-</code></pre><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/%E5%89%8D%E7%AB%AF/>前端</a></li><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/CSS/>CSS</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202203/1646270875/ class="left arrow">上一篇</a>
+<span>于&nbsp;</span><time datetime="2022-03-07 00:00:00 +0000 UTC" data-pagefind-meta=日期>2022年3月7日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><nav id=TableOfContents><ul><li><a href=#起因>起因</a></li><li><a href=#需求>需求</a></li><li><a href=#实现原理>实现原理</a><ul><li><a href=#悬浮侧边栏>悬浮侧边栏</a></li><li><a href=#响应式布局>响应式布局</a></li><li><a href=#目录高亮跟随>目录高亮跟随</a></li></ul></li><li><a href=#演示代码>演示代码</a><ul><li><a href=#html>HTML</a></li><li><a href=#css>CSS</a></li><li><a href=#javascript>JavaScript</a></li></ul></li></ul></nav><div id=collapsed-toc><a class=button><i class="fa-solid fa-bars"></i></a></div><aside id=aside-toc data-pagefind-ignore><div class=header><i class="fa-solid fa-bars"></i>&nbsp;章节目录<a class="button close"><i class="fa-solid fa-xmark"></i></a></div><div class=content></div></aside><h2 id=起因>起因</h2><p>一直很反感那些花里胡哨的博客模板，所以为这个网站选择了一套非常简约的主题，并在此基础上简单地修改。主要是将默认的衬线字体改成了非衬线字体，增加了顶部的导航栏等。</p><p>主题默认的章节目录和正文是顺序堆叠（stacklayout）的。然而，在实际使用过程中发现，当文章内容很长时，如果没有章节目录导航的话，阅读体验相当不好，特别是在触屏移动设备上，体验更加不堪。因此，决定给文章页加上章节目录导航。</p><h2 id=需求>需求</h2><p>现在的文章页是单列布局，正文栏最大宽度为 800 像素，如果要换成左右两列布局，整个模板都需要大改动，不切实际。在不改变现有布局的前提下，章节导航应实现如下需求：</p><ol><li>只有当文章页启用目录（table of contents）时，才会显示导航栏；</li><li>当浏览器 viewport 宽度大于 1280 像素时，导航栏悬浮在网页的左侧空白区域；<br><figure><img src=rendering-1.jpg alt="当浏览器 viewport 宽度大于 1280 像素时"><figcaption><p>当浏览器 viewport 宽度大于 1280 像素时</p></figcaption></figure></li><li>当浏览器 viewport 宽度小于 1280 像素时，导航栏通过悬浮按钮召唤弹出，覆盖浏览器 viewport；<br><figure><img src=rendering-2.jpg alt="当浏览器 viewport 宽度小于 1280 像素时"><figcaption><p>当浏览器 viewport 宽度小于 1280 像素时</p></figcaption></figure><figure><img src=rendering-3.jpg alt=弹出导航栏><figcaption><p>弹出导航栏</p></figcaption></figure></li><li>当导航栏内容高度超出 viewport 高度时，能在垂直方向滚动；</li><li>导航栏目录会跟随当前 viewport 的正文偏移位置自动高亮或加粗。</li></ol><h2 id=实现原理>实现原理</h2><h3 id=悬浮侧边栏>悬浮侧边栏</h3><p>让侧边栏悬浮的原理很简单，使用 CSS 属性 <code>position: sticky</code>。这个属性的作用是，当元素在 viewport 内，表现为 relative；当元素要滑出 viewport 时，表现为 fixed。</p><h3 id=响应式布局>响应式布局</h3><p>利用 CSS 的媒体查询，实现响应式布局。案例中使用了如下几档宽度：</p><ul><li><code>@media (min-width: 1280px)</code> 宽度大于 1280 像素，显示侧边栏，且设置侧边栏宽度为 230 像素；</li><li><code>@media (min-width: 1360px)</code> 宽度大于 1360 像素，显示侧边栏，且设置侧边栏宽度为 270 像素；</li><li><code>@media (min-width: 1680px) </code>宽度大于 1680 像素，显示侧边栏，且设置侧边栏宽度为 430 像素；</li><li><code>@media (max-width: 1279px)</code> 宽度小于 1280 像素，不显示侧边栏，且设置召唤导航栏宽度为 800 像素；</li><li><code>@media (max-width: 800px) </code>宽度小于 800 像素，不显示侧边栏，且设置召唤导航栏宽度为 viewport 宽度。</li></ul><h3 id=目录高亮跟随>目录高亮跟随</h3><p>目录高亮跟随需要通过脚本实现：</p><ol><li>遍历页面中所有的 <code>h1</code>~<code>h6</code> 章节的 DOM 节点，将每个节点的 <code>id</code> 属性和 <code>offsetTop</code> 属性保存到数组 <code>anchorPositions</code> 中，按 <code>offsetTop</code> 大小倒序；</li><li>监听 <code>window.onscroll</code> 事件，在 handler 中顺序遍历 <code>anchorPositions</code> 数组中的节点，当 <code>window.pageYOffset</code> 大于当前节点的 <code>offsetTop</code> 时，高亮显示当前节点对应的目录菜单项并退出遍历；</li><li>由于页面内容变化，比如载入图片或动态生成内容等，章节的 <code>offsetTop</code> 属性会发生变化。监听 <code>window.onresize</code> 事件，在 handler 中更新 <code>anchorPositions</code> 数组的数据。</li></ol><h2 id=演示代码>演示代码</h2><h3 id=html>HTML</h3><p>演示代码为 HUGO 模板。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-html data-lang=html><span style=display:flex><span><span style=color:#75715e>&lt;!-- 如果文章显示章节目录 --&gt;</span>
+</span></span><span style=display:flex><span>{{- if .Params.toc }}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>&lt;!-- 输出章节目录 --&gt;</span>
+</span></span><span style=display:flex><span>{{ .TableOfContents }}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>&lt;!-- 导航栏召唤按钮 --&gt;</span>
+</span></span><span style=display:flex><span>&lt;<span style=color:#f92672>div</span> <span style=color:#a6e22e>id</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;collapsed-toc&#34;</span>&gt;
+</span></span><span style=display:flex><span>    &lt;<span style=color:#f92672>a</span> <span style=color:#a6e22e>class</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;button&#34;</span>&gt;
+</span></span><span style=display:flex><span>        &lt;<span style=color:#f92672>i</span> <span style=color:#a6e22e>class</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;fa-solid fa-bars&#34;</span>&gt;&lt;/<span style=color:#f92672>i</span>&gt;
+</span></span><span style=display:flex><span>    &lt;/<span style=color:#f92672>a</span>&gt;
+</span></span><span style=display:flex><span>&lt;/<span style=color:#f92672>div</span>&gt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>&lt;!-- 导航栏 --&gt;</span>
+</span></span><span style=display:flex><span>&lt;<span style=color:#f92672>aside</span> <span style=color:#a6e22e>id</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;aside-toc&#34;</span>&gt;
+</span></span><span style=display:flex><span>    <span style=color:#75715e>&lt;!-- 标题栏 --&gt;</span>
+</span></span><span style=display:flex><span>    &lt;<span style=color:#f92672>div</span> <span style=color:#a6e22e>class</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;header&#34;</span>&gt;
+</span></span><span style=display:flex><span>        &lt;<span style=color:#f92672>span</span>&gt;章节目录&lt;/<span style=color:#f92672>span</span>&gt;    
+</span></span><span style=display:flex><span>        <span style=color:#75715e>&lt;!-- 关闭按钮 --&gt;</span>
+</span></span><span style=display:flex><span>        &lt;<span style=color:#f92672>a</span> <span style=color:#a6e22e>class</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;button close&#34;</span>&gt;
+</span></span><span style=display:flex><span>            &lt;<span style=color:#f92672>i</span> <span style=color:#a6e22e>class</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;fa-solid fa-xmark&#34;</span>&gt;&lt;/<span style=color:#f92672>i</span>&gt;
+</span></span><span style=display:flex><span>        &lt;/<span style=color:#f92672>a</span>&gt;
+</span></span><span style=display:flex><span>    &lt;/<span style=color:#f92672>div</span>&gt;
+</span></span><span style=display:flex><span>    <span style=color:#75715e>&lt;!-- 章节目录 --&gt;</span>
+</span></span><span style=display:flex><span>    &lt;<span style=color:#f92672>div</span> <span style=color:#a6e22e>class</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;content&#34;</span>&gt;&lt;/<span style=color:#f92672>div</span>&gt;
+</span></span><span style=display:flex><span>&lt;/<span style=color:#f92672>aside</span>&gt;
+</span></span><span style=display:flex><span>{{- end }}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>&lt;!-- 下面是文章的正文 --&gt;</span>
+</span></span><span style=display:flex><span>{{ .Content }}
+</span></span></code></pre></div><h3 id=css>CSS</h3><p>演示代码使用了 SCSS 预处理器。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-scss data-lang=scss><span style=display:flex><span><span style=color:#a6e22e>.is-clipped</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>overflow</span><span style=color:#f92672>:</span> hidden<span style=color:#66d9ef>!important</span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>#aside-toc {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>z-index</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>100</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>display</span><span style=color:#f92672>:</span> none;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>float</span><span style=color:#f92672>:</span> left;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>top</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>max-height</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>100</span><span style=color:#66d9ef>vh</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>.header</span> {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>.button.close</span> {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>float</span><span style=color:#f92672>:</span> right;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  <span style=color:#f92672>ul</span> {
+</span></span><span style=display:flex><span>    <span style=color:#f92672>li</span> {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>a</span><span style=color:#a6e22e>.active</span> {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>font-weight</span><span style=color:#f92672>:</span> bold;
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>color</span><span style=color:#f92672>:</span> <span style=color:#66d9ef>black</span>;
+</span></span><span style=display:flex><span>      }  
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>#aside-toc<span style=color:#a6e22e>:hover</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>overflow-y</span><span style=color:#f92672>:</span> auto;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>#collapsed-toc {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>top</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>position</span><span style=color:#f92672>:</span> sticky;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>z-index</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>10</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>display</span><span style=color:#f92672>:</span> none;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>html</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>@media</span> (<span style=color:#a6e22e>min-width</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>1280</span><span style=color:#66d9ef>px</span>) {
+</span></span><span style=display:flex><span>    #aside-toc {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>display</span><span style=color:#f92672>:</span> block;
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>position</span><span style=color:#f92672>:</span> sticky;
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>margin-left</span><span style=color:#f92672>:</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>240</span><span style=color:#66d9ef>px</span>;
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>width</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>230</span><span style=color:#66d9ef>px</span>;
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>.button.close</span> {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>display</span><span style=color:#f92672>:</span> none;
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>@media</span> (<span style=color:#a6e22e>min-width</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>1360</span><span style=color:#66d9ef>px</span>) {
+</span></span><span style=display:flex><span>    #aside-toc {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>margin-left</span><span style=color:#f92672>:</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>280</span><span style=color:#66d9ef>px</span>;
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>width</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>270</span><span style=color:#66d9ef>px</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>@media</span> (<span style=color:#a6e22e>min-width</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>1680</span><span style=color:#66d9ef>px</span>) {
+</span></span><span style=display:flex><span>    #aside-toc {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>margin-left</span><span style=color:#f92672>:</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>440</span><span style=color:#66d9ef>px</span>;
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>width</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>430</span><span style=color:#66d9ef>px</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>@media</span> (<span style=color:#a6e22e>max-width</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>1279</span><span style=color:#66d9ef>px</span>) {
+</span></span><span style=display:flex><span>    #aside-toc {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>display</span><span style=color:#f92672>:</span> none;
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>position</span><span style=color:#f92672>:</span> fixed;
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>width</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>800</span><span style=color:#66d9ef>px</span>;
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>top</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>height</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>100</span><span style=color:#66d9ef>vh</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    #aside-toc<span style=color:#a6e22e>.active</span> {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>display</span><span style=color:#f92672>:</span> block;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    #collapsed-toc {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>display</span><span style=color:#f92672>:</span> block;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>@media</span> (<span style=color:#a6e22e>max-width</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>800</span><span style=color:#66d9ef>px</span>) {
+</span></span><span style=display:flex><span>    #aside-toc {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>width</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>100</span><span style=color:#66d9ef>vw</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=javascript>JavaScript</h3><p>演示代码使用 jQuery 库。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#a6e22e>$</span>(<span style=color:#66d9ef>function</span>(){
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>$tableOfContents</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>$</span>(<span style=color:#e6db74>&#39;#TableOfContents&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>$tableOfContents</span>.<span style=color:#a6e22e>length</span> <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>$rootElement</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>$</span>(document.<span style=color:#a6e22e>documentElement</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>$asideBar</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>$</span>(<span style=color:#e6db74>&#39;#aside-toc&#39;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>$collapsedTOC</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>$</span>(<span style=color:#e6db74>&#39;#collapsed-toc&#39;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>$asideTOC</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>$asideBar</span>.<span style=color:#a6e22e>children</span>(<span style=color:#e6db74>&#39;.content&#39;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>$asideTOC</span>.<span style=color:#a6e22e>append</span>(<span style=color:#a6e22e>$tableOfContents</span>.<span style=color:#a6e22e>children</span>(<span style=color:#e6db74>&#39;ul&#39;</span>).<span style=color:#a6e22e>clone</span>());
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>anchorPositions</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>var</span> <span style=color:#a6e22e>loadAnchorPositions</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>function</span> () {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>anchorPositions</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Array();
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>$</span>(<span style=color:#e6db74>&#39;h1,h2,h3,h4,h5,h6&#39;</span>).<span style=color:#a6e22e>each</span>(<span style=color:#66d9ef>function</span> () {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#66d9ef>this</span>.<span style=color:#a6e22e>id</span>) <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>anchorPositions</span>.<span style=color:#a6e22e>unshift</span>({<span style=color:#a6e22e>id</span><span style=color:#f92672>:</span> <span style=color:#66d9ef>this</span>.<span style=color:#a6e22e>id</span>, <span style=color:#a6e22e>top</span><span style=color:#f92672>:</span> <span style=color:#66d9ef>this</span>.<span style=color:#a6e22e>offsetTop</span>});
+</span></span><span style=display:flex><span>      });
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>loadAnchorPositions</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>$</span>(window).<span style=color:#a6e22e>scroll</span>(<span style=color:#66d9ef>function</span> () {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>$</span>(<span style=color:#a6e22e>anchorPositions</span>).<span style=color:#a6e22e>each</span>(<span style=color:#66d9ef>function</span> () {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (window.<span style=color:#a6e22e>pageYOffset</span> <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span> <span style=color:#f92672>&gt;=</span> <span style=color:#66d9ef>this</span>.<span style=color:#a6e22e>top</span>) {
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>$asideTOC</span>.<span style=color:#a6e22e>find</span>(<span style=color:#e6db74>&#39;a&#39;</span>).<span style=color:#a6e22e>removeClass</span>(<span style=color:#e6db74>&#39;active&#39;</span>);
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>$asideTOC</span>.<span style=color:#a6e22e>find</span>(<span style=color:#e6db74>&#39;a[href=&#34;#&#39;</span> <span style=color:#f92672>+</span> <span style=color:#66d9ef>this</span>.<span style=color:#a6e22e>id</span> <span style=color:#f92672>+</span> <span style=color:#e6db74>&#39;&#34;]&#39;</span>).<span style=color:#a6e22e>addClass</span>(<span style=color:#e6db74>&#39;active&#39;</span>);
+</span></span><span style=display:flex><span>          <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>      });
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>      
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>$</span>(window).<span style=color:#a6e22e>resize</span>(<span style=color:#66d9ef>function</span> () {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>loadAnchorPositions</span>();
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>$asideBar</span>.<span style=color:#a6e22e>on</span>(<span style=color:#e6db74>&#39;click&#39;</span>, <span style=color:#e6db74>&#39;a&#39;</span>, <span style=color:#66d9ef>function</span> () {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>$asideBar</span>.<span style=color:#a6e22e>removeClass</span>(<span style=color:#e6db74>&#39;active&#39;</span>);
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>$rootElement</span>.<span style=color:#a6e22e>removeClass</span>(<span style=color:#e6db74>&#39;is-clipped&#39;</span>);
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>$collapsedTOC</span>.<span style=color:#a6e22e>children</span>(<span style=color:#e6db74>&#39;a&#39;</span>).<span style=color:#a6e22e>click</span>(<span style=color:#66d9ef>function</span> () {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>$rootElement</span>.<span style=color:#a6e22e>addClass</span>(<span style=color:#e6db74>&#39;is-clipped&#39;</span>);
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>$asideBar</span>.<span style=color:#a6e22e>addClass</span>(<span style=color:#e6db74>&#39;active&#39;</span>);
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// end of toc processing
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>  }
+</span></span><span style=display:flex><span>});
+</span></span></code></pre></div><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/%E5%89%8D%E7%AB%AF/>前端</a></li><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/CSS/>CSS</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202203/1646270875/ class="left arrow">上一篇</a>
 <a href=/moments/202203/1646624113/ class="right arrow">下一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-02 07:33:13.843539015 &#43;0000 UTC m=&#43;0.370492531">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-03 07:21:10.949323475 +0000 UTC m=+0.414590762">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
