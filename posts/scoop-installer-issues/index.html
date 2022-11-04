@@ -12,86 +12,86 @@
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>Scoop 踩坑记录</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2022-06-17 00:00:00 +0000 UTC" data-pagefind-meta=日期>2022年6月17日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/using/>Using</a></li></ul></div><h2 id=安装时无法指定软件版本>安装时无法指定软件版本</h2><p>网上部分教程表示 scoop 安装软件时可以指定版本号：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-powershell data-lang=powershell><span style=display:flex><span>scoop install git@2.34.0.windows.1
-</span></span></code></pre></div><p>但实际上这个功能现在已无法正常使用，目前的官方文档里也没有注明这样的用法。此外，有些软件官方网站并不会保留历史版本的下载链接，这也是 scoop 不能支持安装软件指定版本的原因之一。</p><p>如果要安装软件的历史版本，只能通过自建软件仓库的方式来实现。</p><h2 id=不支持通过-manifest-文件安装>不支持通过 manifest 文件安装</h2><p>通过命令 <code>scoop help install</code> 查看安装参数可以得知，scoop 应该是支持从 URL 或本地 manifest 文件来安装软件的。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-plaintext data-lang=plaintext><span style=display:flex><span>Usage: scoop install &lt;app&gt; [options]
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>e.g. The usual way to install an app (uses your local &#39;buckets&#39;):
-</span></span><span style=display:flex><span>     scoop install git
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>To install an app from a manifest at a URL:
-</span></span><span style=display:flex><span>     scoop install https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/runat.json
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>To install an app from a manifest on your computer
-</span></span><span style=display:flex><span>     scoop install \path\to\app.json
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>Options:
-</span></span><span style=display:flex><span>  -g, --global              Install the app globally
-</span></span><span style=display:flex><span>  -i, --independent         Don&#39;t install dependencies automatically
-</span></span><span style=display:flex><span>  -k, --no-cache            Don&#39;t use the download cache
-</span></span><span style=display:flex><span>  -u, --no-update-scoop     Don&#39;t update Scoop before installing if it&#39;s outdated
-</span></span><span style=display:flex><span>  -s, --skip                Skip hash validation (use with caution!)
-</span></span><span style=display:flex><span>  -a, --arch &lt;32bit|64bit&gt;  Use the specified architecture, if the app supports it
-</span></span></code></pre></div><p>但是实测并不成功，会得到一个 <code>Couldn't find manifest for 'APP_NAME'.</code> 错误。看起来，安装的软件名称必须在现有的仓库中存在才行。这样的话，通过 URL 或 json 文件来安装软件的功能就一点意义都没有了。</p><h2 id=安装时发生-hash-check-failed-错误>安装时发生 Hash check failed 错误</h2><p>有时，在安装软件时会遇到 <code>Hash check failed</code> 错误。比如目前用 <code>scoop install nirsoft\filetypesman</code> 命令安装 FileTypesMan 时报错：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-plaintext data-lang=plaintext><span style=display:flex><span>Installing &#39;filetypesman&#39; (1.95) [64bit]
-</span></span><span style=display:flex><span>Checking hash of filetypesman-x64.zip ... ERROR Hash check failed!
-</span></span><span style=display:flex><span>App:         nirsoft/filetypesman
-</span></span><span style=display:flex><span>URL:         https://www.nirsoft.net/utils/filetypesman-x64.zip
-</span></span><span style=display:flex><span>First bytes: 50 4B 03 04 14 00 02 00
-</span></span><span style=display:flex><span>Expected:    d032ee7ea72b6678a65c3500f19eb3edb58574f33a2be9ff0ac6d9ef9ea29ada
-</span></span><span style=display:flex><span>Actual:      5feec2a7c0ca1d46ff8bd27a0eadd068f3d8c6dc3fee6f7354973319aeecefb3
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>Please try again or create a new issue by using the following link and paste your console output:
-</span></span><span style=display:flex><span>https://github.com/kodybrown/scoop-nirsoft/issues/new?title=filetypesman%401.95%3a+hash+check+failed
-</span></span></code></pre></div><p>发生该错误的原因是，官方软件的下载地址没有版本区分，发布的历史版本和当前版本都是用同一个 URL。FileTypesMan 已经发布了 1.96 版本，而仓库中的 manifest 文件未及时更新，仍是 1.95 版本，导致下载后的安装包没有通过 Hash 验证。解决方法就是安装时使用 <code>-s</code> 参数跳过 Hash 验证：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-powershell data-lang=powershell><span style=display:flex><span>scoop install -s nirsoft\filetypesman
-</span></span></code></pre></div><h2 id=manifest-的-persist-默认为文件夹>manifest 的 persist 默认为文件夹</h2><p>在 manifest 文件中，可以用 persist 定义持久性数据，但是默认为文件夹。如果要指向文件，需要用 pre_install 脚本特别处理。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;version&#34;</span>: <span style=color:#e6db74>&#34;2.51.0&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;homepage&#34;</span>: <span style=color:#e6db74>&#34;https://www.xnview.com/en/xnview/&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;license&#34;</span>: <span style=color:#e6db74>&#34;Freeware|Proprietary&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;url&#34;</span>: <span style=color:#e6db74>&#34;https://download.xnview.com/XnView-win-full.zip&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;hash&#34;</span>: <span style=color:#e6db74>&#34;DF376971063951076211D00AF74E98513C6E25377C57FCA4957EE817AB809B30&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;extract_dir&#34;</span>: <span style=color:#e6db74>&#34;XnView&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;bin&#34;</span>: <span style=color:#e6db74>&#34;xnview.exe&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;shortcuts&#34;</span>: [
-</span></span><span style=display:flex><span>        [
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;xnview.exe&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;XnView&#34;</span>
-</span></span><span style=display:flex><span>        ]
-</span></span><span style=display:flex><span>    ],
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;pre_install&#34;</span>: [
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;# --- If xnview.ini exists as a folder, then remove it ---&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;if (Test-Path \&#34;$persist_dir\\xnview.ini\&#34; -PathType Container) {&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;    Remove-Item \&#34;$persist_dir\\xnview.ini\&#34; -Force -Recurse&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;}&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;if (!(Test-Path \&#34;$persist_dir\\xnview.ini\&#34;)) {&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;   New-Item \&#34;$dir\\xnview.ini\&#34; -ItemType File | Out-Null&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;}&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;# --- If category.db exists as a folder, then remove it ---&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;if (Test-Path \&#34;$persist_dir\\category.db\&#34; -PathType Container) {&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;    Remove-Item \&#34;$persist_dir\\category.db\&#34; -Force -Recurse&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;}&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;if (!(Test-Path \&#34;$persist_dir\\category.db\&#34;)) {&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;   New-Item \&#34;$dir\\category.db\&#34; -ItemType File | Out-Null&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;}&#34;</span>
-</span></span><span style=display:flex><span>    ],
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;uninstaller&#34;</span>: {
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;script&#34;</span>: [
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;# Manually copy because Xnview overwrites hardlink with a regular file, which breaks persist&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;if ((Test-Path \&#34;$dir\\xnview.ini\&#34;) -and !(Get-Item \&#34;$dir\\xnview.ini\&#34;).LinkType -and (Test-Path $persist_dir)) { Copy-Item \&#34;$dir\\xnview.ini\&#34; $persist_dir -Force }&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#34;if ((Test-Path \&#34;$dir\\category.db\&#34;) -and !(Get-Item \&#34;$dir\\category.db\&#34;).LinkType -and (Test-Path $persist_dir)) { Copy-Item \&#34;$dir\\category.db\&#34; $persist_dir -Force }&#34;</span>
-</span></span><span style=display:flex><span>        ]
-</span></span><span style=display:flex><span>    },
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;persist&#34;</span>: [
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;xnview.ini&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;category.db&#34;</span>
-</span></span><span style=display:flex><span>    ],
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;checkver&#34;</span>: <span style=color:#e6db74>&#34;Download &lt;strong&gt;XnView ([\\d.]+)&lt;/strong&gt; for Windows&#34;</span>,
-</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;autoupdate&#34;</span>: {
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;url&#34;</span>: <span style=color:#e6db74>&#34;https://download.xnview.com/XnView-win-full.zip&#34;</span>,
-</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;hash&#34;</span>: {
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;url&#34;</span>: <span style=color:#e6db74>&#34;https://www.xnview.com/en/xnview/&#34;</span>,
-</span></span><span style=display:flex><span>            <span style=color:#f92672>&#34;find&#34;</span>: <span style=color:#e6db74>&#34;XnView-win-full.zip: ($sha256)&#34;</span>
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/%E7%AC%94%E8%AE%B0/>笔记</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/the-principle-of-git-credentials/ class="left arrow">上一篇：<br>Git Credentials 原理</a>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/using/>Using</a></li></ul></div><h2 id=安装时无法指定软件版本>安装时无法指定软件版本</h2><p>网上部分教程表示 scoop 安装软件时可以指定版本号：</p><pre><code class=language-powershell>scoop install git@2.34.0.windows.1
+</code></pre><p>但实际上这个功能现在已无法正常使用，目前的官方文档里也没有注明这样的用法。此外，有些软件官方网站并不会保留历史版本的下载链接，这也是 scoop 不能支持安装软件指定版本的原因之一。</p><p>如果要安装软件的历史版本，只能通过自建软件仓库的方式来实现。</p><h2 id=不支持通过-manifest-文件安装>不支持通过 manifest 文件安装</h2><p>通过命令 <code>scoop help install</code> 查看安装参数可以得知，scoop 应该是支持从 URL 或本地 manifest 文件来安装软件的。</p><pre><code class=language-plaintext>Usage: scoop install &lt;app&gt; [options]
+
+e.g. The usual way to install an app (uses your local 'buckets'):
+     scoop install git
+
+To install an app from a manifest at a URL:
+     scoop install https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/runat.json
+
+To install an app from a manifest on your computer
+     scoop install \path\to\app.json
+
+Options:
+  -g, --global              Install the app globally
+  -i, --independent         Don't install dependencies automatically
+  -k, --no-cache            Don't use the download cache
+  -u, --no-update-scoop     Don't update Scoop before installing if it's outdated
+  -s, --skip                Skip hash validation (use with caution!)
+  -a, --arch &lt;32bit|64bit&gt;  Use the specified architecture, if the app supports it
+</code></pre><p>但是实测并不成功，会得到一个 <code>Couldn't find manifest for 'APP_NAME'.</code> 错误。看起来，安装的软件名称必须在现有的仓库中存在才行。这样的话，通过 URL 或 json 文件来安装软件的功能就一点意义都没有了。</p><h2 id=安装时发生-hash-check-failed-错误>安装时发生 Hash check failed 错误</h2><p>有时，在安装软件时会遇到 <code>Hash check failed</code> 错误。比如目前用 <code>scoop install nirsoft\filetypesman</code> 命令安装 FileTypesMan 时报错：</p><pre><code class=language-plaintext>Installing 'filetypesman' (1.95) [64bit]
+Checking hash of filetypesman-x64.zip ... ERROR Hash check failed!
+App:         nirsoft/filetypesman
+URL:         https://www.nirsoft.net/utils/filetypesman-x64.zip
+First bytes: 50 4B 03 04 14 00 02 00
+Expected:    d032ee7ea72b6678a65c3500f19eb3edb58574f33a2be9ff0ac6d9ef9ea29ada
+Actual:      5feec2a7c0ca1d46ff8bd27a0eadd068f3d8c6dc3fee6f7354973319aeecefb3
+
+Please try again or create a new issue by using the following link and paste your console output:
+https://github.com/kodybrown/scoop-nirsoft/issues/new?title=filetypesman%401.95%3a+hash+check+failed
+</code></pre><p>发生该错误的原因是，官方软件的下载地址没有版本区分，发布的历史版本和当前版本都是用同一个 URL。FileTypesMan 已经发布了 1.96 版本，而仓库中的 manifest 文件未及时更新，仍是 1.95 版本，导致下载后的安装包没有通过 Hash 验证。解决方法就是安装时使用 <code>-s</code> 参数跳过 Hash 验证：</p><pre><code class=language-powershell>scoop install -s nirsoft\filetypesman
+</code></pre><h2 id=manifest-的-persist-默认为文件夹>manifest 的 persist 默认为文件夹</h2><p>在 manifest 文件中，可以用 persist 定义持久性数据，但是默认为文件夹。如果要指向文件，需要用 pre_install 脚本特别处理。</p><pre><code class=language-json>{
+    &quot;version&quot;: &quot;2.51.0&quot;,
+    &quot;homepage&quot;: &quot;https://www.xnview.com/en/xnview/&quot;,
+    &quot;license&quot;: &quot;Freeware|Proprietary&quot;,
+    &quot;url&quot;: &quot;https://download.xnview.com/XnView-win-full.zip&quot;,
+    &quot;hash&quot;: &quot;DF376971063951076211D00AF74E98513C6E25377C57FCA4957EE817AB809B30&quot;,
+    &quot;extract_dir&quot;: &quot;XnView&quot;,
+    &quot;bin&quot;: &quot;xnview.exe&quot;,
+    &quot;shortcuts&quot;: [
+        [
+            &quot;xnview.exe&quot;,
+            &quot;XnView&quot;
+        ]
+    ],
+    &quot;pre_install&quot;: [
+        &quot;# --- If xnview.ini exists as a folder, then remove it ---&quot;,
+        &quot;if (Test-Path \&quot;$persist_dir\\xnview.ini\&quot; -PathType Container) {&quot;,
+        &quot;    Remove-Item \&quot;$persist_dir\\xnview.ini\&quot; -Force -Recurse&quot;,
+        &quot;}&quot;,
+        &quot;if (!(Test-Path \&quot;$persist_dir\\xnview.ini\&quot;)) {&quot;,
+        &quot;   New-Item \&quot;$dir\\xnview.ini\&quot; -ItemType File | Out-Null&quot;,
+        &quot;}&quot;,
+        &quot;# --- If category.db exists as a folder, then remove it ---&quot;,
+        &quot;if (Test-Path \&quot;$persist_dir\\category.db\&quot; -PathType Container) {&quot;,
+        &quot;    Remove-Item \&quot;$persist_dir\\category.db\&quot; -Force -Recurse&quot;,
+        &quot;}&quot;,
+        &quot;if (!(Test-Path \&quot;$persist_dir\\category.db\&quot;)) {&quot;,
+        &quot;   New-Item \&quot;$dir\\category.db\&quot; -ItemType File | Out-Null&quot;,
+        &quot;}&quot;
+    ],
+    &quot;uninstaller&quot;: {
+        &quot;script&quot;: [
+            &quot;# Manually copy because Xnview overwrites hardlink with a regular file, which breaks persist&quot;,
+            &quot;if ((Test-Path \&quot;$dir\\xnview.ini\&quot;) -and !(Get-Item \&quot;$dir\\xnview.ini\&quot;).LinkType -and (Test-Path $persist_dir)) { Copy-Item \&quot;$dir\\xnview.ini\&quot; $persist_dir -Force }&quot;,
+            &quot;if ((Test-Path \&quot;$dir\\category.db\&quot;) -and !(Get-Item \&quot;$dir\\category.db\&quot;).LinkType -and (Test-Path $persist_dir)) { Copy-Item \&quot;$dir\\category.db\&quot; $persist_dir -Force }&quot;
+        ]
+    },
+    &quot;persist&quot;: [
+        &quot;xnview.ini&quot;,
+        &quot;category.db&quot;
+    ],
+    &quot;checkver&quot;: &quot;Download &lt;strong&gt;XnView ([\\d.]+)&lt;/strong&gt; for Windows&quot;,
+    &quot;autoupdate&quot;: {
+        &quot;url&quot;: &quot;https://download.xnview.com/XnView-win-full.zip&quot;,
+        &quot;hash&quot;: {
+            &quot;url&quot;: &quot;https://www.xnview.com/en/xnview/&quot;,
+            &quot;find&quot;: &quot;XnView-win-full.zip: ($sha256)&quot;
+        }
+    }
+}
+</code></pre><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/%E7%AC%94%E8%AE%B0/>笔记</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/the-principle-of-git-credentials/ class="left arrow">上一篇：<br>Git Credentials 原理</a>
 <a href=/posts/free-special-purpose-operating-system/ class="right arrow">下一篇：<br>免费的专用操作系统</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-04 06:13:30.596262958 +0000 UTC m=+0.352328506">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-04 06:17:33.118405306 +0000 UTC m=+0.230054026">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/main.js></script></body></html>

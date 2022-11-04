@@ -12,179 +12,179 @@
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>Nim 语言的动态分发机制</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2021-03-15 00:00:00 +0000 UTC" data-pagefind-meta=日期>2021年3月15日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p><a href=https://nim-lang.org/>Nim</a> 是一款 Python 风格的静态类型语言。但事实上，除了缩进语法外，Nim 和 Python 并没有太多相似之处。相对于 Python，Nim 更多地吸收了 Ada 和 Lisp 等语言的特性。</p><p>Nim 编译器通过生成 C 或 Obj-C 中间代码的方式来进行本地编译，所以需要依赖一套外部编译器。Nim 也可以生成 Javascript 代码。此外，还有以脚本方式运行的 <a href=https://nim-lang.org/docs/nims.html>NimScript</a>。</p><p>OOP 的一个特性就是支持多态，而<strong>动态分发</strong>（Dynamic Dispatch）就是实现多态的基础。在讲解 Nim 的动态分发实现前，先讲一下其他语言是如何实现的。</p><h3 id=c-虚函数>C++ 虚函数</h3><p>为了实现动态分发，C++ 必须将方法声明为 virtual。编译器会为每个类创建一个虚函数表（vtable），并将其地址保存在每个创建的对象中。当调用虚函数时，需要通过虚函数表的偏移量来定位真正的方法入口。</p><h3 id=go-接口>Go 接口</h3><p>Go 语言通过接口实现动态分发。Go 的接口是隐式实现的，类型只需要实现接口的所有方法，而不需要像 Java 那样显示声明。编译器仅在类型转换、参数传递、函数返回等操作时，才进行类型检查。</p><p>Go 的接口（runtime.iface）类型包含两个指针，一个是指向数据结构的 data 指针，另一个指向 itab 结构，该结构保存了接口的方法入口表。这样做的优点是编译器实现更加简单，语法上也更灵活，缺点是接口类型占用了更多的空间。</p><h3 id=python-鸭子类型>Python 鸭子类型</h3><p>Python 等动态类型语言具有<a href=https://zh.wikipedia.org/zh-hans/%E9%B8%AD%E5%AD%90%E7%B1%BB%E5%9E%8B>鸭子类型</a>（Duck typing）的特性，对象方法都是动态分发，而无需显式声明。Python 将方法保存在一个 dict 散列表中，在运行时通过方法名称动态查找。如果在当前类中没有找到该方法，则通过 <a href=https://docs.python.org/zh-cn/3/glossary.html#term-method-resolution-order>MRO</a> 依次向父类中查找。</p><p>显然，这种动态分发方式的开销是很高的。某些动态类型语言，例如 smalltalk 和 Javascript(V8) 会使用一种叫<a href=https://zh.wikipedia.org/zh-hans/%E5%86%85%E8%81%94%E7%BC%93%E5%AD%98>内联缓存</a>（inline cache）的优化方式来提升运行效率。</p><h3 id=nim-动态分发>Nim 动态分发</h3><p>Nim 的数据和方法是分开定义的，这种风格有点类似 Julia 和 Common Lisp。用 <code>proc</code> 关键字定义的方法使用静态分发，如果要使用动态分发，则需要使用 <code>method</code> 关键字。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nim data-lang=nim><span style=display:flex><span><span style=color:#66d9ef>type</span>
-</span></span><span style=display:flex><span>  Foo <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> RootObj
-</span></span><span style=display:flex><span>  Bar <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Foo
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispath(foo: Foo) {.base.} <span style=color:#f92672>=</span>
-</span></span><span style=display:flex><span>  echo <span style=color:#e6db74>&#34;foo&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispath(bar: Bar) <span style=color:#f92672>=</span>
-</span></span><span style=display:flex><span>  echo <span style=color:#e6db74>&#34;bar&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>proc </span><span style=color:#a6e22e>static_dispath</span>(foo: Foo) <span style=color:#f92672>=</span>
-</span></span><span style=display:flex><span>  echo <span style=color:#e6db74>&#34;foo&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>proc </span><span style=color:#a6e22e>static_dispath</span>(bar: Bar) <span style=color:#f92672>=</span>
-</span></span><span style=display:flex><span>  echo <span style=color:#e6db74>&#34;bar&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> foo: Foo <span style=color:#f92672>=</span> new(Bar)
-</span></span><span style=display:flex><span>foo.static_dispath() <span style=color:#75715e># output: foo</span>
-</span></span><span style=display:flex><span>foo.dynamic_dispath() <span style=color:#75715e># output: bar</span>
-</span></span></code></pre></div><p>同 Julia 和 Common Lisp 一样，Nim 也支持<a href=https://zh.wikipedia.org/zh-hans/%E5%A4%9A%E5%88%86%E6%B4%BE>多重分发</a>（Multiple dispatch）。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nim data-lang=nim><span style=display:flex><span><span style=color:#66d9ef>type</span>
-</span></span><span style=display:flex><span>  Thing <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> RootObj
-</span></span><span style=display:flex><span>  Unit <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Thing
-</span></span><span style=display:flex><span>    x: <span style=color:#66d9ef>int</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> collide(a, b: Thing) {.inline.} <span style=color:#f92672>=</span>
-</span></span><span style=display:flex><span>  quit <span style=color:#e6db74>&#34;to override!&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> collide(a: Thing, b: Unit) {.inline.} <span style=color:#f92672>=</span>
-</span></span><span style=display:flex><span>  echo <span style=color:#e6db74>&#34;1&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> collide(a: Unit, b: Thing) {.inline.} <span style=color:#f92672>=</span>
-</span></span><span style=display:flex><span>  echo <span style=color:#e6db74>&#34;2&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> a, b: Unit
-</span></span><span style=display:flex><span>new a
-</span></span><span style=display:flex><span>new b
-</span></span><span style=display:flex><span>collide(a, b) <span style=color:#75715e># output: 2</span>
-</span></span></code></pre></div><p><strong>注:</strong> 自 Nim 0.20 起，编译时需要使用参数 <code>--multimethods:on</code> 来启用多重分发支持。</p><p>此外，Nim 支持一种叫<a href=https://en.wikipedia.org/wiki/Uniform_Function_Call_Syntax>统一函数调用语法</a>（Uniform Function Call Syntax）的风格：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nim data-lang=nim><span style=display:flex><span><span style=color:#66d9ef>proc </span><span style=color:#a6e22e>print</span>(s: <span style=color:#66d9ef>string</span>) <span style=color:#f92672>=</span> echo s
-</span></span><span style=display:flex><span><span style=color:#66d9ef>proc </span><span style=color:#a6e22e>print</span>(s1: <span style=color:#66d9ef>string</span>, s2: <span style=color:#66d9ef>string</span>) <span style=color:#f92672>=</span> echo s1, s2
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>print(<span style=color:#e6db74>&#34;Hello World!&#34;</span>)
-</span></span><span style=display:flex><span>print <span style=color:#e6db74>&#34;Hello World!&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#e6db74>&#34;Hello World!&#34;</span>.print()
-</span></span><span style=display:flex><span><span style=color:#e6db74>&#34;Hello World!&#34;</span>.print
-</span></span><span style=display:flex><span><span style=color:#e6db74>&#34;Hello&#34;</span>.print (<span style=color:#e6db74>&#34; World!&#34;</span>)
-</span></span><span style=display:flex><span><span style=color:#e6db74>&#34;Hello&#34;</span>.print <span style=color:#e6db74>&#34; World!&#34;</span>
-</span></span></code></pre></div><p>Nim 的动态分发并没有通过虚函数表的方式来实现，而是在动态方法调用处内联展开一系列的 <code>if</code> 判断，根据调用对象的类型，最终选择不同的方法函数。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nim data-lang=nim><span style=display:flex><span><span style=color:#66d9ef>type</span>
-</span></span><span style=display:flex><span>  Base <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> RootObj
-</span></span><span style=display:flex><span>  Derived <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Base
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispatch(foo: Base) <span style=color:#f92672>=</span> echo <span style=color:#e6db74>&#34;Base&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispatch(foo: Derived) <span style=color:#f92672>=</span> echo <span style=color:#e6db74>&#34;Derived&#34;</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> foo: Base <span style=color:#f92672>=</span> new(Derived)
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>foo.dynamic_dispatch
-</span></span></code></pre></div><p>生成的 C 代码如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>/* section: NIM_merge_DATA */</span>
-</span></span><span style=display:flex><span>STRING_LITERAL(TM__TK8P9bk048kbmFtnhzKkOjA_3, <span style=color:#e6db74>&#34;Base&#34;</span>, <span style=color:#ae81ff>4</span>);
-</span></span><span style=display:flex><span><span style=color:#66d9ef>static</span> NIM_CONST tyArray__nHXaesL0DJZHyVS07ARPRA TM__TK8P9bk048kbmFtnhzKkOjA_2 <span style=color:#f92672>=</span> {((NimStringDesc<span style=color:#f92672>*</span>) <span style=color:#f92672>&amp;</span>TM__TK8P9bk048kbmFtnhzKkOjA_3)}
-</span></span><span style=display:flex><span>;
-</span></span><span style=display:flex><span>STRING_LITERAL(TM__TK8P9bk048kbmFtnhzKkOjA_5, <span style=color:#e6db74>&#34;Derived&#34;</span>, <span style=color:#ae81ff>7</span>);
-</span></span><span style=display:flex><span><span style=color:#66d9ef>static</span> NIM_CONST tyArray__nHXaesL0DJZHyVS07ARPRA TM__TK8P9bk048kbmFtnhzKkOjA_4 <span style=color:#f92672>=</span> {((NimStringDesc<span style=color:#f92672>*</span>) <span style=color:#f92672>&amp;</span>TM__TK8P9bk048kbmFtnhzKkOjA_5)}
-</span></span><span style=display:flex><span>;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e>// ... ...
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
-</span></span><span style=display:flex><span>N_LIB_PRIVATE <span style=color:#a6e22e>N_NIMCALL</span>(<span style=color:#66d9ef>void</span>, dynamic_dispatch__c5r4zNoABA7a1469bvDyeFA)(tyObject_BasecolonObjectType___9c7UwwsDx9cls9baHKBs8Py0g<span style=color:#f92672>*</span> foo) {
-</span></span><span style=display:flex><span>	nimfr_(<span style=color:#e6db74>&#34;dynamic_dispatch&#34;</span>, <span style=color:#e6db74>&#34;test.nim&#34;</span>);
-</span></span><span style=display:flex><span>	nimln_(<span style=color:#ae81ff>5</span>, <span style=color:#e6db74>&#34;test.nim&#34;</span>);
-</span></span><span style=display:flex><span>	echoBinSafe(TM__TK8P9bk048kbmFtnhzKkOjA_2, <span style=color:#ae81ff>1</span>); <span style=color:#75715e>// method dynamic_dispatch(foo: Base) = echo &#34;Base&#34;
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	popFrame();
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>N_LIB_PRIVATE <span style=color:#a6e22e>N_NIMCALL</span>(<span style=color:#66d9ef>void</span>, dynamic_dispatch__NGJl71YhyrlEEKIVgc1qbA)(tyObject_DerivedcolonObjectType___KIiBF5jw56vc7JjtgVaRMg<span style=color:#f92672>*</span> foo) {
-</span></span><span style=display:flex><span>	nimfr_(<span style=color:#e6db74>&#34;dynamic_dispatch&#34;</span>, <span style=color:#e6db74>&#34;test.nim&#34;</span>);
-</span></span><span style=display:flex><span>	nimln_(<span style=color:#ae81ff>6</span>, <span style=color:#e6db74>&#34;test.nim&#34;</span>);
-</span></span><span style=display:flex><span>	echoBinSafe(TM__TK8P9bk048kbmFtnhzKkOjA_4, <span style=color:#ae81ff>1</span>); <span style=color:#75715e>// method dynamic_dispatch(foo: Derived) = echo &#34;Derived&#34;
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	popFrame();
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e>// ... ...
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
-</span></span><span style=display:flex><span>N_LIB_PRIVATE <span style=color:#a6e22e>N_NIMCALL</span>(<span style=color:#66d9ef>void</span>, dynamic_dispatch__5KArHhtsF2JAL9bQSgyiLMA)(tyObject_BasecolonObjectType___9c7UwwsDx9cls9baHKBs8Py0g<span style=color:#f92672>*</span> foo) {
-</span></span><span style=display:flex><span>	nimfr_(<span style=color:#e6db74>&#34;dynamic_dispatch&#34;</span>, <span style=color:#e6db74>&#34;test.nim&#34;</span>);
-</span></span><span style=display:flex><span>	nimln_(<span style=color:#ae81ff>84</span>, <span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\\</span><span style=color:#e6db74>.choosenim</span><span style=color:#ae81ff>\\</span><span style=color:#e6db74>toolchains</span><span style=color:#ae81ff>\\</span><span style=color:#e6db74>nim-1.4.4</span><span style=color:#ae81ff>\\</span><span style=color:#e6db74>lib</span><span style=color:#ae81ff>\\</span><span style=color:#e6db74>system</span><span style=color:#ae81ff>\\</span><span style=color:#e6db74>ch&#34;</span>
-</span></span><span style=display:flex><span><span style=color:#e6db74>&#34;cks.nim&#34;</span>);
-</span></span><span style=display:flex><span>	chckNilDisp(foo);
-</span></span><span style=display:flex><span>	nimln_(<span style=color:#ae81ff>5</span>, <span style=color:#e6db74>&#34;test.nim&#34;</span>);
-</span></span><span style=display:flex><span>	{
-</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>((foo) <span style=color:#f92672>&amp;&amp;</span> ((<span style=color:#f92672>*</span>foo).Sup.m_type <span style=color:#f92672>==</span> (<span style=color:#f92672>&amp;</span>NTI__KIiBF5jw56vc7JjtgVaRMg_)))) <span style=color:#66d9ef>goto</span> LA3_;
-</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> (foo <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>!</span>isObj((<span style=color:#f92672>*</span>foo).Sup.m_type, (<span style=color:#f92672>&amp;</span>NTI__KIiBF5jw56vc7JjtgVaRMg_))){ raiseObjectConversionError(); }
-</span></span><span style=display:flex><span>		dynamic_dispatch__NGJl71YhyrlEEKIVgc1qbA(((tyObject_DerivedcolonObjectType___KIiBF5jw56vc7JjtgVaRMg<span style=color:#f92672>*</span>) (foo)));
-</span></span><span style=display:flex><span>	}
-</span></span><span style=display:flex><span>	<span style=color:#66d9ef>goto</span> LA1_;
-</span></span><span style=display:flex><span>	LA3_: ;
-</span></span><span style=display:flex><span>	{
-</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>((foo) <span style=color:#f92672>&amp;&amp;</span> (isObjWithCache((<span style=color:#f92672>*</span>foo).Sup.m_type, (<span style=color:#f92672>&amp;</span>NTI__9c7UwwsDx9cls9baHKBs8Py0g_), Nim_OfCheck_CACHE8)))) <span style=color:#66d9ef>goto</span> LA6_;
-</span></span><span style=display:flex><span>		dynamic_dispatch__c5r4zNoABA7a1469bvDyeFA(foo);
-</span></span><span style=display:flex><span>	}
-</span></span><span style=display:flex><span>	<span style=color:#66d9ef>goto</span> LA1_;
-</span></span><span style=display:flex><span>	LA6_: ;
-</span></span><span style=display:flex><span>	LA1_: ;
-</span></span><span style=display:flex><span>	popFrame();
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e>// ... ...
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
-</span></span><span style=display:flex><span>N_LIB_PRIVATE <span style=color:#a6e22e>N_NIMCALL</span>(<span style=color:#66d9ef>void</span>, NimMainModule)(<span style=color:#66d9ef>void</span>) {
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>	TFrame FR_; FR_.len <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>	nimRegisterGlobalMarker(TM__TK8P9bk048kbmFtnhzKkOjA_6);
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>}<span style=color:#75715e>/* preInitProc end */</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>	tyObject_DerivedcolonObjectType___KIiBF5jw56vc7JjtgVaRMg<span style=color:#f92672>*</span> T1_;
-</span></span><span style=display:flex><span>	nimfr_(<span style=color:#e6db74>&#34;test&#34;</span>, <span style=color:#e6db74>&#34;test.nim&#34;</span>);
-</span></span><span style=display:flex><span>	nimln_(<span style=color:#ae81ff>8</span>, <span style=color:#e6db74>&#34;test.nim&#34;</span>);
-</span></span><span style=display:flex><span>	T1_ <span style=color:#f92672>=</span> (tyObject_DerivedcolonObjectType___KIiBF5jw56vc7JjtgVaRMg<span style=color:#f92672>*</span>)<span style=color:#ae81ff>0</span>;
-</span></span><span style=display:flex><span>	T1_ <span style=color:#f92672>=</span> new__hYny4BGj3LhiDCg0b9az6qQ();
-</span></span><span style=display:flex><span>	asgnRef((<span style=color:#66d9ef>void</span><span style=color:#f92672>**</span>) (<span style=color:#f92672>&amp;</span>foo__arkQMChktByKQJ3cIC51Bg), <span style=color:#f92672>&amp;</span>T1_<span style=color:#f92672>-&gt;</span>Sup);
-</span></span><span style=display:flex><span>	nimln_(<span style=color:#ae81ff>10</span>, <span style=color:#e6db74>&#34;test.nim&#34;</span>);
-</span></span><span style=display:flex><span>	dynamic_dispatch__5KArHhtsF2JAL9bQSgyiLMA(foo__arkQMChktByKQJ3cIC51Bg); <span style=color:#75715e>// foo.dynamic_dispatch
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	popFrame();
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>这种方式有个缺点：如果继承树很深，那么判断分支就会很长，调用的对象类型越是靠近根部，调用的开销越大。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nim data-lang=nim><span style=display:flex><span><span style=color:#f92672>import</span> times
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span>
-</span></span><span style=display:flex><span>  Base <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> RootObj
-</span></span><span style=display:flex><span>  Derived1 <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Base
-</span></span><span style=display:flex><span>  Derived2 <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Derived1
-</span></span><span style=display:flex><span>  Derived3 <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Derived2
-</span></span><span style=display:flex><span>  Derived4 <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Derived3
-</span></span><span style=display:flex><span>  Derived5 <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Derived4
-</span></span><span style=display:flex><span>  Derived6 <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Derived5
-</span></span><span style=display:flex><span>  Derived7 <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Derived6
-</span></span><span style=display:flex><span>  Derived8 <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Derived7
-</span></span><span style=display:flex><span>  Derived9 <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Derived8
-</span></span><span style=display:flex><span>  Derived10 <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Derived9
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>proc </span><span style=color:#a6e22e>static_dispatch</span>(foo: Base, count: <span style=color:#66d9ef>int</span>): <span style=color:#66d9ef>int</span> <span style=color:#f92672>=</span> count <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispatch(foo: Base, count: <span style=color:#66d9ef>int</span>): <span style=color:#66d9ef>int</span> {.base.} <span style=color:#f92672>=</span> count <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispatch(foo: Derived1, count: <span style=color:#66d9ef>int</span>): <span style=color:#66d9ef>int</span> <span style=color:#f92672>=</span> count <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispatch(foo: Derived2, count: <span style=color:#66d9ef>int</span>): <span style=color:#66d9ef>int</span> <span style=color:#f92672>=</span> count <span style=color:#f92672>+</span> <span style=color:#ae81ff>2</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispatch(foo: Derived3, count: <span style=color:#66d9ef>int</span>): <span style=color:#66d9ef>int</span> <span style=color:#f92672>=</span> count <span style=color:#f92672>+</span> <span style=color:#ae81ff>3</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispatch(foo: Derived4, count: <span style=color:#66d9ef>int</span>): <span style=color:#66d9ef>int</span> <span style=color:#f92672>=</span> count <span style=color:#f92672>+</span> <span style=color:#ae81ff>4</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispatch(foo: Derived5, count: <span style=color:#66d9ef>int</span>): <span style=color:#66d9ef>int</span> <span style=color:#f92672>=</span> count <span style=color:#f92672>+</span> <span style=color:#ae81ff>5</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispatch(foo: Derived6, count: <span style=color:#66d9ef>int</span>): <span style=color:#66d9ef>int</span> <span style=color:#f92672>=</span> count <span style=color:#f92672>+</span> <span style=color:#ae81ff>6</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispatch(foo: Derived7, count: <span style=color:#66d9ef>int</span>): <span style=color:#66d9ef>int</span> <span style=color:#f92672>=</span> count <span style=color:#f92672>+</span> <span style=color:#ae81ff>7</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispatch(foo: Derived8, count: <span style=color:#66d9ef>int</span>): <span style=color:#66d9ef>int</span> <span style=color:#f92672>=</span> count <span style=color:#f92672>+</span> <span style=color:#ae81ff>8</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispatch(foo: Derived9, count: <span style=color:#66d9ef>int</span>): <span style=color:#66d9ef>int</span> <span style=color:#f92672>=</span> count <span style=color:#f92672>+</span> <span style=color:#ae81ff>9</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>method</span> dynamic_dispatch(foo: Derived10, count: <span style=color:#66d9ef>int</span>): <span style=color:#66d9ef>int</span> <span style=color:#f92672>=</span> count <span style=color:#f92672>+</span> <span style=color:#ae81ff>10</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> foo: Base <span style=color:#f92672>=</span> new(Base)
-</span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> start <span style=color:#f92672>=</span> cpuTime()
-</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> <span style=color:#ae81ff>0</span>..<span style=color:#ae81ff>99999999</span>:
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>discard</span> foo.dynamic_dispatch(i)
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;Time taken: &#34;</span>, cpuTime() <span style=color:#f92672>-</span> start <span style=color:#75715e># Time taken: 1.342</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>foo <span style=color:#f92672>=</span> new(Derived10)
-</span></span><span style=display:flex><span>start <span style=color:#f92672>=</span> cpuTime()
-</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> <span style=color:#ae81ff>0</span>..<span style=color:#ae81ff>99999999</span>:
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>discard</span> foo.dynamic_dispatch(i)
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;Time taken: &#34;</span>, cpuTime() <span style=color:#f92672>-</span> start <span style=color:#75715e># Time taken: 0.672</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>start <span style=color:#f92672>=</span> cpuTime()
-</span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> <span style=color:#ae81ff>0</span>..<span style=color:#ae81ff>99999999</span>:
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>discard</span> foo.static_dispatch(i)
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;Time taken: &#34;</span>, cpuTime() <span style=color:#f92672>-</span> start <span style=color:#75715e># Time taken: 0.055</span>
-</span></span></code></pre></div><p>调用 <code>Base</code> 的 <code>dynamic_dispatch</code> 方法所消耗时间是调用 <code>Derived10</code> 方法的两倍多。而 <code>proc</code> 关键字定义的静态分发耗时仅是动态分发的 1/10，之所以性能提升那么大，主要原因大概有两个。首先是 CPU 分支预测命中导致的性能提升，其次是编译器将函数调用优化为内联展开。</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/Nim/>Nim</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/Zettelkasten-method-and-bi-directional-links-is-not-necessary/ class="left arrow">上一篇：<br>不要迷信卢曼卡片盒方法和双向链笔记</a>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p><a href=https://nim-lang.org/>Nim</a> 是一款 Python 风格的静态类型语言。但事实上，除了缩进语法外，Nim 和 Python 并没有太多相似之处。相对于 Python，Nim 更多地吸收了 Ada 和 Lisp 等语言的特性。</p><p>Nim 编译器通过生成 C 或 Obj-C 中间代码的方式来进行本地编译，所以需要依赖一套外部编译器。Nim 也可以生成 Javascript 代码。此外，还有以脚本方式运行的 <a href=https://nim-lang.org/docs/nims.html>NimScript</a>。</p><p>OOP 的一个特性就是支持多态，而<strong>动态分发</strong>（Dynamic Dispatch）就是实现多态的基础。在讲解 Nim 的动态分发实现前，先讲一下其他语言是如何实现的。</p><h3 id=c-虚函数>C++ 虚函数</h3><p>为了实现动态分发，C++ 必须将方法声明为 virtual。编译器会为每个类创建一个虚函数表（vtable），并将其地址保存在每个创建的对象中。当调用虚函数时，需要通过虚函数表的偏移量来定位真正的方法入口。</p><h3 id=go-接口>Go 接口</h3><p>Go 语言通过接口实现动态分发。Go 的接口是隐式实现的，类型只需要实现接口的所有方法，而不需要像 Java 那样显示声明。编译器仅在类型转换、参数传递、函数返回等操作时，才进行类型检查。</p><p>Go 的接口（runtime.iface）类型包含两个指针，一个是指向数据结构的 data 指针，另一个指向 itab 结构，该结构保存了接口的方法入口表。这样做的优点是编译器实现更加简单，语法上也更灵活，缺点是接口类型占用了更多的空间。</p><h3 id=python-鸭子类型>Python 鸭子类型</h3><p>Python 等动态类型语言具有<a href=https://zh.wikipedia.org/zh-hans/%E9%B8%AD%E5%AD%90%E7%B1%BB%E5%9E%8B>鸭子类型</a>（Duck typing）的特性，对象方法都是动态分发，而无需显式声明。Python 将方法保存在一个 dict 散列表中，在运行时通过方法名称动态查找。如果在当前类中没有找到该方法，则通过 <a href=https://docs.python.org/zh-cn/3/glossary.html#term-method-resolution-order>MRO</a> 依次向父类中查找。</p><p>显然，这种动态分发方式的开销是很高的。某些动态类型语言，例如 smalltalk 和 Javascript(V8) 会使用一种叫<a href=https://zh.wikipedia.org/zh-hans/%E5%86%85%E8%81%94%E7%BC%93%E5%AD%98>内联缓存</a>（inline cache）的优化方式来提升运行效率。</p><h3 id=nim-动态分发>Nim 动态分发</h3><p>Nim 的数据和方法是分开定义的，这种风格有点类似 Julia 和 Common Lisp。用 <code>proc</code> 关键字定义的方法使用静态分发，如果要使用动态分发，则需要使用 <code>method</code> 关键字。</p><pre><code class=language-nim>type
+  Foo = ref object of RootObj
+  Bar = ref object of Foo
+
+method dynamic_dispath(foo: Foo) {.base.} =
+  echo &quot;foo&quot;
+
+method dynamic_dispath(bar: Bar) =
+  echo &quot;bar&quot;
+
+proc static_dispath(foo: Foo) =
+  echo &quot;foo&quot;
+
+proc static_dispath(bar: Bar) =
+  echo &quot;bar&quot;
+
+
+var foo: Foo = new(Bar)
+foo.static_dispath() # output: foo
+foo.dynamic_dispath() # output: bar
+</code></pre><p>同 Julia 和 Common Lisp 一样，Nim 也支持<a href=https://zh.wikipedia.org/zh-hans/%E5%A4%9A%E5%88%86%E6%B4%BE>多重分发</a>（Multiple dispatch）。</p><pre><code class=language-nim>type
+  Thing = ref object of RootObj
+  Unit = ref object of Thing
+    x: int
+
+method collide(a, b: Thing) {.inline.} =
+  quit &quot;to override!&quot;
+
+method collide(a: Thing, b: Unit) {.inline.} =
+  echo &quot;1&quot;
+
+method collide(a: Unit, b: Thing) {.inline.} =
+  echo &quot;2&quot;
+
+var a, b: Unit
+new a
+new b
+collide(a, b) # output: 2
+</code></pre><p><strong>注:</strong> 自 Nim 0.20 起，编译时需要使用参数 <code>--multimethods:on</code> 来启用多重分发支持。</p><p>此外，Nim 支持一种叫<a href=https://en.wikipedia.org/wiki/Uniform_Function_Call_Syntax>统一函数调用语法</a>（Uniform Function Call Syntax）的风格：</p><pre><code class=language-nim>proc print(s: string) = echo s
+proc print(s1: string, s2: string) = echo s1, s2
+
+print(&quot;Hello World!&quot;)
+print &quot;Hello World!&quot;
+&quot;Hello World!&quot;.print()
+&quot;Hello World!&quot;.print
+&quot;Hello&quot;.print (&quot; World!&quot;)
+&quot;Hello&quot;.print &quot; World!&quot;
+</code></pre><p>Nim 的动态分发并没有通过虚函数表的方式来实现，而是在动态方法调用处内联展开一系列的 <code>if</code> 判断，根据调用对象的类型，最终选择不同的方法函数。</p><pre><code class=language-nim>type
+  Base = ref object of RootObj
+  Derived = ref object of Base
+
+method dynamic_dispatch(foo: Base) = echo &quot;Base&quot;
+method dynamic_dispatch(foo: Derived) = echo &quot;Derived&quot;
+
+var foo: Base = new(Derived)
+
+foo.dynamic_dispatch
+</code></pre><p>生成的 C 代码如下：</p><pre><code class=language-c>/* section: NIM_merge_DATA */
+STRING_LITERAL(TM__TK8P9bk048kbmFtnhzKkOjA_3, &quot;Base&quot;, 4);
+static NIM_CONST tyArray__nHXaesL0DJZHyVS07ARPRA TM__TK8P9bk048kbmFtnhzKkOjA_2 = {((NimStringDesc*) &amp;TM__TK8P9bk048kbmFtnhzKkOjA_3)}
+;
+STRING_LITERAL(TM__TK8P9bk048kbmFtnhzKkOjA_5, &quot;Derived&quot;, 7);
+static NIM_CONST tyArray__nHXaesL0DJZHyVS07ARPRA TM__TK8P9bk048kbmFtnhzKkOjA_4 = {((NimStringDesc*) &amp;TM__TK8P9bk048kbmFtnhzKkOjA_5)}
+;
+
+// ... ...
+
+N_LIB_PRIVATE N_NIMCALL(void, dynamic_dispatch__c5r4zNoABA7a1469bvDyeFA)(tyObject_BasecolonObjectType___9c7UwwsDx9cls9baHKBs8Py0g* foo) {
+	nimfr_(&quot;dynamic_dispatch&quot;, &quot;test.nim&quot;);
+	nimln_(5, &quot;test.nim&quot;);
+	echoBinSafe(TM__TK8P9bk048kbmFtnhzKkOjA_2, 1); // method dynamic_dispatch(foo: Base) = echo &quot;Base&quot;
+	popFrame();
+}
+N_LIB_PRIVATE N_NIMCALL(void, dynamic_dispatch__NGJl71YhyrlEEKIVgc1qbA)(tyObject_DerivedcolonObjectType___KIiBF5jw56vc7JjtgVaRMg* foo) {
+	nimfr_(&quot;dynamic_dispatch&quot;, &quot;test.nim&quot;);
+	nimln_(6, &quot;test.nim&quot;);
+	echoBinSafe(TM__TK8P9bk048kbmFtnhzKkOjA_4, 1); // method dynamic_dispatch(foo: Derived) = echo &quot;Derived&quot;
+	popFrame();
+}
+
+// ... ...
+
+N_LIB_PRIVATE N_NIMCALL(void, dynamic_dispatch__5KArHhtsF2JAL9bQSgyiLMA)(tyObject_BasecolonObjectType___9c7UwwsDx9cls9baHKBs8Py0g* foo) {
+	nimfr_(&quot;dynamic_dispatch&quot;, &quot;test.nim&quot;);
+	nimln_(84, &quot;\\.choosenim\\toolchains\\nim-1.4.4\\lib\\system\\ch&quot;
+&quot;cks.nim&quot;);
+	chckNilDisp(foo);
+	nimln_(5, &quot;test.nim&quot;);
+	{
+		if (!((foo) &amp;&amp; ((*foo).Sup.m_type == (&amp;NTI__KIiBF5jw56vc7JjtgVaRMg_)))) goto LA3_;
+		if (foo &amp;&amp; !isObj((*foo).Sup.m_type, (&amp;NTI__KIiBF5jw56vc7JjtgVaRMg_))){ raiseObjectConversionError(); }
+		dynamic_dispatch__NGJl71YhyrlEEKIVgc1qbA(((tyObject_DerivedcolonObjectType___KIiBF5jw56vc7JjtgVaRMg*) (foo)));
+	}
+	goto LA1_;
+	LA3_: ;
+	{
+		if (!((foo) &amp;&amp; (isObjWithCache((*foo).Sup.m_type, (&amp;NTI__9c7UwwsDx9cls9baHKBs8Py0g_), Nim_OfCheck_CACHE8)))) goto LA6_;
+		dynamic_dispatch__c5r4zNoABA7a1469bvDyeFA(foo);
+	}
+	goto LA1_;
+	LA6_: ;
+	LA1_: ;
+	popFrame();
+}
+
+// ... ...
+
+N_LIB_PRIVATE N_NIMCALL(void, NimMainModule)(void) {
+{
+	TFrame FR_; FR_.len = 0;
+
+	nimRegisterGlobalMarker(TM__TK8P9bk048kbmFtnhzKkOjA_6);
+
+}/* preInitProc end */
+{
+	tyObject_DerivedcolonObjectType___KIiBF5jw56vc7JjtgVaRMg* T1_;
+	nimfr_(&quot;test&quot;, &quot;test.nim&quot;);
+	nimln_(8, &quot;test.nim&quot;);
+	T1_ = (tyObject_DerivedcolonObjectType___KIiBF5jw56vc7JjtgVaRMg*)0;
+	T1_ = new__hYny4BGj3LhiDCg0b9az6qQ();
+	asgnRef((void**) (&amp;foo__arkQMChktByKQJ3cIC51Bg), &amp;T1_-&gt;Sup);
+	nimln_(10, &quot;test.nim&quot;);
+	dynamic_dispatch__5KArHhtsF2JAL9bQSgyiLMA(foo__arkQMChktByKQJ3cIC51Bg); // foo.dynamic_dispatch
+	popFrame();
+}
+}
+</code></pre><p>这种方式有个缺点：如果继承树很深，那么判断分支就会很长，调用的对象类型越是靠近根部，调用的开销越大。</p><pre><code class=language-nim>import times
+
+type
+  Base = ref object of RootObj
+  Derived1 = ref object of Base
+  Derived2 = ref object of Derived1
+  Derived3 = ref object of Derived2
+  Derived4 = ref object of Derived3
+  Derived5 = ref object of Derived4
+  Derived6 = ref object of Derived5
+  Derived7 = ref object of Derived6
+  Derived8 = ref object of Derived7
+  Derived9 = ref object of Derived8
+  Derived10 = ref object of Derived9
+
+proc static_dispatch(foo: Base, count: int): int = count - 1
+method dynamic_dispatch(foo: Base, count: int): int {.base.} = count - 1
+method dynamic_dispatch(foo: Derived1, count: int): int = count + 1
+method dynamic_dispatch(foo: Derived2, count: int): int = count + 2
+method dynamic_dispatch(foo: Derived3, count: int): int = count + 3
+method dynamic_dispatch(foo: Derived4, count: int): int = count + 4
+method dynamic_dispatch(foo: Derived5, count: int): int = count + 5
+method dynamic_dispatch(foo: Derived6, count: int): int = count + 6
+method dynamic_dispatch(foo: Derived7, count: int): int = count + 7
+method dynamic_dispatch(foo: Derived8, count: int): int = count + 8
+method dynamic_dispatch(foo: Derived9, count: int): int = count + 9
+method dynamic_dispatch(foo: Derived10, count: int): int = count + 10
+
+var foo: Base = new(Base)
+var start = cpuTime()
+for i in 0..99999999:
+    discard foo.dynamic_dispatch(i)
+    
+echo &quot;Time taken: &quot;, cpuTime() - start # Time taken: 1.342
+
+foo = new(Derived10)
+start = cpuTime()
+for i in 0..99999999:
+    discard foo.dynamic_dispatch(i)
+    
+echo &quot;Time taken: &quot;, cpuTime() - start # Time taken: 0.672
+
+start = cpuTime()
+for i in 0..99999999:
+    discard foo.static_dispatch(i)
+    
+echo &quot;Time taken: &quot;, cpuTime() - start # Time taken: 0.055
+</code></pre><p>调用 <code>Base</code> 的 <code>dynamic_dispatch</code> 方法所消耗时间是调用 <code>Derived10</code> 方法的两倍多。而 <code>proc</code> 关键字定义的静态分发耗时仅是动态分发的 1/10，之所以性能提升那么大，主要原因大概有两个。首先是 CPU 分支预测命中导致的性能提升，其次是编译器将函数调用优化为内联展开。</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/Nim/>Nim</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/Zettelkasten-method-and-bi-directional-links-is-not-necessary/ class="left arrow">上一篇：<br>不要迷信卢曼卡片盒方法和双向链笔记</a>
 <a href=/posts/python-libraries-and-packages/ class="right arrow">下一篇：<br>Python 库资源收集</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-04 06:13:30.567780942 +0000 UTC m=+0.323846390">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-04 06:17:33.103706604 +0000 UTC m=+0.215355224">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/main.js></script></body></html>

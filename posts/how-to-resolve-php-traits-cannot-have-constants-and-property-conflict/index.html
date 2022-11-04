@@ -12,132 +12,132 @@
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>解决 PHP Trait 不能定义常量及成员变量冲突的问题</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2021-10-21 00:00:00 +0000 UTC" data-pagefind-meta=日期>2021年10月21日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p>PHP Trait 只能定义成员变量和方法，不能定义常量。如下代码会报错：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#75715e>// test.php
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>trait</span> <span style=color:#a6e22e>UsageTrait</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#66d9ef>THE_CONST_NAME</span> <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>;
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>错误消息为：</p><blockquote><p>Fatal error: Traits cannot have constants in test.php</p></blockquote><p>想要在不同的类中共用一组常量，可以通过接口来解决：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>UsageConstantsInterface</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#66d9ef>THE_CONST_NAME</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>__CLASS__</span>;
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>trait</span> <span style=color:#a6e22e>UsageTrait</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>usageForBar</span>()
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>echo</span> <span style=color:#a6e22e>UsageConstantsInterface</span><span style=color:#f92672>::</span><span style=color:#a6e22e>THE_CONST_NAME</span>, <span style=color:#a6e22e>PHP_EOL</span>;
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>usageForFoo</span>()
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        <span style=color:#75715e>// 如果使用 UsageTrait 的类实现了 UsageConstantsInterface 接口，
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#75715e>// 也可以使用 self::THE_CONST_NAME 来访问常量
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#66d9ef>echo</span> <span style=color:#a6e22e>self</span><span style=color:#f92672>::</span><span style=color:#a6e22e>THE_CONST_NAME</span>, <span style=color:#a6e22e>PHP_EOL</span>;
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Foo</span> <span style=color:#66d9ef>implements</span> <span style=color:#a6e22e>UsageConstantsInterface</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>use</span> <span style=color:#a6e22e>UsageTrait</span>;
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Bar</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>use</span> <span style=color:#a6e22e>UsageTrait</span>;
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>(<span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Foo</span>)<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>usageForFoo</span>();
-</span></span><span style=display:flex><span>(<span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Bar</span>)<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>usageForBar</span>();
-</span></span></code></pre></div><p>另外，PHP Trait 的 <code>insteadof</code> 和 <code>as</code> 语句只能处理方法名的冲突，而无法处理成员变量的冲突。如果在 Trait 和类中都定义了同名的成员变量，当它们的初始值不一致时，编译器会报错。如下代码可以正常执行：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>trait</span> <span style=color:#a6e22e>UsageTrait</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> $property1;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> $property2 <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;some value&#39;</span>;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> $property3 <span style=color:#f92672>=</span> <span style=color:#66d9ef>__CLASS__</span>;
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Foo</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>use</span> <span style=color:#a6e22e>UsageTrait</span>;
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> $property1;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> $property2 <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;some value&#39;</span>;
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#75715e>// 非常有意思的是，$property3 这样初始化不会引发冲突
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#75715e>// 虽然两处的 __CLASS__ 的实际值并不相同
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>protected</span> $property3 <span style=color:#f92672>=</span> <span style=color:#66d9ef>__CLASS__</span>;
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Foo</span>;
-</span></span></code></pre></div><p>如下代码则会报错：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#75715e>// test.php
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>trait</span> <span style=color:#a6e22e>UsageTrait</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> $property <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;default value&#39;</span>;
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Foo</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>use</span> <span style=color:#a6e22e>UsageTrait</span>;
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> $property <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;new value&#39;</span>;
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Foo</span>;
-</span></span></code></pre></div><p>错误消息为：</p><blockquote><p>Fatal error: Foo and UsageTrait define the same property ($property) in the composition of Foo. However, the definition differs and is considered incompatible. Class was composed in test.php on line 8</p></blockquote><p>在某些场景下，我们希望在 Trait 里定义一个缺省的成员变量，而在类中可以覆盖这个成员变量的值。一种方案是在子类中覆盖这个成员变量，代码如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>trait</span> <span style=color:#a6e22e>UsageTrait</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> $property <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;default value&#39;</span>;
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>abstract</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Foo</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>use</span> <span style=color:#a6e22e>UsageTrait</span>;
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Bar</span> <span style=color:#66d9ef>extends</span> <span style=color:#a6e22e>Foo</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> $property <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;new value&#39;</span>;
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>但实际上，我们之所以使用 Trait 这种 Mixin 方式就是为了更加灵活地、低耦合地组合代码。而上面的解决方案要求使用 UsageTrait 的类必须继承自同一个抽象类，显然违背了 Trait 的初衷。在没有更好的解决方案情况下，只能自己多写几行代码了：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#e6db74>/**
-</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @property string $property
-</span></span></span><span style=display:flex><span><span style=color:#e6db74> */</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>trait</span> <span style=color:#a6e22e>UsageTrait</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> $_property <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;default value&#39;</span>;
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> __get($name)
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> ($name <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;property&#39;</span>) {
-</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>_property</span>;
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>usage</span>()
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>echo</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>property</span>, <span style=color:#a6e22e>PHP_EOL</span>;
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> $this;
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Foo</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>use</span> <span style=color:#a6e22e>UsageTrait</span>;
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> $property <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;new value&#39;</span>;
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Bar</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>use</span> <span style=color:#a6e22e>UsageTrait</span>;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>(<span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Foo</span>)<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>usage</span>();	<span style=color:#75715e>// 打印 &#34;new value&#34;
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>(<span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Bar</span>)<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>usage</span>();	<span style=color:#75715e>// 打印 &#34;default value&#34;
-</span></span></span></code></pre></div><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/PHP/>PHP</a></li><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/%E7%AC%94%E8%AE%B0/>笔记</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202110/1634136763/ class="left arrow">上一篇</a>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p>PHP Trait 只能定义成员变量和方法，不能定义常量。如下代码会报错：</p><pre><code class=language-php>// test.php
+
+trait UsageTrait
+{
+    const THE_CONST_NAME = 1;
+}
+</code></pre><p>错误消息为：</p><blockquote><p>Fatal error: Traits cannot have constants in test.php</p></blockquote><p>想要在不同的类中共用一组常量，可以通过接口来解决：</p><pre><code class=language-php>interface UsageConstantsInterface
+{
+    const THE_CONST_NAME = __CLASS__;
+}
+
+trait UsageTrait
+{
+    public function usageForBar()
+    {
+        echo UsageConstantsInterface::THE_CONST_NAME, PHP_EOL;
+    }
+    
+    public function usageForFoo()
+    {
+        // 如果使用 UsageTrait 的类实现了 UsageConstantsInterface 接口，
+        // 也可以使用 self::THE_CONST_NAME 来访问常量
+        echo self::THE_CONST_NAME, PHP_EOL;
+    }
+}
+
+class Foo implements UsageConstantsInterface
+{
+    use UsageTrait;
+}
+
+class Bar
+{
+    use UsageTrait;
+}
+
+(new Foo)-&gt;usageForFoo();
+(new Bar)-&gt;usageForBar();
+</code></pre><p>另外，PHP Trait 的 <code>insteadof</code> 和 <code>as</code> 语句只能处理方法名的冲突，而无法处理成员变量的冲突。如果在 Trait 和类中都定义了同名的成员变量，当它们的初始值不一致时，编译器会报错。如下代码可以正常执行：</p><pre><code class=language-php>trait UsageTrait
+{
+    protected $property1;
+
+    protected $property2 = 'some value';
+
+    protected $property3 = __CLASS__;
+}
+
+class Foo
+{
+    use UsageTrait;
+    
+    protected $property1;
+
+    protected $property2 = 'some value';
+    
+    // 非常有意思的是，$property3 这样初始化不会引发冲突
+    // 虽然两处的 __CLASS__ 的实际值并不相同
+    protected $property3 = __CLASS__;
+}
+
+new Foo;
+</code></pre><p>如下代码则会报错：</p><pre><code class=language-php>// test.php
+
+trait UsageTrait
+{
+    protected $property = 'default value';
+}
+
+class Foo
+{
+    use UsageTrait;
+    
+    protected $property = 'new value';
+}
+
+new Foo;
+</code></pre><p>错误消息为：</p><blockquote><p>Fatal error: Foo and UsageTrait define the same property ($property) in the composition of Foo. However, the definition differs and is considered incompatible. Class was composed in test.php on line 8</p></blockquote><p>在某些场景下，我们希望在 Trait 里定义一个缺省的成员变量，而在类中可以覆盖这个成员变量的值。一种方案是在子类中覆盖这个成员变量，代码如下：</p><pre><code class=language-php>trait UsageTrait
+{
+    protected $property = 'default value';
+}
+
+abstract class Foo
+{
+    use UsageTrait;
+}
+
+class Bar extends Foo
+{
+    protected $property = 'new value';
+}
+</code></pre><p>但实际上，我们之所以使用 Trait 这种 Mixin 方式就是为了更加灵活地、低耦合地组合代码。而上面的解决方案要求使用 UsageTrait 的类必须继承自同一个抽象类，显然违背了 Trait 的初衷。在没有更好的解决方案情况下，只能自己多写几行代码了：</p><pre><code class=language-php>/**
+ * @property string $property
+ */
+trait UsageTrait
+{
+    private $_property = 'default value';
+    
+    public function __get($name)
+    {
+        if ($name == 'property') {
+            return $this-&gt;_property;
+        }
+    }
+    
+    public function usage()
+    {
+        echo $this-&gt;property, PHP_EOL;
+        return $this;
+    }
+}
+
+class Foo
+{
+    use UsageTrait;
+    
+    protected $property = 'new value';
+}
+
+class Bar
+{
+    use UsageTrait;
+
+}
+
+(new Foo)-&gt;usage();	// 打印 &quot;new value&quot;
+(new Bar)-&gt;usage();	// 打印 &quot;default value&quot;
+</code></pre><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/PHP/>PHP</a></li><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/%E7%AC%94%E8%AE%B0/>笔记</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202110/1634136763/ class="left arrow">上一篇</a>
 <a href=/moments/202110/1635324826/ class="right arrow">下一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-04 06:13:31.110152571 +0000 UTC m=+0.866218119">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-04 06:17:33.484310242 +0000 UTC m=+0.595958962">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/main.js></script></body></html>

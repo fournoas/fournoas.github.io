@@ -12,202 +12,202 @@
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>让 FastRoute 支持 URL 反向解析</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2019-12-17 00:00:00 +0000 UTC" data-pagefind-meta=日期>2019年12月17日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p><a href=https://github.com/nikic/FastRoute>FastRoute</a> 是一款高性能路由组件，需要运行于 PHP 7.1 及以上版本。很多 PHP Web 框架都用它作为默认路由。然而这款路由组件不支持 URL 反向解析。</p><p><a href=https://www.hyperf.io/>Hyperf</a> 框架也采用了这款路由组件，以下代码可以让 Hyperf 支持 URL 反向解析：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#f92672>&lt;?</span><span style=color:#a6e22e>php</span>
-</span></span><span style=display:flex><span><span style=color:#e6db74>/**
-</span></span></span><span style=display:flex><span><span style=color:#e6db74> * Router.php
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>**/</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>declare</span>(<span style=color:#a6e22e>strict_types</span><span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>);
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>namespace</span> <span style=color:#a6e22e>App\Http</span>;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>use</span> <span style=color:#a6e22e>Hyperf\HttpServer\Router\Router</span> <span style=color:#66d9ef>as</span> <span style=color:#a6e22e>BaseRouter</span>;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Router</span> <span style=color:#66d9ef>extends</span> <span style=color:#a6e22e>BaseRouter</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>/**
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * @var array
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     */</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> <span style=color:#66d9ef>static</span> $routeMethods <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#39;get&#39;</span>, <span style=color:#e6db74>&#39;post&#39;</span>, <span style=color:#e6db74>&#39;put&#39;</span>, <span style=color:#e6db74>&#39;delete&#39;</span>, <span style=color:#e6db74>&#39;patch&#39;</span>, <span style=color:#e6db74>&#39;head&#39;</span>];
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>/**
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * @var string
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     */</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> <span style=color:#66d9ef>static</span> $currentGroupPrefix;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>createUrl</span>($route)
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Url</span>(<span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$currentGroupPrefix <span style=color:#f92672>.</span> $route);
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>addGroup</span>(<span style=color:#a6e22e>string</span> $prefix, <span style=color:#a6e22e>callable</span> $callback, <span style=color:#66d9ef>array</span> $options <span style=color:#f92672>=</span> [])
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        $previousGroupPrefix <span style=color:#f92672>=</span> <span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$currentGroupPrefix;
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$currentGroupPrefix <span style=color:#f92672>=</span> $previousGroupPrefix <span style=color:#f92672>.</span> $prefix;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>        $router <span style=color:#f92672>=</span> <span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$factory<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>getRouter</span>(<span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$serverName);
-</span></span><span style=display:flex><span>        $router<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>addGroup</span>($prefix, $callback, $options);
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$currentGroupPrefix <span style=color:#f92672>=</span> $previousGroupPrefix;
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>addRoute</span>($httpMethod, <span style=color:#a6e22e>string</span> $route, $handler, <span style=color:#66d9ef>array</span> $options <span style=color:#f92672>=</span> [])
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        $router <span style=color:#f92672>=</span> <span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$factory<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>getRouter</span>(<span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$serverName);
-</span></span><span style=display:flex><span>        $router<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>addRoute</span>($httpMethod, $route, $handler, $options);
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>static</span><span style=color:#f92672>::</span><span style=color:#a6e22e>createUrl</span>($route);
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>function</span> __callStatic($name, $arguments)
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        $returnValue <span style=color:#f92672>=</span> <span style=color:#66d9ef>parent</span><span style=color:#f92672>::</span><span style=color:#a6e22e>__callStatic</span>($name, $arguments);
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>in_array</span>($name, <span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$routeMethods) <span style=color:#f92672>?</span> <span style=color:#66d9ef>static</span><span style=color:#f92672>::</span><span style=color:#a6e22e>createUrl</span>($arguments[<span style=color:#ae81ff>0</span>]) <span style=color:#f92672>:</span> $returnValue;
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#f92672>&lt;?</span><span style=color:#a6e22e>php</span>
-</span></span><span style=display:flex><span><span style=color:#e6db74>/**
-</span></span></span><span style=display:flex><span><span style=color:#e6db74> * Url.php
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>**/</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>declare</span>(<span style=color:#a6e22e>strict_types</span><span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>);
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>namespace</span> <span style=color:#a6e22e>App\Http</span>;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>use</span> <span style=color:#a6e22e>FastRoute\RouteParser\Std</span> <span style=color:#66d9ef>as</span> <span style=color:#a6e22e>RouteParser</span>;
-</span></span><span style=display:flex><span><span style=color:#66d9ef>use</span> <span style=color:#a6e22e>LogicException</span>;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Url</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>/**
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * @var string
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     */</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> $route;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>/**
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * @var string
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     */</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> $name;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> __construct(<span style=color:#a6e22e>string</span> $route)
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>route</span> <span style=color:#f92672>=</span> $route;
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>name</span>(<span style=color:#a6e22e>string</span> $name)
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>name</span> <span style=color:#f92672>=</span> $name;
-</span></span><span style=display:flex><span>        <span style=color:#a6e22e>UrlManager</span><span style=color:#f92672>::</span><span style=color:#a6e22e>getManager</span>()<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>addUrl</span>($this);
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> $this;
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>parse</span>(<span style=color:#f92672>...</span>$arguments)
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        $routeParser <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>RouteParser</span>;
-</span></span><span style=display:flex><span>        $routes <span style=color:#f92672>=</span> $routeParser<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>parse</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>route</span>);
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>foreach</span> ($routes <span style=color:#66d9ef>as</span> $route) {
-</span></span><span style=display:flex><span>            $parsedUrl <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;&#39;</span>;
-</span></span><span style=display:flex><span>            $i <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
-</span></span><span style=display:flex><span>            <span style=color:#66d9ef>foreach</span> ($route <span style=color:#66d9ef>as</span> $part) {
-</span></span><span style=display:flex><span>                <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>is_string</span>($part)) {
-</span></span><span style=display:flex><span>                    $parsedUrl <span style=color:#f92672>.=</span> $part;
-</span></span><span style=display:flex><span>                    <span style=color:#66d9ef>continue</span>;
-</span></span><span style=display:flex><span>                }
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>                <span style=color:#66d9ef>if</span> ($i <span style=color:#f92672>===</span> <span style=color:#a6e22e>count</span>($arguments)) {
-</span></span><span style=display:flex><span>                    <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>LogicException</span>(<span style=color:#e6db74>&#39;Not enough parameters given&#39;</span>);
-</span></span><span style=display:flex><span>                }
-</span></span><span style=display:flex><span>                $parsedUrl <span style=color:#f92672>.=</span> $arguments[$i<span style=color:#f92672>++</span>];
-</span></span><span style=display:flex><span>            }
-</span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>            <span style=color:#66d9ef>if</span> ($i <span style=color:#f92672>===</span> <span style=color:#a6e22e>count</span>($arguments)) {
-</span></span><span style=display:flex><span>                <span style=color:#66d9ef>return</span> $parsedUrl;
-</span></span><span style=display:flex><span>            }
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>LogicException</span>(
-</span></span><span style=display:flex><span>            <span style=color:#a6e22e>sprintf</span>(<span style=color:#e6db74>&#39;The arguments does not matched for the route \&#39;%s\&#39;.&#39;</span>, $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>name</span>)
-</span></span><span style=display:flex><span>        );
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#f92672>&lt;?</span><span style=color:#a6e22e>php</span>
-</span></span><span style=display:flex><span><span style=color:#e6db74>/**
-</span></span></span><span style=display:flex><span><span style=color:#e6db74> * UrlManager.php
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>**/</span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>declare</span>(<span style=color:#a6e22e>strict_types</span><span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>);
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>namespace</span> <span style=color:#a6e22e>App\Http</span>;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>use</span> <span style=color:#a6e22e>RuntimeException</span>;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>UrlManager</span>
-</span></span><span style=display:flex><span>{
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>/**
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * @var UrlManager
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     */</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> <span style=color:#66d9ef>static</span> $manager;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>/**
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * @var array
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     */</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> $urls <span style=color:#f92672>=</span> [];
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>addUrl</span>(<span style=color:#a6e22e>Url</span> $url)
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>isset</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>urls</span>[$url<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>name</span>])) {
-</span></span><span style=display:flex><span>            <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>RuntimeException</span>(
-</span></span><span style=display:flex><span>                <span style=color:#a6e22e>sprintf</span>(<span style=color:#e6db74>&#39;Cannot add the url named \&#39;%s\&#39;. A duplicate name exists.&#39;</span>, $url<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>name</span>)
-</span></span><span style=display:flex><span>            );
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>urls</span>[$url<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>name</span>] <span style=color:#f92672>=</span> $url;
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>reverse</span>(<span style=color:#a6e22e>string</span> $name, <span style=color:#f92672>...</span>$arguments)
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span> <span style=color:#a6e22e>isset</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>urls</span>[$name])) {
-</span></span><span style=display:flex><span>            <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>RuntimeException</span>(
-</span></span><span style=display:flex><span>                <span style=color:#a6e22e>sprintf</span>(<span style=color:#e6db74>&#39;The url named \&#39;%s\&#39; does not exists.&#39;</span>, $name)
-</span></span><span style=display:flex><span>            );
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>urls</span>[$name]<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>parse</span>(<span style=color:#f92672>...</span>$arguments);
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>    <span style=color:#e6db74>/**
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     * @return UrlManager
-</span></span></span><span style=display:flex><span><span style=color:#e6db74>     */</span>
-</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>getManager</span>()
-</span></span><span style=display:flex><span>    {
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span> <span style=color:#a6e22e>isset</span>(<span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$manager)) {
-</span></span><span style=display:flex><span>            <span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$manager <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#66d9ef>static</span>();
-</span></span><span style=display:flex><span>        }
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$manager;
-</span></span><span style=display:flex><span>    }
-</span></span><span style=display:flex><span>}
-</span></span></code></pre></div><p>修改项目中的 <code>config\routes.php</code> 配置文件：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#f92672>&lt;?</span><span style=color:#a6e22e>php</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>declare</span>(<span style=color:#a6e22e>strict_types</span><span style=color:#f92672>=</span><span style=color:#ae81ff>1</span>);
-</span></span><span style=display:flex><span><span style=color:#e6db74>/**
-</span></span></span><span style=display:flex><span><span style=color:#e6db74> * This file is part of Hyperf.
-</span></span></span><span style=display:flex><span><span style=color:#e6db74> *
-</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @link     https://www.hyperf.io
-</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @document https://doc.hyperf.io
-</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @contact  group@hyperf.io
-</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @license  https://github.com/hyperf-cloud/hyperf/blob/master/LICENSE
-</span></span></span><span style=display:flex><span><span style=color:#e6db74> */</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>use</span> <span style=color:#a6e22e>App\Http\Router</span>;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#a6e22e>Router</span><span style=color:#f92672>::</span><span style=color:#a6e22e>get</span>(<span style=color:#e6db74>&#39;/user/{id}&#39;</span>, <span style=color:#e6db74>&#39;App\Controller\UserController@info&#39;</span>)<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>name</span>(<span style=color:#e6db74>&#39;user-info&#39;</span>);
-</span></span></code></pre></div><p>使用 URL 反向解析：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#f92672>&lt;?</span><span style=color:#a6e22e>php</span>
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#66d9ef>use</span> <span style=color:#a6e22e>App\Http\UrlManager</span>;
-</span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span><span style=color:#75715e>// 返回 &#39;/user/123&#39;
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>$url <span style=color:#f92672>=</span> <span style=color:#a6e22e>UrlManager</span><span style=color:#f92672>::</span><span style=color:#a6e22e>getManager</span>()<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>reverse</span>(<span style=color:#e6db74>&#39;user-info&#39;</span>, <span style=color:#ae81ff>123</span>);
-</span></span></code></pre></div><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/PHP/>PHP</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/french-onion-soup/ class="left arrow">上一篇：<br>法式洋葱汤</a>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><p><a href=https://github.com/nikic/FastRoute>FastRoute</a> 是一款高性能路由组件，需要运行于 PHP 7.1 及以上版本。很多 PHP Web 框架都用它作为默认路由。然而这款路由组件不支持 URL 反向解析。</p><p><a href=https://www.hyperf.io/>Hyperf</a> 框架也采用了这款路由组件，以下代码可以让 Hyperf 支持 URL 反向解析：</p><pre><code class=language-php>&lt;?php
+/**
+ * Router.php
+**/
+declare(strict_types=1);
+
+namespace App\Http;
+
+use Hyperf\HttpServer\Router\Router as BaseRouter;
+
+class Router extends BaseRouter
+{
+    /**
+     * @var array
+     */
+    protected static $routeMethods = ['get', 'post', 'put', 'delete', 'patch', 'head'];
+
+    /**
+     * @var string
+     */
+    protected static $currentGroupPrefix;
+
+    protected static function createUrl($route)
+    {
+        return new Url(static::$currentGroupPrefix . $route);
+    }
+
+    public static function addGroup(string $prefix, callable $callback, array $options = [])
+    {
+        $previousGroupPrefix = static::$currentGroupPrefix;
+        static::$currentGroupPrefix = $previousGroupPrefix . $prefix;
+
+        $router = static::$factory-&gt;getRouter(static::$serverName);
+        $router-&gt;addGroup($prefix, $callback, $options);
+
+        static::$currentGroupPrefix = $previousGroupPrefix;
+    }
+
+    public static function addRoute($httpMethod, string $route, $handler, array $options = [])
+    {
+        $router = static::$factory-&gt;getRouter(static::$serverName);
+        $router-&gt;addRoute($httpMethod, $route, $handler, $options);
+
+        return static::createUrl($route);
+    }
+
+    public static function __callStatic($name, $arguments)
+    {
+        $returnValue = parent::__callStatic($name, $arguments);
+
+        return in_array($name, static::$routeMethods) ? static::createUrl($arguments[0]) : $returnValue;
+    }
+}
+</code></pre><pre><code class=language-php>&lt;?php
+/**
+ * Url.php
+**/
+declare(strict_types=1);
+
+namespace App\Http;
+
+use FastRoute\RouteParser\Std as RouteParser;
+use LogicException;
+
+class Url
+{
+    /**
+     * @var string
+     */
+    public $route;
+
+    /**
+     * @var string
+     */
+    public $name;
+
+    public function __construct(string $route)
+    {
+        $this-&gt;route = $route;
+    }
+
+    public function name(string $name)
+    {
+        $this-&gt;name = $name;
+        UrlManager::getManager()-&gt;addUrl($this);
+
+        return $this;
+    }
+
+    public function parse(...$arguments)
+    {
+        $routeParser = new RouteParser;
+        $routes = $routeParser-&gt;parse($this-&gt;route);
+
+        foreach ($routes as $route) {
+            $parsedUrl = '';
+            $i = 0;
+            foreach ($route as $part) {
+                if (is_string($part)) {
+                    $parsedUrl .= $part;
+                    continue;
+                }
+    
+                if ($i === count($arguments)) {
+                    throw new LogicException('Not enough parameters given');
+                }
+                $parsedUrl .= $arguments[$i++];
+            }
+    
+            if ($i === count($arguments)) {
+                return $parsedUrl;
+            }
+        }
+
+        throw new LogicException(
+            sprintf('The arguments does not matched for the route \'%s\'.', $this-&gt;name)
+        );
+    }
+}
+</code></pre><pre><code class=language-php>&lt;?php
+/**
+ * UrlManager.php
+**/
+declare(strict_types=1);
+
+namespace App\Http;
+
+use RuntimeException;
+
+class UrlManager
+{
+    /**
+     * @var UrlManager
+     */
+    protected static $manager;
+
+    /**
+     * @var array
+     */
+    protected $urls = [];
+
+    public function addUrl(Url $url)
+    {
+        if (isset($this-&gt;urls[$url-&gt;name])) {
+            throw new RuntimeException(
+                sprintf('Cannot add the url named \'%s\'. A duplicate name exists.', $url-&gt;name)
+            );
+        }
+
+        $this-&gt;urls[$url-&gt;name] = $url;
+    }
+
+    public function reverse(string $name, ...$arguments)
+    {
+        if (! isset($this-&gt;urls[$name])) {
+            throw new RuntimeException(
+                sprintf('The url named \'%s\' does not exists.', $name)
+            );
+        }
+
+        return $this-&gt;urls[$name]-&gt;parse(...$arguments);
+    }
+
+    /**
+     * @return UrlManager
+     */
+    public static function getManager()
+    {
+        if (! isset(static::$manager)) {
+            static::$manager = new static();
+        }
+
+        return static::$manager;
+    }
+}
+</code></pre><p>修改项目中的 <code>config\routes.php</code> 配置文件：</p><pre><code class=language-php>&lt;?php
+
+declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://doc.hyperf.io
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf-cloud/hyperf/blob/master/LICENSE
+ */
+
+use App\Http\Router;
+
+Router::get('/user/{id}', 'App\Controller\UserController@info')-&gt;name('user-info');
+</code></pre><p>使用 URL 反向解析：</p><pre><code class=language-php>&lt;?php
+
+use App\Http\UrlManager;
+
+// 返回 '/user/123'
+$url = UrlManager::getManager()-&gt;reverse('user-info', 123);
+</code></pre><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/PHP/>PHP</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/french-onion-soup/ class="left arrow">上一篇：<br>法式洋葱汤</a>
 <a href=/posts/three-hundred-Song-Ci/ class="right arrow">下一篇：<br>宋词三百首</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-04 06:13:31.127276961 +0000 UTC m=+0.883342409">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-04 06:17:33.48521146 +0000 UTC m=+0.596860080">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/main.js></script></body></html>

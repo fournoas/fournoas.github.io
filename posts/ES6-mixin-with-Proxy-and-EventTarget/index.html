@@ -12,26 +12,26 @@
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>ES6 中 Proxy 和 EventTarget 的 Mixin 模式</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2019-05-04 00:00:00 +0000 UTC" data-pagefind-meta=日期>2019年5月4日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><blockquote><p>Javascript sucks</p></blockquote><p>Javascript 不支持多重继承，也不支持原生类的 mixin。想实现一个具备 <code>Proxy</code> 和 <code>EventTarget</code> 多重功能的混合类。以下代码会引发异常：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#66d9ef>let</span> <span style=color:#a6e22e>mixin</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Proxy(<span style=color:#66d9ef>new</span> <span style=color:#a6e22e>EventTarget</span>(), {
-</span></span><span style=display:flex><span>	<span style=color:#a6e22e>get</span>(<span style=color:#a6e22e>target</span>, <span style=color:#a6e22e>property</span>, <span style=color:#a6e22e>receiver</span>) {
-</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>property</span> <span style=color:#66d9ef>in</span> <span style=color:#a6e22e>target</span>) {
-</span></span><span style=display:flex><span>			<span style=color:#66d9ef>return</span> <span style=color:#a6e22e>target</span>[<span style=color:#a6e22e>property</span>];
-</span></span><span style=display:flex><span>		}
-</span></span><span style=display:flex><span>		<span style=color:#75715e>// do something
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	}
-</span></span><span style=display:flex><span>});
-</span></span></code></pre></div><p>运行：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#a6e22e>mixin</span>.<span style=color:#a6e22e>addEventListener</span>(...)
-</span></span></code></pre></div><p>错误：</p><pre tabindex=0><code>Uncaught TypeError: Illegal invocation
-</code></pre><p>正确的代码如下：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-javascript data-lang=javascript><span style=display:flex><span><span style=color:#66d9ef>let</span> <span style=color:#a6e22e>mixin</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Proxy(<span style=color:#66d9ef>new</span> <span style=color:#a6e22e>EventTarget</span>(), {
-</span></span><span style=display:flex><span>	<span style=color:#a6e22e>get</span>(<span style=color:#a6e22e>target</span>, <span style=color:#a6e22e>property</span>, <span style=color:#a6e22e>receiver</span>) {
-</span></span><span style=display:flex><span>		<span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>property</span> <span style=color:#66d9ef>in</span> <span style=color:#a6e22e>target</span>) {
-</span></span><span style=display:flex><span>			<span style=color:#66d9ef>return</span> (...<span style=color:#a6e22e>args</span>) =&gt; {
-</span></span><span style=display:flex><span>				<span style=color:#a6e22e>target</span>[<span style=color:#a6e22e>property</span>].<span style=color:#a6e22e>apply</span>(<span style=color:#a6e22e>target</span>, <span style=color:#a6e22e>args</span>);
-</span></span><span style=display:flex><span>    		};
-</span></span><span style=display:flex><span>		}
-</span></span><span style=display:flex><span>		<span style=color:#75715e>// do something
-</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	}
-</span></span><span style=display:flex><span>});
-</span></span></code></pre></div><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/JavaScript/>JavaScript</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/simplified-Chinese-characters-analysis/ class="left arrow">上一篇：<br>《现代汉语常用字表》、GB2312收入汉字和字频统计</a>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=https://www.fournoas.com/categories/coding/>Coding</a></li></ul></div><blockquote><p>Javascript sucks</p></blockquote><p>Javascript 不支持多重继承，也不支持原生类的 mixin。想实现一个具备 <code>Proxy</code> 和 <code>EventTarget</code> 多重功能的混合类。以下代码会引发异常：</p><pre><code class=language-javascript>let mixin = new Proxy(new EventTarget(), {
+	get(target, property, receiver) {
+		if (property in target) {
+			return target[property];
+		}
+		// do something
+	}
+});
+</code></pre><p>运行：</p><pre><code class=language-javascript>mixin.addEventListener(...)
+</code></pre><p>错误：</p><pre><code>Uncaught TypeError: Illegal invocation
+</code></pre><p>正确的代码如下：</p><pre><code class=language-javascript>let mixin = new Proxy(new EventTarget(), {
+	get(target, property, receiver) {
+		if (property in target) {
+			return (...args) =&gt; {
+				target[property].apply(target, args);
+    		};
+		}
+		// do something
+	}
+});
+</code></pre><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/JavaScript/>JavaScript</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/simplified-Chinese-characters-analysis/ class="left arrow">上一篇：<br>《现代汉语常用字表》、GB2312收入汉字和字频统计</a>
 <a href=/posts/DIY-cement-cleaner/ class="right arrow">下一篇：<br>自制“水泥克星”瓷砖地砖清洗剂</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-04 06:13:30.505827453 +0000 UTC m=+0.261892901">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-04 06:17:33.095869243 +0000 UTC m=+0.207517863">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/main.js></script></body></html>
