@@ -85,7 +85,7 @@ _enter_buffered_busy(buffered *self)
     ( (PyThread_acquire_lock(self-&gt;lock, 0) ? \
        1 : _enter_buffered_busy(self)) \
      &amp;&amp; (self-&gt;owner = PyThread_get_thread_ident(), 1) )
-</code></pre><p>RuntimeError 是在 <code>_enter_buffered_busy</code> 函数中被抛出的，而该函数被 <code>ENTER_BUFFERED</code> 宏所调用：当使用 <code>PyThread_acquire_lock()</code> 获取锁失败时便会抛出异常。进一步在当前文件中搜索<code>ENTER_BUFFERED</code>，发现<a href=https://github.com/python/cpython/blob/774ef28814d0d9d57ec813cb31b0a7af6c476127/Modules/_io/bufferedio.c#L1916>第 1916 行</a>处的调用可能是抛出异常的上层函数，该函数名为 <code>io_BufferedWriter_write_impl</code>，正好和错误信息中的 <code>&lt;_io.BufferedWriter name='&lt;stdout>'></code> 相对应。该函数的完整代码如下：</p><pre><code class=language-c>/*[clinic input]
+</code></pre><p>RuntimeError 是在 <code>_enter_buffered_busy</code> 函数中被抛出的，而该函数被 <code>ENTER_BUFFERED</code> 宏所调用：当使用 <code>PyThread_acquire_lock()</code> 获取锁失败时便会抛出异常。进一步在当前文件中搜索<code>ENTER_BUFFERED</code>，发现<a href=https://github.com/python/cpython/blob/774ef28814d0d9d57ec813cb31b0a7af6c476127/Modules/_io/bufferedio.c#L1916>第 1916 行</a>处的调用可能是抛出异常的上层函数，该函数名为 <code>io_BufferedWriter_write_impl</code>，正好和错误信息中的 <code>&lt;_io.BufferedWriter name='&lt;stdout>'></code> 相对应。该函数的完整代码如下：</p><pre><code data-ln-selected=1916,2025:2029 data-ln-start-from=1900 class=language-c>/*[clinic input]
 _io.BufferedWriter.write
     buffer: Py_buffer
     /
@@ -242,4 +242,4 @@ if (PyErr_CheckSignals() &lt; 0)
     goto error;
 </code></pre><p>显然，这里就是 Python 唤起信号处理器的地方。<code>PyErr_CheckSignals()</code> 的作用就是检查信号标志位，如果设置了标志位就立即调用信号处理器。在 Python 源代码中的搜索「<a href="https://github.com/python/cpython/search?l=C&q=PyErr_CheckSignals">PyErr_CheckSignals</a>」，能找到20多处调用。果然，官方文档中的描述是有问题的——事实上，Python 不仅仅在两次 bytecode 执行之间会调用信号处理器，在内置函数中也可能会调用信号处理器。</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202210/1667136126/ class="left arrow">上一篇</a>
 <a href=/posts/handling-signal-in-python-on-different-platforms/ class="right arrow">下一篇：<br>Python 信号处理在不同平台上的差异</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-04 07:31:52.227008772 +0000 UTC m=+0.202592546">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-04 07:44:55.127189786 +0000 UTC m=+0.256980725">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/main.js></script></body></html>
