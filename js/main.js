@@ -39,4 +39,8 @@ $(function(){
     openModal($('<img src="' + imgSrc +'">'))
     return false
   })
+
+  $('.catalogue-moment').each(function() {
+    let dialogueTail = $('<div>').addClass('dialogue-tail').insertBefore(this)
+  })
 });
