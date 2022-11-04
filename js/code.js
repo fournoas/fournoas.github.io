@@ -1,15 +1,25 @@
 !function(root, document) {
     "use strict";
     function processCodeBlock(codeBlock) {
+        function getCodeBlockTable(codeBlock) {
+            if (!codeBlock.childNodes[0] || 
+                !codeBlock.childNodes[0].tagName ||
+                codeBlock.childNodes[0].tagName.toLowerCase() != 'table') {
+                return
+            }
+            return codeBlock.childNodes[0]
+        }
+        root.setTimeout(function() {
+            getCodeBlockTable(codeBlock) && codeBlock.classList.add('multiline')
+        }, 0)
         let preContainer = codeBlock.parentElement
-        codeBlock.classList.add('multiline')
         codeBlock.addEventListener('dblclick', function () {
-            if (this.childNodes[0] && this.childNodes[0].tagName.toLowerCase() == 'table') {
-                let codeTable = this.childNodes[0]
-                if (codeTable.scrollHeight <= this.clientHeight && codeTable.scrollWidth <= this.clientWidth)
-                    return
-            } else return
-
+            let codeTable = getCodeBlockTable(this)
+            if (!codeTable) return
+            if (codeTable.scrollHeight <= this.clientHeight && 
+                codeTable.scrollWidth <= this.clientWidth) {
+                return
+            }
             openModal($('<pre>').append($(codeBlock)), {
                 contentClass: 'fullscreen',
                 onClose: function (e) {
