@@ -9,23 +9,34 @@
             }
             return codeBlock.childNodes[0]
         }
+        function isFullscreenable(codeBlock) {
+            let codeTable = getCodeBlockTable(codeBlock)
+            if (!codeTable) return false
+            if (codeTable.scrollHeight <= codeBlock.clientHeight && 
+                codeTable.scrollWidth <= codeBlock.clientWidth) {
+                return false
+            }
+            return true
+        }
         root.setTimeout(function() {
             getCodeBlockTable(codeBlock) && codeBlock.classList.add('multiline')
         }, 0)
         let preContainer = codeBlock.parentElement
         codeBlock.addEventListener('dblclick', function () {
-            let codeTable = getCodeBlockTable(this)
-            if (!codeTable) return
-            if (codeTable.scrollHeight <= this.clientHeight && 
-                codeTable.scrollWidth <= this.clientWidth) {
-                return
-            }
+            if (!isFullscreenable(this)) return
             openModal($('<pre>').append($(codeBlock)), {
                 contentClass: 'fullscreen',
                 onClose: function (e) {
                     preContainer.appendChild(codeBlock)
                 }
             })
+        })
+        codeBlock.addEventListener('mouseover', function () {
+            if (!isFullscreenable(this)) return
+            this.title = '双击全屏显示'
+        })
+        codeBlock.addEventListener('mouseout', function () {
+            this.title = ''
         })
         return codeBlock
     }
