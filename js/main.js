@@ -1,27 +1,42 @@
 // main.js
 $(function(){
-  var $rootElement = $(document.documentElement);
-  var $body = $('body');
-  
-  $('.img-preview').click(function(e){
-    e.preventDefault();
+  let $body = $('body')
+  let $rootElement = $(document.documentElement)
 
-    var imgSrc = $(e.target).data('src');
-    $rootElement.addClass('is-clipped');
-    $body.append('\
+  window.openModal = function (element, option) {
+    if (element instanceof Element) {
+      element = $(element)
+    }
+    $rootElement.addClass('is-clipped')
+    $modal = $('\
 <div class="modal">\
   <div class="modal-background"></div>\
   <div class="modal-content">\
-    <div class="modal-box"><img src="' + imgSrc + '"></div>\
+    <div class="modal-box"></div>\
     <button class="modal-close"></button>\
   </div>\
-</div>');
+</div>')
+    let $modalBox = $modal.find('.modal-box')
+    let $modalContent = $modal.find('.modal-content')
+    let $modalClose = $modal.find('.modal-close')
+    if (option && option.contentClass) {
+      $modalContent.addClass(option.contentClass)
+    }
+    $modalBox.append(element)
+    $modalClose.on('click', function (e) {
+      if (option && option.onClose) option.onClose($modal, e)
+      if (e.defaultPrevented) return
+      $rootElement.removeClass('is-clipped');
+      $(e.target).parents('.modal').remove();
+    })
+    $body.append($modal)
+    return $modal
+  }
 
-    return false;
-  });
-  
-  $body.on('click', '.modal-close', function(e){
-    $rootElement.removeClass('is-clipped');
-    $(e.target).parents('.modal').remove();
-  });
+  $('.img-preview').click(function(e){
+    e.preventDefault()
+    let imgSrc = $(e.target).data('src')
+    openModal($('<img src="' + imgSrc +'">'))
+    return false
+  })
 });

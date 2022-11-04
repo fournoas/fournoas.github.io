@@ -1,13 +1,14 @@
-<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Nim 语言的动态分发机制 &#183; 白汤四物</title><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<link rel=stylesheet href=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=//cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
-<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link href rel=alternate type=application/rss+xml title=白汤四物><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Nim 语言的动态分发机制 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/fontawesome.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/solid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class=post><h1 class=post-title data-pagefind-meta=title>Nim 语言的动态分发机制</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2021-03-15 00:00:00 +0000 UTC" data-pagefind-meta=日期>2021年3月15日</time>
@@ -29,8 +30,8 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> foo: Foo <span style=color:#f92672>=</span> new(Bar)
-</span></span><span style=display:flex><span>foo.static_dispath() <span style=color:#e6db74>## output: foo</span>
-</span></span><span style=display:flex><span>foo.dynamic_dispath() <span style=color:#e6db74>## output: bar</span>
+</span></span><span style=display:flex><span>foo.static_dispath() <span style=color:#75715e># output: foo</span>
+</span></span><span style=display:flex><span>foo.dynamic_dispath() <span style=color:#75715e># output: bar</span>
 </span></span></code></pre></div><p>同 Julia 和 Common Lisp 一样，Nim 也支持<a href=https://zh.wikipedia.org/zh-hans/%E5%A4%9A%E5%88%86%E6%B4%BE>多重分发</a>（Multiple dispatch）。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nim data-lang=nim><span style=display:flex><span><span style=color:#66d9ef>type</span>
 </span></span><span style=display:flex><span>  Thing <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> RootObj
 </span></span><span style=display:flex><span>  Unit <span style=color:#f92672>=</span> <span style=color:#66d9ef>ref</span> <span style=color:#66d9ef>object</span> <span style=color:#66d9ef>of</span> Thing
@@ -48,7 +49,7 @@
 </span></span><span style=display:flex><span><span style=color:#66d9ef>var</span> a, b: Unit
 </span></span><span style=display:flex><span>new a
 </span></span><span style=display:flex><span>new b
-</span></span><span style=display:flex><span>collide(a, b) <span style=color:#e6db74>## output: 2</span>
+</span></span><span style=display:flex><span>collide(a, b) <span style=color:#75715e># output: 2</span>
 </span></span></code></pre></div><p><strong>注:</strong> 自 Nim 0.20 起，编译时需要使用参数 <code>--multimethods:on</code> 来启用多重分发支持。</p><p>此外，Nim 支持一种叫<a href=https://en.wikipedia.org/wiki/Uniform_Function_Call_Syntax>统一函数调用语法</a>（Uniform Function Call Syntax）的风格：</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nim data-lang=nim><span style=display:flex><span><span style=color:#66d9ef>proc </span><span style=color:#a6e22e>print</span>(s: <span style=color:#66d9ef>string</span>) <span style=color:#f92672>=</span> echo s
 </span></span><span style=display:flex><span><span style=color:#66d9ef>proc </span><span style=color:#a6e22e>print</span>(s1: <span style=color:#66d9ef>string</span>, s2: <span style=color:#66d9ef>string</span>) <span style=color:#f92672>=</span> echo s1, s2
 </span></span><span style=display:flex><span>
@@ -170,20 +171,20 @@
 </span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> <span style=color:#ae81ff>0</span>..<span style=color:#ae81ff>99999999</span>:
 </span></span><span style=display:flex><span>    <span style=color:#66d9ef>discard</span> foo.dynamic_dispatch(i)
 </span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;Time taken: &#34;</span>, cpuTime() <span style=color:#f92672>-</span> start <span style=color:#e6db74>## Time taken: 1.342</span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;Time taken: &#34;</span>, cpuTime() <span style=color:#f92672>-</span> start <span style=color:#75715e># Time taken: 1.342</span>
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>foo <span style=color:#f92672>=</span> new(Derived10)
 </span></span><span style=display:flex><span>start <span style=color:#f92672>=</span> cpuTime()
 </span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> <span style=color:#ae81ff>0</span>..<span style=color:#ae81ff>99999999</span>:
 </span></span><span style=display:flex><span>    <span style=color:#66d9ef>discard</span> foo.dynamic_dispatch(i)
 </span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;Time taken: &#34;</span>, cpuTime() <span style=color:#f92672>-</span> start <span style=color:#e6db74>## Time taken: 0.672</span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;Time taken: &#34;</span>, cpuTime() <span style=color:#f92672>-</span> start <span style=color:#75715e># Time taken: 0.672</span>
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>start <span style=color:#f92672>=</span> cpuTime()
 </span></span><span style=display:flex><span><span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> <span style=color:#ae81ff>0</span>..<span style=color:#ae81ff>99999999</span>:
 </span></span><span style=display:flex><span>    <span style=color:#66d9ef>discard</span> foo.static_dispatch(i)
 </span></span><span style=display:flex><span>    
-</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;Time taken: &#34;</span>, cpuTime() <span style=color:#f92672>-</span> start <span style=color:#e6db74>## Time taken: 0.055</span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#34;Time taken: &#34;</span>, cpuTime() <span style=color:#f92672>-</span> start <span style=color:#75715e># Time taken: 0.055</span>
 </span></span></code></pre></div><p>调用 <code>Base</code> 的 <code>dynamic_dispatch</code> 方法所消耗时间是调用 <code>Derived10</code> 方法的两倍多。而 <code>proc</code> 关键字定义的静态分发耗时仅是动态分发的 1/10，之所以性能提升那么大，主要原因大概有两个。首先是 CPU 分支预测命中导致的性能提升，其次是编译器将函数调用优化为内联展开。</p><script src=/js/post.js></script></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=https://www.fournoas.com/tags/Nim/>Nim</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/Zettelkasten-method-and-bi-directional-links-is-not-necessary/ class="left arrow">上一篇：<br>不要迷信卢曼卡片盒方法和双向链笔记</a>
 <a href=/posts/python-libraries-and-packages/ class="right arrow">下一篇：<br>Python 库资源收集</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-03 07:21:10.806920633 +0000 UTC m=+0.272187820">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://github.com/EmielH/tale-hugo>Tale</a> theme.</span></footer><script src=/js/main.js></script></body></html>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-04 02:22:29.167493269 +0000 UTC m=+0.262287424">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/main.js></script></body></html>
