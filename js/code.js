@@ -54,7 +54,7 @@
                 selectedLinesText.split(',').forEach(function (range) {
                     let selectedRange = range.split(':')
                     let beginLine = parseInt(selectedRange[0])
-                    let endLine = selectedRange.length > 1 ? parent(selectedRange[0]) : beginLine
+                    let endLine = selectedRange.length > 1 ? parseInt(selectedRange[1]) : beginLine
                     if (beginLine > 0 && endLine > 0) {
                         for (let ln = beginLine; ln <= endLine; ln ++) {
                             let td = codeBlock.querySelector('.hljs-ln-line[data-line-number="' + ln +'"]')
