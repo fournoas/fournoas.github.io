@@ -70,7 +70,7 @@ $(function(){
         !href.startsWith('https://')) {
       return
     }
-    let archivedLink = 'https://web.archive.org/web/*/' + this.href
+    let archivedLink = 'https://web.archive.org/web/2/' + this.href
     $('<sup style="padding: 0 .2rem;"><a href="' + 
       archivedLink + 
       '" target="_blank" rel="noopener" title="互联网存档"><i class="fa-regular fa-clone"></i></a></sup>').insertAfter($(this))
