@@ -33,7 +33,7 @@ $(function(){
     return $modal
   }
 
-  $('.img-preview').click(function(e){
+  $body.on('click', '.img-preview', function(e){
     e.preventDefault()
     let imgSrc = $(e.target).data('src')
     openModal($('<img src="' + imgSrc +'">'))
