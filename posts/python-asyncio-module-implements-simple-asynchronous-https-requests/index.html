@@ -1,0 +1,122 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Python asyncio 模块实现简单异步 https 请求 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>Python asyncio 模块实现简单异步 https 请求</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas</span>
+<span>于&nbsp;</span><time datetime="2022-11-11 00:00:00 +0000 UTC" data-pagefind-meta=日期>2022年11月11日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>网上关于 asyncio 实现异步 https 请求的代码几乎都是基于Python 第三方库 aiohttp 的，而我仅需要一个无第三方依赖的、能一键运行的简单 Python 脚本。翻了翻官方文档，也没有什么值得参考的 sample 代码。无奈只能自己动手撸一个。</p><p>以下示例代码的作用是，请求百度首页，并将响应打印出来。支持 Python 3.7 及以上的版本。</p><pre><code class=language-python>import asyncio
+import ssl
+import io
+import pprint
+
+HTTP_HOST = 'www.baidu.com'
+HTTP_REQUEST = 'GET / HTTP/1.1\r\nHOST: {host}\r\n\r\n'.format(host=HTTP_HOST).encode()
+HTTP_TIMEOUT = 2.0    # 请求超时
+
+class HttpRequestProtocol(asyncio.Protocol):
+    def _set_future_result(self, future, result=None):
+        '''
+        从异步等待返回
+        '''
+        if not future.cancelled() and not future.done():
+            future.set_result(result)
+
+    def _parse_response(self):
+        '''
+        从返回的数据中解析 Http 响应体
+        '''
+        if 'headers' in self._response:
+            content_length = int(self._response['headers']['Content-Length'])
+            if self._response_data.tell() &lt; content_length + self._response_body_offset:
+                return False
+            self._response_data.seek(self._response_body_offset)
+            self._response['body'] = self._response_data.read(content_length)
+            self._response_data.close()
+            return self._response
+        else:
+            response_part = self._response_data.getvalue()
+            header_end_offset = response_part.find(b'\r\n\r\n')
+            if header_end_offset &lt; 0:
+                return False
+            
+            self._response_body_offset = header_end_offset + 4
+            header_data = response_part[:header_end_offset]
+            headers = header_data.decode().split('\r\n')
+            self._response['status'] = headers[0]
+            self._response['headers'] = {_[0]: _[1] for _ in \
+                [[__.strip() for __ in _.split(':', 1)] for _ in headers[1:]]}
+            if 'Content-Length' not in self._response['headers']:
+                raise ValueError('响应数据丢失 &quot;Content-Length&quot; 头部，无法处理该响应')
+            return self._parse_response()
+
+    def __init__(self, on_data_received, on_connection_lost):
+        self.on_data_received = on_data_received
+        self.on_connection_lost = on_connection_lost
+        self._response = dict()
+        self._response_data = io.BytesIO()
+        self._response_body_offset = 0
+
+    def data_received(self, data):
+        '''
+        每次收到服务器返回的数据，都尝试能否解析出完整的响应
+        '''
+        self._response_data.write(data)
+        response = self._parse_response()
+        if response:
+            # 已收到完整的响应数据，请求操作完成返回
+            self._set_future_result(self.on_data_received, response)
+
+    def connection_lost(self, exc):
+        print('与服务器连接已关闭: {0}'.format(exc))
+        self._set_future_result(self.on_connection_lost)
+
+
+async def main():
+    loop = asyncio.get_running_loop()
+    on_connection_lost = loop.create_future()
+    on_data_received = loop.create_future()
+    transport, protocol = await loop.create_connection(
+        lambda: HttpRequestProtocol(on_data_received, on_connection_lost),
+        HTTP_HOST, 443
+    )
+    # 连接开启 TLS
+    ssl_context = ssl.create_default_context()
+    ssl_transport = await loop.start_tls(transport, protocol, ssl_context)
+    ssl_transport.write(HTTP_REQUEST)
+    print('发送请求: {!r}'.format(HTTP_REQUEST))
+
+    try:
+        # 等待请求返回响应
+        response = await asyncio.wait_for(on_data_received, HTTP_TIMEOUT)
+        pprint.pprint(response)
+    except (asyncio.exceptions.CancelledError, 
+            asyncio.exceptions.InvalidStateError,
+            TimeoutError):
+        print('请求失败')
+    except (TypeError, ValueError):
+        print('收到异常数据')
+    finally:
+        # 如果要维持长连接，此处不要关闭 transport
+        transport.close()
+
+    try:
+        # 如果未关闭连接，此处等待连接关闭
+        await on_connection_lost
+    finally:
+        transport.close()
+
+if __name__ == '__main__':
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass
+</code></pre></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/chinese-web-typesetting-design-suggestions/ class="left arrow">上一篇：<br>中文网页排版设计建议</a>
+<a href=/moments/202211/1668125577/ class="right arrow">下一篇</a>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-11 09:25:02.096004067 +0000 UTC m=+0.279413365">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
+<script src=/js/main.js></script></body></html>
