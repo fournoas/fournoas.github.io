@@ -10,7 +10,7 @@
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>Python asyncio 模块实现简单异步 https 请求</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2022-11-11 00:00:00 +0000 UTC" data-pagefind-meta=日期>2022年11月11日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>网上关于 asyncio 实现异步 https 请求的代码几乎都是基于Python 第三方库 aiohttp 的，而我仅需要一个无第三方依赖的、能一键运行的简单 Python 脚本。翻了翻官方文档，也没有什么值得参考的 sample 代码。无奈只能自己动手撸一个。</p><p>以下示例代码的作用是，请求百度首页，并将响应打印出来。支持 Python 3.7 及以上的版本。</p><pre><code class=language-python>import asyncio
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>网上关于 asyncio 实现异步 https 请求的代码几乎都是基于Python 第三方库 aiohttp 的，而我仅需要一个无第三方依赖的、能一键运行的简单 Python 脚本。翻了翻官方文档，也没有什么值得参考的 sample 代码。无奈只能自己动手撸一个。</p><p>以下示例代码的作用是，请求百度首页，并将响应打印出来。支持 Python 3.7 及以上的版本。</p><h1 id=版本一>版本一</h1><p>使用 <code>loop.create_connection()</code> 从零开始撸。</p><pre><code class=language-python>import asyncio
 import ssl
 import io
 import pprint
@@ -116,7 +116,103 @@ if __name__ == '__main__':
         asyncio.run(main())
     except KeyboardInterrupt:
         pass
+</code></pre><h1 id=版本二>版本二</h1><p>使用 <code>asyncio.open_connection()</code> 。</p><pre><code class=language-python>import asyncio
+import ssl
+import pprint
+
+
+async def main():
+    reader, writer = await asyncio.open_connection(
+        'www.baidu.com', 
+        443, 
+        ssl=ssl.create_default_context()
+    )
+    writer.writelines([
+        b'GET / HTTP/1.1\r\n'
+        b'HOST: www.baidu.com\r\n'
+        b'\r\n'
+    ])
+    await writer.drain()
+    raw_repsonse_header = await reader.readuntil(b'\r\n\r\n')
+    response_headers = {_[0]: _[1] for _ in \
+        [[__.strip() for __ in _.split(b':', 1)] for _ in raw_repsonse_header.split(b'\r\n')[1:-2]]}
+    
+    if b'Content-Length' not in response_headers:
+        raise ValueError('响应数据丢失 &quot;Content-Length&quot; 头部，无法处理该响应')
+    content_length = int(response_headers[b'Content-Length'])
+    repsonse_body = await reader.readexactly(content_length)
+    pprint.pprint(response_headers)
+    pprint.pprint(repsonse_body)
+    writer.close()
+    await writer.wait_closed()
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
+</code></pre><p>此版本的缺陷是必须指定 hostname 。如果 <code>asyncio.open_connection()</code> 的 <code>host</code> 参数使用 IP 地址，那么必须同时传递 <code>server_hostname</code> 参数，否则会报错。下面代码会抛出 <code>ssl.SSLCertVerificationError</code> 异常：</p><pre><code>reader, writer = await asyncio.open_connection(
+    '112.80.248.75', 
+    443, 
+    ssl=ssl.create_default_context()
+)
+</code></pre><p>异常信息：</p><pre><code class=language-text>ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: IP address mismatch, certificate is not valid for '112.80.248.75'. (_ssl.c:992)
+</code></pre><h1 id=版本三>版本三</h1><p>在版本二的基础上进行改进，不要求验证证书的 hostname 。照着 <code>asyncio.streams</code> 的代码依样画葫芦：</p><pre><code class=language-python>import asyncio
+import ssl
+import pprint
+from asyncio.streams import _DEFAULT_LIMIT, StreamReader, StreamReaderProtocol, StreamWriter
+
+
+class TslStreamReaderProtocol(StreamReaderProtocol):
+    def eof_received(self):
+        super().eof_received()
+        &quot;&quot;&quot;
+        如果这里返回 True
+        会打印下面的提示信息
+        returning true from eof_received() has no effect when using ssl
+        &quot;&quot;&quot;
+        return False
+
+
+async def open_connection(host=None, port=None, *,
+                          limit=_DEFAULT_LIMIT, **kwds):
+    ssl_context = ssl.create_default_context()
+    loop = asyncio.get_running_loop()
+    reader = StreamReader(limit=limit, loop=loop)
+    protocol = TslStreamReaderProtocol(reader, loop=loop)
+    transport, _ = await loop.create_connection(
+        lambda: protocol, host, port, **kwds)
+    ssl_transport = await loop.start_tls(transport, protocol, ssl_context)
+    writer = StreamWriter(ssl_transport, protocol, reader, loop)
+    return reader, writer
+
+
+async def main():
+    reader, writer = await open_connection(
+        '112.80.248.75', 
+        443,
+    )
+    writer.writelines([
+        b'GET / HTTP/1.1\r\n'
+        b'HOST: www.baidu.com\r\n'
+        b'\r\n'
+    ])
+    await writer.drain()
+    raw_repsonse_header = await reader.readuntil(b'\r\n\r\n')
+    response_headers = {_[0]: _[1] for _ in \
+        [[__.strip() for __ in _.split(b':', 1)] for _ in raw_repsonse_header.split(b'\r\n')[1:-2]]}
+    
+    if b'Content-Length' not in response_headers:
+        raise ValueError('响应数据丢失 &quot;Content-Length&quot; 头部，无法处理该响应')
+    content_length = int(response_headers[b'Content-Length'])
+    repsonse_body = await reader.readexactly(content_length)
+    pprint.pprint(response_headers)
+    pprint.pprint(repsonse_body)
+    writer.close()
+    await writer.wait_closed()
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
 </code></pre></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/chinese-web-typesetting-design-suggestions/ class="left arrow">上一篇：<br>中文网页排版设计建议</a>
 <a href=/moments/202211/1668125577/ class="right arrow">下一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-15 05:53:50.794623739 +0000 UTC m=+0.288105911">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-16 10:15:53.591545686 +0000 UTC m=+0.281454896">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
 <script src=/js/main.js></script></body></html>
