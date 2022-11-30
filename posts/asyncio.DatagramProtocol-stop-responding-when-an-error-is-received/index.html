@@ -51,8 +51,8 @@ async def main():
     class DatagramProtocol(asyncio.DatagramProtocol):
         def datagram_received(self, data, addr):
             print('Received %r from %s' % (data.decode(), addr))
-            task = asyncio.create_task(asyncio.sleep(2))
-            task.add_done_callback(lambda t: transport.sendto(data, addr))
+            asyncio.get_running_loop().\
+                call_later(2, lambda: transport.sendto(data, addr))
 
         def error_received(self, exc):
             print('Received error:', exc)
@@ -129,8 +129,8 @@ async def main():
 
         def datagram_received(self, data, addr):
             print('Received %r from %s' % (data.decode(), addr))
-            task = asyncio.create_task(asyncio.sleep(2))
-            task.add_done_callback(lambda t: self.transport.sendto(data, addr))
+            asyncio.get_running_loop().\
+                call_later(2, lambda: self.transport.sendto(data, addr))
  
         def error_received(self, exc):
             print('Received error:', exc)
@@ -163,5 +163,5 @@ async def main():
  
 asyncio.run(main())
 </code></pre><p>此解决方案虽然不够优雅，但也可堪一用。也希望官方能早日修复这个 BUG 。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202211/1669623297/ class="left arrow">上一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-30 08:06:04.021501196 +0000 UTC m=+1.215918099">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-11-30 10:10:03.25213116 +0000 UTC m=+0.232580336">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
 <script src=/js/main.js></script></body></html>
