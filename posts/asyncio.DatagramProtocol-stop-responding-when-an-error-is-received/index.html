@@ -44,7 +44,7 @@ async def main():
 
 
 asyncio.run(main())
-</code></pre><p>然而，一旦收到运行时错误，该 UDP Server 便会失去响应，无法继续工作。通常来说，即使目标地址和端口未开启，发送 UDP 数据包也不会引发异常。但是在 Windows 系统上，如果向本地未开启监听的端口发送 UDP 数据包，会引起一个代码为 0x4D2 的 ERROR_PORT_UNREACHABLE 错误，其描述为「没有任何服务正在远程系统上的目标网络终结点上操作。（ No service is operating at the destination network endpoint on the remote system. ）」。在 GitHub 上已经有人提交了编号为 <a href=https://github.com/python/cpython/issues/91227 target=_blank rel=noopener>#91227</a> 的 issue ，标题是「 asyncio proactor udp transport stops responding after send to port that isn&rsquo;t listening 」。</p><p>可以通过下面的代码来复现这个问题。服务端（ server.py ）代码：</p><pre><code class=language-python>import asyncio
+</code></pre><p>然而，一旦收到运行时错误，该 UDP Server 便会失去响应，无法继续工作。通常来说，即使目标地址和端口未开启，发送 UDP 数据包也不会引发异常。但是在 Windows 系统上，如果向本地未开启监听的端口发送 UDP 数据包，会引起一个代码为 0x4D2 的 ERROR_PORT_UNREACHABLE 错误，其描述为「没有任何服务正在远程系统上的目标网络终结点上操作。（ No service is operating at the destination network endpoint on the remote system. ）」。在 GitHub 上已经有人提交了编号为 <a href=https://github.com/python/cpython/issues/91227 target=_blank rel=noopener>#91227</a> 的 issue ，标题是「 asyncio proactor udp transport stops responding after send to port that isn&rsquo;t listening 」。可以通过代码来复现这个问题。</p><p>服务端（ server.py ）代码：</p><pre><code class=language-python>import asyncio
 
 
 async def main():
@@ -75,8 +75,8 @@ asyncio.run(main())
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.sendto(b'test data', ('127.0.0.1', 9999))
 s.close()
-</code></pre><p>先运行服务端脚本，再执行客户端脚本。客户端向本地 9999 端口发送一个 UDP 数据包后立即关闭 socket 退出。服务端监听本地 9999 端口，当接收到数据包后，延迟 2 秒向客户端源端口发送响应数据包，此时客户端的 socket 已经关闭，会导致 ERROR_PORT_UNREACHABLE 错误。服务端输出：</p><pre><code class=language-text>Received error: [WinError 1234] 没有任何服务正在远程系统上的目标网络终结点上操作。
-</code></pre><p>错误发生后，虽然服务端仍在监听本地的 9999 端口，但是向该端口继续发送数据，服务端已经不再有响应。</p><p>根据官方文档可得知，在 Windows 平台上的默认事件循环为 <a href=https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.ProactorEventLoop target=_blank rel=noopener>ProactorEventLoop</a> 。打开 <a href=https://github.com/python/cpython/blob/3.11/Lib/asyncio/proactor_events.py#L459 target=_blank rel=noopener>Lib/asyncio/proactor_events.py</a> 文件，找到 <code>_ProactorDatagramTransport</code> 类，这里面就是 <code>asyncio.DatagramTransport</code> 的具体实现代码。定位到文件的<a href=https://github.com/python/cpython/blob/3.11/Lib/asyncio/proactor_events.py#L539 target=_blank rel=noopener>第 539 行</a>：</p><pre><code data-ln-selected=539 data-ln-start-from=513 class=language-python>    def _loop_writing(self, fut=None):
+</code></pre><p>先运行服务端脚本，再执行客户端脚本。服务端监听本地 9999 端口，客户端向该端口发送一个 UDP 数据包后立即关闭 socket 并退出。当服务端接收到数据包后，延迟 2 秒向客户端源端口发送响应数据包，而此时客户端的 socket 已经关闭，导致 ERROR_PORT_UNREACHABLE 错误。服务端输出：</p><pre><code class=language-text>Received error: [WinError 1234] 没有任何服务正在远程系统上的目标网络终结点上操作。
+</code></pre><p>错误发生后，虽然服务端仍在监听本地的 9999 端口，但是向该端口继续发送数据，服务端已经不再有响应。</p><p>根据官方文档可得知，在 Windows 平台上的默认事件循环为 <a href=https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.ProactorEventLoop target=_blank rel=noopener>ProactorEventLoop</a> 。打开 Python 安装路径下的 <a href=https://github.com/python/cpython/blob/3.11/Lib/asyncio/proactor_events.py#L459 target=_blank rel=noopener>Lib/asyncio/proactor_events.py</a> 文件，找到 <code>_ProactorDatagramTransport</code> 类，这里面就是 <code>asyncio.DatagramTransport</code> 的具体实现代码。定位到文件的<a href=https://github.com/python/cpython/blob/3.11/Lib/asyncio/proactor_events.py#L539 target=_blank rel=noopener>第 539 行</a>：</p><pre><code data-ln-selected=539 data-ln-start-from=513 class=language-python>    def _loop_writing(self, fut=None):
         try:
             if self._conn_lost:
                 return
@@ -109,7 +109,7 @@ s.close()
         else:
             self._write_fut.add_done_callback(self._loop_writing)
             self._maybe_resume_protocol()
-</code></pre><p>当捕获到 OSError 异常时，会调用 <code>DatagramProtocol.error_received()</code> ，但是却没有执行第 544 和 545 行的代码。这也就是服务端不再工作的原因。其实只要将这里的代码稍作修改就能修复这个 BUG 了，但是要等官方修复。作为普通用户，在不改动 Python 内部代码的前提下，暂时想到两种修复方案。</p><h2 id=方案一>方案一</h2><p>方案一是将默认的事件循环设置成 <a href=https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.SelectorEventLoop target=_blank rel=noopener>SelectorEventLoop</a> ：</p><pre><code class=language-python>import asyncio
+</code></pre><p>当捕获到 OSError 异常时，会调用 <code>DatagramProtocol.error_received()</code> ，但是却没有执行第 544 和 545 行的代码。这也就是服务端不再工作的原因。其实只要将这里的代码稍作修改就能修复这个 BUG 了，但是要等官方修复。作为普通用户，在不改动 Python 内部代码的前提下，暂时有两种修复方案。</p><h2 id=方案一>方案一</h2><p>方案一是将默认的事件循环设置成 <a href=https://docs.python.org/3/library/asyncio-eventloop.html#asyncio.SelectorEventLoop target=_blank rel=noopener>SelectorEventLoop</a> ：</p><pre><code class=language-python>import asyncio
 import selectors
 
 class MyPolicy(asyncio.DefaultEventLoopPolicy):
@@ -162,7 +162,7 @@ async def main():
  
  
 asyncio.run(main())
-</code></pre><p>此解决方案虽然不够优雅，但也可堪一用。也希望官方能早日修复这个 BUG 。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202211/1669623297/ class="left arrow">上一篇</a>
+</code></pre><p>此方案虽然不够优雅，但也可堪一用。另外，也希望官方能早日修复这个 BUG 。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202211/1669623297/ class="left arrow">上一篇</a>
 <a href=/moments/202211/1669807911/ class="right arrow">下一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-12-01 03:33:04.290370676 +0000 UTC m=+0.216638906">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-12-01 04:59:16.64246196 +0000 UTC m=+0.212774888">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
 <script src=/js/main.js></script></body></html>
