@@ -1,0 +1,107 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>速通 SOCKS5 代理协议 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>速通 SOCKS5 代理协议</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas</span>
+<span>于&nbsp;</span><time datetime="2022-12-05 00:00:00 +0000 UTC" data-pagefind-meta=日期>2022年12月5日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>SOCKS5 是最常见的代理服务协议，服务通常使用 1080 端口，支持代理 TCP/UDP 网络协议。协议由 <a href=https://datatracker.ietf.org/doc/html/rfc1928 target=_blank rel=noopener>RFC 1928</a> 定义，也可以阅读非官方翻译的<a href=https://luyuhuang.tech/2020/08/27/rfc1928.html target=_blank rel=noopener>中文版</a>。本文主要用于快速入门，省略了协议中不常用的部分。文中提供了协议的部分 Python 代码实现。</p><p>连接 SOCKS5 代理服务的 Python 代码如下：</p><pre><code class=language-python>import ipaddress
+import socket
+import struct
+
+proxy_host = 'localhost'
+proxy_port= 1080
+proxy_username = ''
+proxy_password = ''
+proxy_version = 0x05
+
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect((proxy_host, proxy_port))
+</code></pre><h2 id=协商阶段>协商阶段</h2><p>客户端与 SOCKS5 代理服务器建立 TCP 连接后，首先需要进行身份验证协商，客户端和服务端就身份验证的方法达成一致。</p><p>首先，客户端向服务器发送一条包含协议版本号和可选验证方法的消息：</p><table><thead><tr><th>字段</th><th>描述</th><th style=text-align:center>类型</th><th style=text-align:center>长度</th><th>例值</th></tr></thead><tbody><tr><td>VER</td><td>协议版本号</td><td style=text-align:center>unsigned char</td><td style=text-align:center>1</td><td>0x05</td></tr><tr><td>NMETHODS</td><td>客户端支持的方法数量<br>决定 METHODS 的长度</td><td style=text-align:center>unsigned char</td><td style=text-align:center>1</td><td>1 - 255</td></tr><tr><td>METHODS</td><td>客户端支持的方法列表<br>一个字节对应一个方法</td><td style=text-align:center>unsigned char []</td><td style=text-align:center>可变长度<br>1-255</td><td>0x02 用户名密码验证</td></tr></tbody></table><p>发送消息的 Python 代码实现如下：</p><pre><code class=language-python>client.send(struct.pack('!3B', proxy_version, 1, 0x02))
+</code></pre><p>服务器会在客户端支持的方法中选择一个，并返回消息：</p><table><thead><tr><th>字段</th><th>描述</th><th>类型</th><th style=text-align:center>长度</th><th>例值</th></tr></thead><tbody><tr><td>VER</td><td>协议版本号</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x05</td></tr><tr><td>METHOD</td><td>服务端选择的可用方法</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x00 不需要身份验证<br>0x02 用户名密码验证<br>0xFF 无可接受的方法</td></tr></tbody></table><p>身份验证方法（ METHOD ）的全部可选值如下：</p><ul><li><strong>0x00 不需要身份验证（ NO AUTHENTICATION REQUIRED ）</strong></li><li>0x01 <a href=https://en.wikipedia.org/wiki/Generic_Security_Services_Application_Program_Interface target=_blank rel=noopener>GSSAPI</a></li><li><strong>0x02 用户名密码（ USERNAME/PASSWORD ）</strong></li><li>0x03 至 0x7F 由 IANA 分配（ IANA ASSIGNED ）</li><li>0x80 至 0xFE 为私人方法保留（ RESERVED FOR PRIVATE METHODS ）</li><li><strong>0xFF 无可接受的方法（ NO ACCEPTABLE METHODS ）</strong></li></ul><p>虽然 RFC 要求符合规范的 SOCKS5 协议必须实现 GSSAPI 和用户名密码验证，但是通常只要实现后者即可。如果服务器返回消息中的 METHOD 值为 0xFF ，则意味着协商失败。解析服务器消息的 Python 代码如下：</p><pre><code class=language-python>ver, method = struct.unpack('!2B', client.recv(2))
+
+if ver != proxy_version:
+    client.close()
+    raise ConnectionError('协议版本不匹配')
+
+if method == 0xFF:
+    client.close()
+    raise ConnectionError('协商失败：代理服务器无可接受的方法')
+</code></pre><h3 id=子协商>子协商</h3><p>如果服务器返回的方法不为 0x00 ，则需要进入子协商阶段，即身份验证阶段。本文实现的客户端仅支持用户名密码的验证方式。客户端向服务端发送一条包含用户名和密码的消息：</p><table><thead><tr><th>字段</th><th>描述</th><th>类型</th><th style=text-align:center>长度</th><th>例值</th></tr></thead><tbody><tr><td>VER</td><td>协议版本号</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x05</td></tr><tr><td>ULEN</td><td>用户名长度</td><td>unsigned char</td><td style=text-align:center>1</td><td></td></tr><tr><td>UNAME</td><td>用户名</td><td>unsigned char []</td><td style=text-align:center>可变长度<br>1-255</td><td></td></tr><tr><td>PLEN</td><td>密码长度</td><td>unsigned char</td><td style=text-align:center>1</td><td></td></tr><tr><td>PASSWD</td><td>密码</td><td>unsigned char []</td><td style=text-align:center>可变长度<br>1-255</td><td></td></tr></tbody></table><p>发送消息的 Python 代码实现如下：</p><pre><code class=language-python>raw_username = proxy_username.encode()
+raw_password = proxy_password.encode()
+username_len = len(raw_username)
+password_len = len(raw_password)
+
+client.send(struct.pack(
+    '!2B%dsB%ds' % (username_len, password_len), 
+    proxy_version, 
+    username_len,
+    raw_username,
+    password_len,
+    raw_password
+))
+</code></pre><p>服务器收到消息后返回验证结果：</p><table><thead><tr><th>字段</th><th>描述</th><th>类型</th><th style=text-align:center>长度</th><th>例值</th></tr></thead><tbody><tr><td>VER</td><td>协议版本号</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x05</td></tr><tr><td>STATUS</td><td>验证结果</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x00 成功</td></tr></tbody></table><p>解析服务器消息的 Python 代码如下：</p><pre><code class=language-python>ver, status = struct.unpack('!2B', client.recv(2))
+
+if status != 0x00:
+    client.close()
+    raise ConnectionError('身份验证失败')
+</code></pre><h2 id=代理请求>代理请求</h2><p>协商验证通过后，客户端向服务器发送代理请求消息：</p><table><thead><tr><th>字段</th><th>描述</th><th>类型</th><th style=text-align:center>长度</th><th>例值</th></tr></thead><tbody><tr><td>VER</td><td>协议版本号</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x05</td></tr><tr><td>CMD</td><td>命令类型</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x01 CONNECT<br>0x02 BIND<br>0x03 UDP ASSOCIATE</td></tr><tr><td>RSV</td><td>保留字段</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x00</td></tr><tr><td>ATYP</td><td>目标地址类型</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x01 IPv4<br>0x03 域名<br>0x04 IPv6</td></tr><tr><td>DST.ADDR</td><td>目标地址</td><td>unsigned char []</td><td style=text-align:center>可变长度<br>4 (IPv4)<br>16 (IPv6)<br>域名另见下表</td><td></td></tr><tr><td>DST.PORT</td><td>目标端口</td><td>unsigned short</td><td style=text-align:center>2</td><td></td></tr></tbody></table><p>如果 ATYP 字段值是 0x03，则 DST.ADDR 的格式为：</p><table><thead><tr><th>字段</th><th>描述</th><th>类型</th><th style=text-align:center>长度</th></tr></thead><tbody><tr><td>DLEN</td><td>域名长度</td><td>unsigned char</td><td style=text-align:center>1</td></tr><tr><td>DOMAIN</td><td>域名</td><td>unsigned char []</td><td style=text-align:center>可变长度<br>1-255</td></tr></tbody></table><p>CMD 字段的三个值分别表示：</p><ul><li>CONNECT 代理 TCP 流量</li><li>BIND 代理开启监听端口，接收目标地址的连接</li><li>UDP ASSOCIATE 代理 UDP 数据转发</li></ul><p>通常只用到 CONNECT 和 UDP ASSOCIATE 请求。如果 SOCKS5 代理服务器具有公网 IP 地址，则可以通过 BIND 请求实现内网穿透。</p><p>发送 CONNECT 请求的 Python 代码实现如下：</p><pre><code class=language-python>dst_addr = 'www.baidu.com'
+dst_port = 443
+cmd_connect = 0x01
+atyp_ipv4 = 0x01
+atyp_ipv6 = 0x04
+atyp_domain = 0x03
+
+try:
+    ip_addr = ipaddress.ip_address(dst_addr)
+except ValueError:
+    # Domain
+    raw_dst_addr = dst_addr.encode()
+    dst_addr_len = len(raw_dst_addr)
+    client.send(struct.pack(
+        '!5B%dsH' % (dst_addr_len, ),
+        proxy_version, cmd_connect, 0, atyp_domain, dst_addr_len,
+        raw_dst_addr, dst_port
+    ))
+else:
+    if isinstance(ip_addr, ipaddress.IPv4Address):
+        client.send(struct.pack(
+            '!4B4sH', 
+            proxy_version, cmd_connect, 0, atyp_ipv4,
+            ip_addr.packed, dst_port
+        ))
+    else:
+        # IPv6
+        client.send(struct.pack(
+            '!4B16sH', 
+            proxy_version, cmd_connect, 0, atyp_ipv6,
+            ip_addr.packed, dst_port
+        ))
+</code></pre><p>服务器收到代理请求后会响应如下消息：</p><table><thead><tr><th>字段</th><th>描述</th><th>类型</th><th style=text-align:center>长度</th><th>例值</th></tr></thead><tbody><tr><td>VER</td><td>协议版本号</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x05</td></tr><tr><td>REP</td><td>服务器应答</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x00 成功</td></tr><tr><td>RSV</td><td>保留字段</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x00</td></tr><tr><td>ATYP</td><td>目标地址类型</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x01 IPv4<br>0x04 IPv6</td></tr><tr><td>BND.ADDR</td><td>绑定地址</td><td>unsigned char []</td><td style=text-align:center>可变长度<br>4 (IPv4)<br>16 (IPv6)</td><td></td></tr><tr><td>BND.PORT</td><td>绑定端口</td><td>unsigned short</td><td style=text-align:center>2</td><td></td></tr></tbody></table><p>服务器响应消息中的 REP 字段如果不为 0x00 ，则表示请求失败。不同值的具体含义如下：</p><ul><li>0x00 成功</li><li>0x01 常规 SOCKS 服务器故障</li><li>0x02 规则不允许的链接</li><li>0x03 网络无法访问</li><li>0x04 主机无法访问</li><li>0x05 连接被拒绝</li><li>0x06 TTL 过期</li><li>0x07 不支持的命令</li><li>0x08 不支持的地址类型</li></ul><p>解析服务器消息的 Python 代码如下：</p><pre><code class=language-python>ver, rep, _, atyp,  = struct.unpack('!4B', client.recv(4))
+
+if rep != 0x00:
+    client.close()
+    raise ConnectionError('代理请求失败', rep)
+
+if atyp == atyp_ipv4:
+    bind_addr, bind_port = struct.unpack('!4sH', client.recv(6))
+    bind_addr = str(ipaddress.IPv4Address(bind_addr))
+elif atyp == atyp_ipv6:
+    bind_addr, bind_port = struct.unpack('!16sH', client.recv(18))
+    bind_addr = str(ipaddress.IPv6Address(bind_addr))
+elif atyp == atyp_domain:
+    bind_addr_len, = struct.unpack('!B', client.recv(1))
+    bind_addr = client.recv(bind_addr_len).encode()
+    bind_port, = struct.unpack('!H', client.recv(2))
+else:
+    raise ConnectionError('服务器响应未知的 ATYP', atyp)
+</code></pre><h2 id=代理中继>代理中继</h2><p>服务器返回的 BND.ADDR 和 BND.PORT 是 SOCKS5 代理中继服务器的地址和端口，通常返回的中继服务器即当前 SOCKS5 代理的地址和端口。如果 SOCKS5 代理是以多主机（ multi-homed ）方式部署的话，则返回的 BND.ADDR 和 BND.PORT 可能与当前代理服务器地址和端口不一致。</p><h3 id=connect>CONNECT</h3><p>需要判断返回的中继地址和端口与当前连接的代理服务器一致。如果一致，则直接在当前会话开始代理流量的数据通信。</p><pre><code class=language-python>if client.getpeername() != (bind_addr, bind_port):
+    raise ConnectionError('SOCKS5 代理客户端不支持中继')
+</code></pre><h3 id=bind>BIND</h3><p>该命令的作用是告知代理服务器开启端口监听，接受来自目标地址的 TCP 连接，不过有些 SOCKS5 代理的实现未实现此功能。如果代理服务器接受该命令，会依次向客户端发送两条响应消息。当代理服务成功开启监听套接字后，向客户端发送第一条消息，其中 BND.ADDR 和 BND.PORT 是代理服务器监听的地址和端口；当代理服务器接受到远程连接后，向客户端发送第一条消息，其中 BND.ADDR 和 BND.PORT 是远程主机的地址和端口号。</p><h3 id=udp-associate>UDP ASSOCIATE</h3><p>在请求建立 UDP 关联（转发代理）时，如果还不确定目标地址，可以将 DST.ADDR 和 DST.PORT 都设为 0 。当发送 UDP 关联请求的 TCP 连接终止时，UDP 关联也一并终止。</p><blockquote><p>大多数 SOCKS5 代理的实现并没有严格遵守 RFC 的规范。即便 TCP 连接断开后，服务器的 UDP 关联依旧会保持。甚至某些实现连协商握手的步骤都可以省略，客户端直接向 SOCKS5 代理的端口（通常此类服务器的 TCP 和 UDP 复用同一个端口）发送封装好的 UDP 数据包即可实现转发。</p></blockquote><p>通过中继收发的 UDP 数据报都经过封装。封装格式如下：</p><table><thead><tr><th>字段</th><th>描述</th><th>类型</th><th style=text-align:center>长度</th><th>例值</th></tr></thead><tbody><tr><td>RSV</td><td>保留字段</td><td>unsigned short</td><td style=text-align:center>2</td><td>0x0000</td></tr><tr><td>FRAG</td><td>分片编号</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x00</td></tr><tr><td>ATYP</td><td>目标地址类型</td><td>unsigned char</td><td style=text-align:center>1</td><td>0x01 IPv4<br>0x03 域名<br>0x04 IPv6</td></tr><tr><td>DST.ADDR</td><td>绑定地址</td><td>unsigned char []</td><td style=text-align:center>可变长度<br>4 (IPv4)<br>16 (IPv6)<br>域名见前表</td><td></td></tr><tr><td>DST.PORT</td><td>绑定端口</td><td>unsigned short</td><td style=text-align:center>2</td><td></td></tr><tr><td>DATA</td><td>载荷数据</td><td>unsigned char []</td><td style=text-align:center>可变长度</td><td></td></tr></tbody></table><p>其中 FRAG 字段用于数据分片重组，一般情况下用不到，设为 0 即可。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/%E7%BD%91%E7%BB%9C/>网络</a></li><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202212/1669865560/ class="left arrow">上一篇</a>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2022-12-05 09:41:30.566185592 +0000 UTC m=+0.728394167">2022</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
+<script src=/js/main.js></script></body></html>
