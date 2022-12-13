@@ -1,0 +1,22 @@
+shape: sequence_diagram
+client: 客户端
+proxy: SOCKS5 代理
+dst: 目标服务器
+"　协商　": {
+  client.step1 -> proxy.step1: "　　认证方式列表　　"
+  proxy.step1 -> client.step1: "　　确定认证方式　　"
+  "　子协商　": {
+    client.step2 -> proxy.step2: "　　身份验证　　"
+    proxy.step2 -> client.step2: "　　验证通过　　"
+  }
+}
+"　 代理请求 　": {
+  client.step3 -> proxy.step3: "　　代理请求　　"
+  proxy.step3 -> client.step3: "　　请求成功　　"
+}
+"　　　开始与目标服务器通信 　": {
+  client.step4 -> proxy.step4: "　　请求数据　　"
+  proxy.step4 -> dst.step4: "　　请求数据　　"
+  dst.step4 -> proxy.step4: "　　响应数据　　"
+  proxy.step4 -> client.step4: "　　响应数据　　"
+}
