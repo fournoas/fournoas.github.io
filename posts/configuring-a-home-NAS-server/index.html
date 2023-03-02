@@ -126,7 +126,7 @@ baseurl = http://yum.mariadb.org/10.1/centos7-amd64
 gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
 gpgcheck=1
 </code></pre><p>安装：</p><pre><code class=language-shell>yum install -y MariaDB-server MariaDB-client
-</code></pre><p>或者<a href="https://downloads.mariadb.org/mariadb/10.1.21/#bits=64&file_type=rpm" target=_blank rel=noopener>下载</a> rpm 安装包手动安装。</p><p>运行：</p><pre><code class=language-shell>systemctl start mariadb.service
+</code></pre><p>或者<a href="https://downloads.mariadb.org/mariadb/10.1.21/#bits=64&amp;file_type=rpm" target=_blank rel=noopener>下载</a> rpm 安装包手动安装。</p><p>运行：</p><pre><code class=language-shell>systemctl start mariadb.service
 </code></pre><p>如果无法启动服务，运行 <code>journalctl -xe</code> 查看错误。此处显示错误为：<em>error while loading shared libraries: libjemalloc.so.1: cannot open shared object file: No such file or directory</em></p><p>安装依赖库：</p><pre><code>yum install -y jemalloc
 </code></pre><p>重新安装 MaraiDB：</p><pre><code>yum remove -y MariaDB-server
 rm -rf /var/lib/mysql
@@ -187,5 +187,5 @@ sysctl -p
 </code></pre><h2 id=配置无线上网>配置无线上网</h2><pre><code class=language-shell>nmtui
 </code></pre><p>（待续）</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/NAS/>NAS</a></li><li>#<a data-pagefind-filter=标签 href=/tags/%E7%BD%91%E7%BB%9C/>网络</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/OpenSSH-for-Windows-could-not-create-directory/ class="left arrow">上一篇：<br>OpenSSH for Windows 错误提示:“Could not create directory '/home/username/.ssh'.”</a>
 <a href=/posts/my-Buddhism-notes/ class="right arrow">下一篇：<br>佛学笔记</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2023-02-28 05:30:34.620372735 +0000 UTC m=+0.765347805">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
+<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2023-03-02 08:42:11.594978458 +0000 UTC m=+0.758673454">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
 <script src=/js/main.js></script></body></html>
