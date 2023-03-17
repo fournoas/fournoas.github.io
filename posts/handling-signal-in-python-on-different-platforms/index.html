@@ -1,13 +1,5 @@
 <!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Python 信号处理在不同平台上的差异 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
-<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.2.2/mermaid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script>mermaid.initialize({startOnLoad:!0})</script><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>Python 信号处理在不同平台上的差异</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2022-10-31 00:00:00 +0000 UTC" data-pagefind-meta=日期>2022年10月31日</time>
@@ -27,7 +19,7 @@ PyOS_setsig(int sig, PyOS_sighandler_t handler)
     struct sigaction context, ocontext;
     context.sa_handler = handler;
     sigemptyset(&amp;context.sa_mask);
-    /* Using SA_ONSTACK is friendlier to other C/C++/Golang-VM code that
+    /* Using SA_ONSTACK is friendlier to other C/C&#43;&#43;/Golang-VM code that
      * extension module or embedding code may use where tiny thread stacks
      * are used.  https://bugs.python.org/issue43390 */
     context.sa_flags = SA_ONSTACK;
@@ -42,8 +34,7 @@ PyOS_setsig(int sig, PyOS_sighandler_t handler)
 #endif
     return oldhandler;
 #endif
-}
-</code></pre><p>如果编译时定义了 <code>HAVE_SIGACTION</code> 宏，则调用 POSIX 标准的 <a href=https://pubs.opengroup.org/onlinepubs/007904875/functions/sigaction.html target=_blank rel=noopener><code>sigaction()</code></a> 函数注册信号处理器，否则使用 ANSI C 标准库的 <code>signal()</code> 函数。由于 Windows 下的 <code>&lt;signal.h></code> 没有提供 <code>sigaction()</code> 函数，所以在 Windows 平台上，Python 使用 <a href=https://learn.microsoft.com/zh-cn/cpp/c-runtime-library/reference/signal target=_blank rel=noopener><code>signal()</code></a> 函数来注册信号处理器；而 Linux 内核兼容 POSIX 标准，所以在 Linux 平台上，Python 使用 <code>sigaction()</code> 函数。关于 Python 信号处理的进一步封装代码可以在 <a href=https://github.com/python/cpython/blob/main/Modules/signalmodule.c target=_blank rel=noopener>Modules/signalmodule.c</a> 文件内找到。</p><h2 id=windows-下的实现原理>Windows 下的实现原理</h2><p>先来看 Windows 下的 <code>signal()</code> 函数是如何实现的。如果安装了 <a href=https://developer.microsoft.com/zh-cn/windows/downloads/windows-sdk/ target=_blank rel=noopener>Windows SDK</a>，则可以在本地路径 <code>C:\Program Files (x86)\Windows Kits\10\Source\10.0.22621.0\ucrt\misc\signal.cpp</code> （此处以版本 10.0.22621 为例，不同版本安装路径不同）找到实现代码：</p><pre><code data-ln-selected=313 data-ln-start-from=286 class=language-c++>extern &quot;C&quot; __crt_signal_handler_t __cdecl signal(int signum, __crt_signal_handler_t sigact)
+}</code></pre><p>如果编译时定义了 <code>HAVE_SIGACTION</code> 宏，则调用 POSIX 标准的 <a href=https://pubs.opengroup.org/onlinepubs/007904875/functions/sigaction.html target=_blank rel=noopener><code>sigaction()</code></a> 函数注册信号处理器，否则使用 ANSI C 标准库的 <code>signal()</code> 函数。由于 Windows 下的 <code>&lt;signal.h></code> 没有提供 <code>sigaction()</code> 函数，所以在 Windows 平台上，Python 使用 <a href=https://learn.microsoft.com/zh-cn/cpp/c-runtime-library/reference/signal target=_blank rel=noopener><code>signal()</code></a> 函数来注册信号处理器；而 Linux 内核兼容 POSIX 标准，所以在 Linux 平台上，Python 使用 <code>sigaction()</code> 函数。关于 Python 信号处理的进一步封装代码可以在 <a href=https://github.com/python/cpython/blob/main/Modules/signalmodule.c target=_blank rel=noopener>Modules/signalmodule.c</a> 文件内找到。</p><h2 id=windows-下的实现原理>Windows 下的实现原理</h2><p>先来看 Windows 下的 <code>signal()</code> 函数是如何实现的。如果安装了 <a href=https://developer.microsoft.com/zh-cn/windows/downloads/windows-sdk/ target=_blank rel=noopener>Windows SDK</a>，则可以在本地路径 <code>C:\Program Files (x86)\Windows Kits\10\Source\10.0.22621.0\ucrt\misc\signal.cpp</code> （此处以版本 10.0.22621 为例，不同版本安装路径不同）找到实现代码：</p><pre><code data-ln-selected=313 data-ln-start-from=286 class=language-c++>extern &#34;C&#34; __crt_signal_handler_t __cdecl signal(int signum, __crt_signal_handler_t sigact)
 {
     // Check for signal actions that are supported on other platforms but not on
     // this one, and make sure the action is not SIG_DIE:
@@ -102,7 +93,7 @@ PyOS_setsig(int sig, PyOS_sighandler_t handler)
 
 
     // If we reach here, signum is supposed to be one of the signals which
-    // correspond to exceptions on the host OS.  If it's not one of these,
+    // correspond to exceptions on the host OS.  If it&#39;s not one of these,
     // fail and return immediately:
     if (signum != SIGFPE &amp;&amp; signum != SIGILL &amp;&amp; signum != SIGSEGV)
         return signal_failed(signum);
@@ -112,7 +103,7 @@ PyOS_setsig(int sig, PyOS_sighandler_t handler)
         return signal_failed(signum);
 
     // Check that there is a per-thread instance of the exception-action table
-    // for this thread.  If there isn't, create one:
+    // for this thread.  If there isn&#39;t, create one:
     if (ptd-&gt;_pxcptacttab == __acrt_exception_action_table)
     {
         // Allocate space for an exception-action table:
@@ -143,19 +134,18 @@ PyOS_setsig(int sig, PyOS_sighandler_t handler)
     // appropriate:
     if (sigact != SIG_GET)
     {
-        __crt_signal_action_t* const last = ptd-&gt;_pxcptacttab + __acrt_signal_action_table_count;
+        __crt_signal_action_t* const last = ptd-&gt;_pxcptacttab &#43; __acrt_signal_action_table_count;
 
         // Iterate until we reach the end of the table or we reach the end of
         // the range of actions for this signal, whichever comes first:
-        for (__crt_signal_action_t* p = xcpt_action; p != last &amp;&amp; p-&gt;_signal_number == signum; ++p)
+        for (__crt_signal_action_t* p = xcpt_action; p != last &amp;&amp; p-&gt;_signal_number == signum; &#43;&#43;p)
         {
             p-&gt;_action = sigact;
         }
     }
 
     return old_action;
-}
-</code></pre><p>通过代码得知，Windows 下 <code>signal()</code> 函数的 <code>signum</code> 参数仅允许以下信号：</p><ul><li><code>SIGINT</code></li><li><code>SIGBREAK</code></li><li><code>SIGABRT</code></li><li><code>SIGABRT_COMPAT</code></li><li><code>SIGTERM</code></li><li><code>SIGFPE</code></li><li><code>SIGILL</code></li><li><code>SIGSEGV</code></li></ul><p>由于 Windows 内核本身并不支持 signal，所以不同的信号处理方式也是不同的。其中，<code>SIGINT</code>、<code>SIGBREAK</code>、<code>SIGABRT</code>、<code>SIGABRT_COMPAT</code> 和 <code>SIGTERM</code> 通过调用 Windows API <a href=https://learn.microsoft.com/zh-cn/windows/console/setconsolectrlhandler target=_blank rel=noopener><code>SetConsoleCtrlHandler()</code></a> 实现；而 <code>SIGFPE</code>、<code>SIGILL</code> 和 <code>SIGSEGV</code> 的信号处理则由 CRT 自己维护。使用 <code>SetConsoleCtrlHandler()</code> 注册一个 <a href=https://learn.microsoft.com/zh-cn/windows/console/handlerroutine target=_blank rel=noopener><code>HandlerRoutine</code></a> 类型的回调函数后，当控制台收到信号时，系统会在进程中创建一个新线程来执行回调函数（未经证实的猜测：这一步操作可能是由 ConHost 或者 OpenConsole 来完成的）。默认的回调函数在接收到 <code>SIGINT</code> 信号时，会直接使用 <code>ExitProcess()</code> 来退出当前进程。相当于如下代码：</p><pre><code class=language-c>#include &lt;windows.h&gt;
+}</code></pre><p>通过代码得知，Windows 下 <code>signal()</code> 函数的 <code>signum</code> 参数仅允许以下信号：</p><ul><li><code>SIGINT</code></li><li><code>SIGBREAK</code></li><li><code>SIGABRT</code></li><li><code>SIGABRT_COMPAT</code></li><li><code>SIGTERM</code></li><li><code>SIGFPE</code></li><li><code>SIGILL</code></li><li><code>SIGSEGV</code></li></ul><p>由于 Windows 内核本身并不支持 signal，所以不同的信号处理方式也是不同的。其中，<code>SIGINT</code>、<code>SIGBREAK</code>、<code>SIGABRT</code>、<code>SIGABRT_COMPAT</code> 和 <code>SIGTERM</code> 通过调用 Windows API <a href=https://learn.microsoft.com/zh-cn/windows/console/setconsolectrlhandler target=_blank rel=noopener><code>SetConsoleCtrlHandler()</code></a> 实现；而 <code>SIGFPE</code>、<code>SIGILL</code> 和 <code>SIGSEGV</code> 的信号处理则由 CRT 自己维护。使用 <code>SetConsoleCtrlHandler()</code> 注册一个 <a href=https://learn.microsoft.com/zh-cn/windows/console/handlerroutine target=_blank rel=noopener><code>HandlerRoutine</code></a> 类型的回调函数后，当控制台收到信号时，系统会在进程中创建一个新线程来执行回调函数（未经证实的猜测：这一步操作可能是由 ConHost 或者 OpenConsole 来完成的）。默认的回调函数在接收到 <code>SIGINT</code> 信号时，会直接使用 <code>ExitProcess()</code> 来退出当前进程。相当于如下代码：</p><pre><code class=language-c>#include &lt;windows.h&gt;
 #include &lt;stdio.h&gt;
 
 BOOL WINAPI CtrlHandler(DWORD fdwCtrlType)
@@ -171,14 +161,12 @@ int main(void)
     SetConsoleCtrlHandler(CtrlHandler, TRUE)
     while (1) {}
     return 0;
-}
-</code></pre><p>由于 <code>CtrlHandler()</code> 是在新线程中被调用的，所以即便程序的主线程处于阻塞状态，也可以实现立即退出进程。然而 Windows 下的 Python 重写了这一行为，它注册的 low-level signal hander 只是修改了 VM 的一个标志位，用于告知 VM 有待处理的信号。而在 Python 代码中注册的 signal handler，必须等到主线程返回到 VM 内才有机会被调用。如果此时主线程阻塞在 VM 之外的代码上，比如 Windows API 或者其他 Native 代码，那么主线程就不能对信号做出响应。这就为什么是在某些情况下，Windows 下的 Python 程序不响应 Ctrl+C 的原因。</p><h3 id=timesleep-的特殊处理><code>time.sleep()</code> 的特殊处理</h3><p>可能你会奇怪，下面的代码明明在 Windows 下工作得很正常，会立即响应 <code>SIGINT</code> 信号：</p><pre><code class=language-python>import time
+}</code></pre><p>由于 <code>CtrlHandler()</code> 是在新线程中被调用的，所以即便程序的主线程处于阻塞状态，也可以实现立即退出进程。然而 Windows 下的 Python 重写了这一行为，它注册的 low-level signal hander 只是修改了 VM 的一个标志位，用于告知 VM 有待处理的信号。而在 Python 代码中注册的 signal handler，必须等到主线程返回到 VM 内才有机会被调用。如果此时主线程阻塞在 VM 之外的代码上，比如 Windows API 或者其他 Native 代码，那么主线程就不能对信号做出响应。这就为什么是在某些情况下，Windows 下的 Python 程序不响应 Ctrl+C 的原因。</p><h3 id=timesleep-的特殊处理><code>time.sleep()</code> 的特殊处理</h3><p>可能你会奇怪，下面的代码明明在 Windows 下工作得很正常，会立即响应 <code>SIGINT</code> 信号：</p><pre><code class=language-python>import time
 
 try:
     while True: time.sleep(100000)
 except KeyboardInterrupt:
-    print('keyboard interrupt received')
-</code></pre><p>那是因为 Python 对 Windows 下的 <code>time.sleep()</code> 做了特殊处理，并非通过调用 Windows API <code>Sleep()</code> 来实现线程休眠功能。在 <a href=https://github.com/python/cpython/blob/342b1151ae7e6ae849c1ed7c8a2cbfdb4edcf51c/Modules/timemodule.c#L2196 target=_blank rel=noopener>Modules/timemodule.c</a> 查看 Windows 下的 <code>time.sleep()</code> 实现：</p><pre><code data-ln-selected=2218,2251 data-ln-start-from=2196 class=language-c>#else  // MS_WINDOWS
+    print(&#39;keyboard interrupt received&#39;)</code></pre><p>那是因为 Python 对 Windows 下的 <code>time.sleep()</code> 做了特殊处理，并非通过调用 Windows API <code>Sleep()</code> 来实现线程休眠功能。在 <a href=https://github.com/python/cpython/blob/342b1151ae7e6ae849c1ed7c8a2cbfdb4edcf51c/Modules/timemodule.c#L2196 target=_blank rel=noopener>Modules/timemodule.c</a> 查看 Windows 下的 <code>time.sleep()</code> 实现：</p><pre><code data-ln-selected=2218,2251 data-ln-start-from=2196 class=language-c>#else  // MS_WINDOWS
     _PyTime_t timeout_100ns = _PyTime_As100Nanoseconds(timeout,
                                                        _PyTime_ROUND_CEILING);
 
@@ -250,7 +238,7 @@ except KeyboardInterrupt:
                 break;
             }
 
-            assert(rc == (WAIT_OBJECT_0 + 1));
+            assert(rc == (WAIT_OBJECT_0 &#43; 1));
             // The sleep was interrupted by SIGINT: restart sleeping
         }
     }
@@ -276,14 +264,19 @@ except KeyboardInterrupt:
 error:
     CloseHandle(timer);
     return -1;
-#endif
-</code></pre><p>Windows 下的 Python 使用 <code>CreateWaitableTimerExW()</code> 创建了一个可等待的计时器对象，通过 <code>WaitForMultipleObjects()</code> 实现线程等待休眠。而在 <a href=https://github.com/python/cpython/blob/342b1151ae7e6ae849c1ed7c8a2cbfdb4edcf51c/Modules/signalmodule.c#L410 target=_blank rel=noopener>Modules/signalmodule.c</a> 中，Python low-level <code>signal_handler()</code> 遇到 <code>SIGINT</code> 信号时，通过 <code>SetEvent()</code> 让 <code>WaitForMultipleObjects()</code> 结束等待：</p><pre><code data-ln-selected=410 data-ln-start-from=407 class=language-c>#ifdef MS_WINDOWS
+#endif</code></pre><p>Windows 下的 Python 使用 <code>CreateWaitableTimerExW()</code> 创建了一个可等待的计时器对象，通过 <code>WaitForMultipleObjects()</code> 实现线程等待休眠。而在 <a href=https://github.com/python/cpython/blob/342b1151ae7e6ae849c1ed7c8a2cbfdb4edcf51c/Modules/signalmodule.c#L410 target=_blank rel=noopener>Modules/signalmodule.c</a> 中，Python low-level <code>signal_handler()</code> 遇到 <code>SIGINT</code> 信号时，通过 <code>SetEvent()</code> 让 <code>WaitForMultipleObjects()</code> 结束等待：</p><pre><code data-ln-selected=410 data-ln-start-from=407 class=language-c>#ifdef MS_WINDOWS
     if (sig_num == SIGINT) {
         signal_state_t *state = &amp;signal_global_state;
         SetEvent(state-&gt;sigint_event);
     }
-#endif
-</code></pre><h2 id=linux-下的实现原理>Linux 下的实现原理</h2><p>Python 在 Linux 下使用 POSIX 标准的 <a href=https://pubs.opengroup.org/onlinepubs/007904875/functions/sigaction.html target=_blank rel=noopener><code>sigaction()</code></a> 函数来实现信号机制。由于 Linux 的 POSIX 兼容是内核提供的，所以实现原理和 Windows 完全不同。最本质的区别是，Linux 下的信号是真正的软中断，由内核触发信号处理，其原理有点类似 Windows 下的<a href=https://learn.microsoft.com/zh-cn/windows/win32/sync/asynchronous-procedure-calls target=_blank rel=noopener>异步过程调用</a>。区别是，Linux 的 signal 在收到信号时就进行异步调用；而 Windows 的 <code>QueueUserAPC()</code> 是将异步过程的函数加入当前线程的 APC 队列，等到线程执行到特定的 API 函数时再触发执行异步过程，这一点倒是和 Python 的 signal 机制有些类似。</p><p>Linux 下的信号由内核处理，当内核收到信号后，会将信号放入目标进程的信号队列中，并且向目标进程发生一个中断，使目标进程进入内核态。如果目标进程的主线程此时正被 IO 操作阻塞，相当于处于休眠状态，则休眠的主线程会被唤醒进行信号处理。接下来内核会将数据复制到进程的用户空间，并将 EIP 指令寄存器指向信号处理器的函数地址。然后返回到用户态中，执行相应的信号处理函数。因此，Linux 下的 Python 进程总是会响应 <code>SIGINT</code> 信号。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/python-signal-handlers-and-reentrant-call-runtime-error-of-print-function/ class="left arrow">上一篇：<br>Python 的 signal 处理与 print() 的 reentrant call 运行时错误</a>
+#endif</code></pre><h2 id=linux-下的实现原理>Linux 下的实现原理</h2><p>Python 在 Linux 下使用 POSIX 标准的 <a href=https://pubs.opengroup.org/onlinepubs/007904875/functions/sigaction.html target=_blank rel=noopener><code>sigaction()</code></a> 函数来实现信号机制。由于 Linux 的 POSIX 兼容是内核提供的，所以实现原理和 Windows 完全不同。最本质的区别是，Linux 下的信号是真正的软中断，由内核触发信号处理，其原理有点类似 Windows 下的<a href=https://learn.microsoft.com/zh-cn/windows/win32/sync/asynchronous-procedure-calls target=_blank rel=noopener>异步过程调用</a>。区别是，Linux 的 signal 在收到信号时就进行异步调用；而 Windows 的 <code>QueueUserAPC()</code> 是将异步过程的函数加入当前线程的 APC 队列，等到线程执行到特定的 API 函数时再触发执行异步过程，这一点倒是和 Python 的 signal 机制有些类似。</p><p>Linux 下的信号由内核处理，当内核收到信号后，会将信号放入目标进程的信号队列中，并且向目标进程发生一个中断，使目标进程进入内核态。如果目标进程的主线程此时正被 IO 操作阻塞，相当于处于休眠状态，则休眠的主线程会被唤醒进行信号处理。接下来内核会将数据复制到进程的用户空间，并将 EIP 指令寄存器指向信号处理器的函数地址。然后返回到用户态中，执行相应的信号处理函数。因此，Linux 下的 Python 进程总是会响应 <code>SIGINT</code> 信号。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/python-signal-handlers-and-reentrant-call-runtime-error-of-print-function/ class="left arrow">上一篇：<br>Python 的 signal 处理与 print() 的 reentrant call 运行时错误</a>
 <a href=/posts/chinese-web-typesetting-design-suggestions/ class="right arrow">下一篇：<br>中文网页排版设计建议</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2023-03-15 06:20:50.860369808 +0000 UTC m=+0.262861828">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
+<a href=# class=top>返回顶部</a></div></main><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-17 03:31:10.666254116 +0000 UTC m=+0.265007407">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
 <script src=/js/main.js></script></body></html>

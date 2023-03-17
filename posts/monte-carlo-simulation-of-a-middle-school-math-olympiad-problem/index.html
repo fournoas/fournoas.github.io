@@ -1,13 +1,5 @@
 <!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>一道初中奥数题的蒙特卡洛解法 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
-<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.2.2/mermaid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script>mermaid.initialize({startOnLoad:!0})</script><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>一道初中奥数题的蒙特卡洛解法</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2022-10-20 00:00:00 +0000 UTC" data-pagefind-meta=日期>2022年10月20日</time>
@@ -29,28 +21,27 @@ for i in range(0, REPEAT_TIMES):
        (points[2] - points[1] &gt; 0.5) or \
        (points[3] - points[2] &gt; 0.5):
 
-        hits = hits + 1
+        hits = hits &#43; 1
     
-print(hits / REPEAT_TIMES)
-</code></pre><p>运行 5 遍程序，得到的结果分别是：</p><ul><li>0.499647</li><li>0.500212</li><li>0.49988</li><li>0.500536</li><li>0.500006</li></ul><p>模拟结果显示答案应该为 0.5。</p><p>此外，对于 n 只鸭子，此题的一般解为：<sup>n</sup>/<sub>2<sup>(n-1)</sup></sub>。</p><figure><img src=solution.jpg alt=最后附上题目的解题思路><figcaption><p>最后附上题目的解题思路</p></figcaption></figure><p>Python 代码如下：</p><pre><code class=language-python>import random
+print(hits / REPEAT_TIMES)</code></pre><p>运行 5 遍程序，得到的结果分别是：</p><ul><li>0.499647</li><li>0.500212</li><li>0.49988</li><li>0.500536</li><li>0.500006</li></ul><p>模拟结果显示答案应该为 0.5。</p><p>此外，对于 n 只鸭子，此题的一般解为：<sup>n</sup>/<sub>2<sup>(n-1)</sup></sub>。</p><figure><img src=solution.jpg alt=最后附上题目的解题思路><figcaption><p>最后附上题目的解题思路</p></figcaption></figure><p>Python 代码如下：</p><pre><code class=language-python>import random
 import math
 
 hits = 0
-repeat_times = int(input('输入模拟次数：'))
-num_ducks = int(input('输入鸭子数量：'))
+repeat_times = int(input(&#39;输入模拟次数：&#39;))
+num_ducks = int(input(&#39;输入鸭子数量：&#39;))
 
 def to_fraction(decimal):
-    '''
+    &#39;&#39;&#39;
     尝试将小数化作分数
-    '''
+    &#39;&#39;&#39;
     for denominator in range(2, 256):
         numerator = decimal * denominator
         numerator_floor = math.floor(numerator)
         if numerator - numerator_floor &lt; 0.1 and int(numerator_floor) &gt; 0:
-            return '{0}/{1}'.format(int(numerator_floor), denominator)
+            return &#39;{0}/{1}&#39;.format(int(numerator_floor), denominator)
         numerator_ceil = math.ceil(numerator)
         if numerator_ceil - numerator &lt; 0.1:
-            return '{0}/{1}'.format(int(numerator_ceil), denominator)
+            return &#39;{0}/{1}&#39;.format(int(numerator_ceil), denominator)
     return decimal
 
 for i in range(0, repeat_times):
@@ -58,11 +49,17 @@ for i in range(0, repeat_times):
     points.sort()
     for k in range(0, num_ducks):
         if points[k] - points[k - 1] &gt; (-0.5 if k == 0 else 0.5):
-            hits = hits + 1
+            hits = hits &#43; 1
             break
 
-print('鸭子在同一半圆的概率为：{0}'.format(to_fraction(hits / repeat_times)))
-</code></pre></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/%E7%AE%97%E6%B3%95/>算法</a></li><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/adding-full-text-search-to-a-hugo-static-website/ class="left arrow">上一篇：<br>为 Hugo 静态网站添加全文检索功能</a>
+print(&#39;鸭子在同一半圆的概率为：{0}&#39;.format(to_fraction(hits / repeat_times)))</code></pre></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/%E7%AE%97%E6%B3%95/>算法</a></li><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/adding-full-text-search-to-a-hugo-static-website/ class="left arrow">上一篇：<br>为 Hugo 静态网站添加全文检索功能</a>
 <a href=/moments/202210/1666430648/ class="right arrow">下一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2023-03-15 06:20:50.903601528 +0000 UTC m=+0.306093548">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
+<a href=# class=top>返回顶部</a></div></main><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-17 03:31:10.706736483 +0000 UTC m=+0.305489774">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
 <script src=/js/main.js></script></body></html>

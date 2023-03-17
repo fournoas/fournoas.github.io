@@ -1,19 +1,11 @@
 <!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>MSN 双开工具源代码 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
-<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.2.2/mermaid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script>mermaid.initialize({startOnLoad:!0})</script><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>MSN 双开工具源代码</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2006-02-04 00:00:00 +0000 UTC" data-pagefind-meta=日期>2006年2月4日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><blockquote><p>网上偶然拾得本人于 2006 年所写的 <strong>MSN Messenger</strong> 双/多开工具的源代码。此即时通讯软件早于 2013 年便已停止服务，而今再看昔日所写代码不甚感慨，遂记录于此，以兹纪念。</p><p>2021年5月17日</p></blockquote><pre><code class=language-c++>#pragma comment(linker,&quot;/subsystem:windows&quot;)
-#pragma comment(linker,&quot;/align:4096&quot;)
-#define MSN_APP &quot;\\MSN Messenger\\msnmsgr.exe&quot;
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><blockquote><p>网上偶然拾得本人于 2006 年所写的 <strong>MSN Messenger</strong> 双/多开工具的源代码。此即时通讯软件早于 2013 年便已停止服务，而今再看昔日所写代码不甚感慨，遂记录于此，以兹纪念。</p><p>2021年5月17日</p></blockquote><pre><code class=language-c++>#pragma comment(linker,&#34;/subsystem:windows&#34;)
+#pragma comment(linker,&#34;/align:4096&#34;)
+#define MSN_APP &#34;\\MSN Messenger\\msnmsgr.exe&#34;
 #define TF_BIT	0x100
 #include &lt;windows.h&gt;
 #include &lt;map&gt;
@@ -45,15 +37,15 @@ int SetHook( bool bSet )
 	{
 		BYTE	lpCode[32];
 		LPVOID	lpGetLastError;
-		lpGetLastError = GetProcAddress( GetModuleHandle( &quot;kernel32.dll&quot; ), &quot;GetLastError&quot; );
+		lpGetLastError = GetProcAddress( GetModuleHandle( &#34;kernel32.dll&#34; ), &#34;GetLastError&#34; );
 		DWORD dwBytesRead;
 /* ReadProcessMemory(hTargetProcess,lpGetLastError,&amp;bytOriginalOpCode,sizeof(BYTE),&amp;dwBytesRead); */
 		ReadProcessMemory( hTargetProcess, lpGetLastError, &amp;lpCode, sizeof(lpCode), &amp;dwBytesRead );
-		for ( int i = 0; i &lt; 32; i++ )
+		for ( int i = 0; i &lt; 32; i&#43;&#43; )
 		{
 			if ( 0xC3 == lpCode[i] )
 			{
-				g_lpGetLastErrorRet = lpGetLastErrorRet = (LPVOID) ( ( (DWORD) lpGetLastError) + i);
+				g_lpGetLastErrorRet = lpGetLastErrorRet = (LPVOID) ( ( (DWORD) lpGetLastError) &#43; i);
 				break;
 			}
 		}
@@ -84,11 +76,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	ZeroMemory( &amp;si, sizeof(si) );
 	ZeroMemory( &amp;pi, sizeof(pi) );
 	si.cb = sizeof(si);
-	GetEnvironmentVariable( &quot;ProgramFiles&quot;, lpApplication, MAX_PATH );
+	GetEnvironmentVariable( &#34;ProgramFiles&#34;, lpApplication, MAX_PATH );
 	strcat( lpApplication, MSN_APP );
 	if ( !CreateProcess( lpApplication, NULL, NULL, NULL, FALSE, DEBUG_ONLY_THIS_PROCESS, NULL, NULL, &amp;si, &amp;pi ) )
 	{
-		MessageBox( GetDesktopWindow(), &quot;Fail to launch \&quot;msnmsgr.exe\&quot;!&quot;, &quot;Error&quot;, MB_OK | MB_ICONSTOP );
+		MessageBox( GetDesktopWindow(), &#34;Fail to launch \&#34;msnmsgr.exe\&#34;!&#34;, &#34;Error&#34;, MB_OK | MB_ICONSTOP );
 		return(FALSE);
 	}
 	DEBUG_EVENT	de;
@@ -139,13 +131,13 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 				{
 					if ( (context.Eip - 1) == (DWORD) g_lpGetLastErrorRet )
 					{
-/* printf(&quot;Return Address: 0x%08X\n&quot;,GetRetAddress((LPVOID)context.Esp)); */
+/* printf(&#34;Return Address: 0x%08X\n&#34;,GetRetAddress((LPVOID)context.Esp)); */
 						if ( 0x00700000 &gt; GetRetAddress( (LPVOID) context.Esp ) &amp;&amp; de.dwThreadId == dwMainThreadId )
 						{
 							if ( ERROR_ALREADY_EXISTS == context.Eax )
 							{
 								context.Eax = 0;
-								uHookCount++;
+								uHookCount&#43;&#43;;
 							}
 						}
 						SetHook( FALSE );
@@ -166,15 +158,20 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 	CloseHandle( pi.hProcess );
 	CloseHandle( pi.hThread );
 	return(TRUE);
-}
-</code></pre><p>MSN Messenger 通过创建全局互斥量来保证系统中同时只能运行一个进程。伪代码如下：</p><pre><code class=language-c++>hMutex = CreateMutex(NULL, FALSE, &quot;MSNMessengerIsRunning&quot;);
+}</code></pre><p>MSN Messenger 通过创建全局互斥量来保证系统中同时只能运行一个进程。伪代码如下：</p><pre><code class=language-c++>hMutex = CreateMutex(NULL, FALSE, &#34;MSNMessengerIsRunning&#34;);
 
 if (GetLastError() == ERROR_ALREADY_EXISTS) 
 {
      // MSN Messenger 已启动，本进程即将退出
      ExitProcess();
-}
-</code></pre><p>工具的破解原理是：通过 Hook <code>GetLastError</code>，修改该 API 的返回值，从而欺骗 MSN 进程，以绕过限制。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/C/C++/>C/C++</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/about/ class="left arrow">上一篇：<br>关于</a>
+}</code></pre><p>工具的破解原理是：通过 Hook <code>GetLastError</code>，修改该 API 的返回值，从而欺骗 MSN 进程，以绕过限制。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/C/C++/>C/C++</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/about/ class="left arrow">上一篇：<br>关于</a>
 <a href=/posts/the-giving-plague/ class="right arrow">下一篇：<br>赐予的瘟疫</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2023-03-15 06:20:50.851192003 +0000 UTC m=+0.253683923">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
+<a href=# class=top>返回顶部</a></div></main><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-17 03:31:10.65025337 +0000 UTC m=+0.249006661">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
 <script src=/js/main.js></script></body></html>

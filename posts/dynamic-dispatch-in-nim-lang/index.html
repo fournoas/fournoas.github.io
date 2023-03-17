@@ -1,13 +1,5 @@
 <!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Nim 语言的动态分发机制 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
-<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.2.2/mermaid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script>mermaid.initialize({startOnLoad:!0})</script><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>Nim 语言的动态分发机制</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2021-03-15 00:00:00 +0000 UTC" data-pagefind-meta=日期>2021年3月15日</time>
@@ -16,89 +8,85 @@
   Bar = ref object of Foo
 
 method dynamic_dispath(foo: Foo) {.base.} =
-  echo &quot;foo&quot;
+  echo &#34;foo&#34;
 
 method dynamic_dispath(bar: Bar) =
-  echo &quot;bar&quot;
+  echo &#34;bar&#34;
 
 proc static_dispath(foo: Foo) =
-  echo &quot;foo&quot;
+  echo &#34;foo&#34;
 
 proc static_dispath(bar: Bar) =
-  echo &quot;bar&quot;
+  echo &#34;bar&#34;
 
 
 var foo: Foo = new(Bar)
 foo.static_dispath() # output: foo
-foo.dynamic_dispath() # output: bar
-</code></pre><p>同 Julia 和 Common Lisp 一样，Nim 也支持<a href=https://zh.wikipedia.org/zh-hans/%E5%A4%9A%E5%88%86%E6%B4%BE target=_blank rel=noopener>多重分发</a>（Multiple dispatch）。</p><pre><code class=language-nim>type
+foo.dynamic_dispath() # output: bar</code></pre><p>同 Julia 和 Common Lisp 一样，Nim 也支持<a href=https://zh.wikipedia.org/zh-hans/%E5%A4%9A%E5%88%86%E6%B4%BE target=_blank rel=noopener>多重分发</a>（Multiple dispatch）。</p><pre><code class=language-nim>type
   Thing = ref object of RootObj
   Unit = ref object of Thing
     x: int
 
 method collide(a, b: Thing) {.inline.} =
-  quit &quot;to override!&quot;
+  quit &#34;to override!&#34;
 
 method collide(a: Thing, b: Unit) {.inline.} =
-  echo &quot;1&quot;
+  echo &#34;1&#34;
 
 method collide(a: Unit, b: Thing) {.inline.} =
-  echo &quot;2&quot;
+  echo &#34;2&#34;
 
 var a, b: Unit
 new a
 new b
-collide(a, b) # output: 2
-</code></pre><p><strong>注:</strong> 自 Nim 0.20 起，编译时需要使用参数 <code>--multimethods:on</code> 来启用多重分发支持。</p><p>此外，Nim 支持一种叫<a href=https://en.wikipedia.org/wiki/Uniform_Function_Call_Syntax target=_blank rel=noopener>统一函数调用语法</a>（Uniform Function Call Syntax）的风格：</p><pre><code class=language-nim>proc print(s: string) = echo s
+collide(a, b) # output: 2</code></pre><p><strong>注:</strong> 自 Nim 0.20 起，编译时需要使用参数 <code>--multimethods:on</code> 来启用多重分发支持。</p><p>此外，Nim 支持一种叫<a href=https://en.wikipedia.org/wiki/Uniform_Function_Call_Syntax target=_blank rel=noopener>统一函数调用语法</a>（Uniform Function Call Syntax）的风格：</p><pre><code class=language-nim>proc print(s: string) = echo s
 proc print(s1: string, s2: string) = echo s1, s2
 
-print(&quot;Hello World!&quot;)
-print &quot;Hello World!&quot;
-&quot;Hello World!&quot;.print()
-&quot;Hello World!&quot;.print
-&quot;Hello&quot;.print (&quot; World!&quot;)
-&quot;Hello&quot;.print &quot; World!&quot;
-</code></pre><p>Nim 的动态分发并没有通过虚函数表的方式来实现，而是在动态方法调用处内联展开一系列的 <code>if</code> 判断，根据调用对象的类型，最终选择不同的方法函数。</p><pre><code class=language-nim>type
+print(&#34;Hello World!&#34;)
+print &#34;Hello World!&#34;
+&#34;Hello World!&#34;.print()
+&#34;Hello World!&#34;.print
+&#34;Hello&#34;.print (&#34; World!&#34;)
+&#34;Hello&#34;.print &#34; World!&#34;</code></pre><p>Nim 的动态分发并没有通过虚函数表的方式来实现，而是在动态方法调用处内联展开一系列的 <code>if</code> 判断，根据调用对象的类型，最终选择不同的方法函数。</p><pre><code class=language-nim>type
   Base = ref object of RootObj
   Derived = ref object of Base
 
-method dynamic_dispatch(foo: Base) = echo &quot;Base&quot;
-method dynamic_dispatch(foo: Derived) = echo &quot;Derived&quot;
+method dynamic_dispatch(foo: Base) = echo &#34;Base&#34;
+method dynamic_dispatch(foo: Derived) = echo &#34;Derived&#34;
 
 var foo: Base = new(Derived)
 
-foo.dynamic_dispatch
-</code></pre><p>生成的 C 代码如下：</p><pre><code class=language-c>/* section: NIM_merge_DATA */
-STRING_LITERAL(TM__TK8P9bk048kbmFtnhzKkOjA_3, &quot;Base&quot;, 4);
+foo.dynamic_dispatch</code></pre><p>生成的 C 代码如下：</p><pre><code class=language-c>/* section: NIM_merge_DATA */
+STRING_LITERAL(TM__TK8P9bk048kbmFtnhzKkOjA_3, &#34;Base&#34;, 4);
 static NIM_CONST tyArray__nHXaesL0DJZHyVS07ARPRA TM__TK8P9bk048kbmFtnhzKkOjA_2 = {((NimStringDesc*) &amp;TM__TK8P9bk048kbmFtnhzKkOjA_3)}
 ;
-STRING_LITERAL(TM__TK8P9bk048kbmFtnhzKkOjA_5, &quot;Derived&quot;, 7);
+STRING_LITERAL(TM__TK8P9bk048kbmFtnhzKkOjA_5, &#34;Derived&#34;, 7);
 static NIM_CONST tyArray__nHXaesL0DJZHyVS07ARPRA TM__TK8P9bk048kbmFtnhzKkOjA_4 = {((NimStringDesc*) &amp;TM__TK8P9bk048kbmFtnhzKkOjA_5)}
 ;
 
 // ... ...
 
 N_LIB_PRIVATE N_NIMCALL(void, dynamic_dispatch__c5r4zNoABA7a1469bvDyeFA)(tyObject_BasecolonObjectType___9c7UwwsDx9cls9baHKBs8Py0g* foo) {
-	nimfr_(&quot;dynamic_dispatch&quot;, &quot;test.nim&quot;);
-	nimln_(5, &quot;test.nim&quot;);
-	echoBinSafe(TM__TK8P9bk048kbmFtnhzKkOjA_2, 1); // method dynamic_dispatch(foo: Base) = echo &quot;Base&quot;
+	nimfr_(&#34;dynamic_dispatch&#34;, &#34;test.nim&#34;);
+	nimln_(5, &#34;test.nim&#34;);
+	echoBinSafe(TM__TK8P9bk048kbmFtnhzKkOjA_2, 1); // method dynamic_dispatch(foo: Base) = echo &#34;Base&#34;
 	popFrame();
 }
 N_LIB_PRIVATE N_NIMCALL(void, dynamic_dispatch__NGJl71YhyrlEEKIVgc1qbA)(tyObject_DerivedcolonObjectType___KIiBF5jw56vc7JjtgVaRMg* foo) {
-	nimfr_(&quot;dynamic_dispatch&quot;, &quot;test.nim&quot;);
-	nimln_(6, &quot;test.nim&quot;);
-	echoBinSafe(TM__TK8P9bk048kbmFtnhzKkOjA_4, 1); // method dynamic_dispatch(foo: Derived) = echo &quot;Derived&quot;
+	nimfr_(&#34;dynamic_dispatch&#34;, &#34;test.nim&#34;);
+	nimln_(6, &#34;test.nim&#34;);
+	echoBinSafe(TM__TK8P9bk048kbmFtnhzKkOjA_4, 1); // method dynamic_dispatch(foo: Derived) = echo &#34;Derived&#34;
 	popFrame();
 }
 
 // ... ...
 
 N_LIB_PRIVATE N_NIMCALL(void, dynamic_dispatch__5KArHhtsF2JAL9bQSgyiLMA)(tyObject_BasecolonObjectType___9c7UwwsDx9cls9baHKBs8Py0g* foo) {
-	nimfr_(&quot;dynamic_dispatch&quot;, &quot;test.nim&quot;);
-	nimln_(84, &quot;\\.choosenim\\toolchains\\nim-1.4.4\\lib\\system\\ch&quot;
-&quot;cks.nim&quot;);
+	nimfr_(&#34;dynamic_dispatch&#34;, &#34;test.nim&#34;);
+	nimln_(84, &#34;\\.choosenim\\toolchains\\nim-1.4.4\\lib\\system\\ch&#34;
+&#34;cks.nim&#34;);
 	chckNilDisp(foo);
-	nimln_(5, &quot;test.nim&quot;);
+	nimln_(5, &#34;test.nim&#34;);
 	{
 		if (!((foo) &amp;&amp; ((*foo).Sup.m_type == (&amp;NTI__KIiBF5jw56vc7JjtgVaRMg_)))) goto LA3_;
 		if (foo &amp;&amp; !isObj((*foo).Sup.m_type, (&amp;NTI__KIiBF5jw56vc7JjtgVaRMg_))){ raiseObjectConversionError(); }
@@ -127,17 +115,16 @@ N_LIB_PRIVATE N_NIMCALL(void, NimMainModule)(void) {
 }/* preInitProc end */
 {
 	tyObject_DerivedcolonObjectType___KIiBF5jw56vc7JjtgVaRMg* T1_;
-	nimfr_(&quot;test&quot;, &quot;test.nim&quot;);
-	nimln_(8, &quot;test.nim&quot;);
+	nimfr_(&#34;test&#34;, &#34;test.nim&#34;);
+	nimln_(8, &#34;test.nim&#34;);
 	T1_ = (tyObject_DerivedcolonObjectType___KIiBF5jw56vc7JjtgVaRMg*)0;
 	T1_ = new__hYny4BGj3LhiDCg0b9az6qQ();
 	asgnRef((void**) (&amp;foo__arkQMChktByKQJ3cIC51Bg), &amp;T1_-&gt;Sup);
-	nimln_(10, &quot;test.nim&quot;);
+	nimln_(10, &#34;test.nim&#34;);
 	dynamic_dispatch__5KArHhtsF2JAL9bQSgyiLMA(foo__arkQMChktByKQJ3cIC51Bg); // foo.dynamic_dispatch
 	popFrame();
 }
-}
-</code></pre><p>这种方式有个缺点：如果继承树很深，那么判断分支就会很长，调用的对象类型越是靠近根部，调用的开销越大。</p><pre><code class=language-nim>import times
+}</code></pre><p>这种方式有个缺点：如果继承树很深，那么判断分支就会很长，调用的对象类型越是靠近根部，调用的开销越大。</p><pre><code class=language-nim>import times
 
 type
   Base = ref object of RootObj
@@ -154,37 +141,43 @@ type
 
 proc static_dispatch(foo: Base, count: int): int = count - 1
 method dynamic_dispatch(foo: Base, count: int): int {.base.} = count - 1
-method dynamic_dispatch(foo: Derived1, count: int): int = count + 1
-method dynamic_dispatch(foo: Derived2, count: int): int = count + 2
-method dynamic_dispatch(foo: Derived3, count: int): int = count + 3
-method dynamic_dispatch(foo: Derived4, count: int): int = count + 4
-method dynamic_dispatch(foo: Derived5, count: int): int = count + 5
-method dynamic_dispatch(foo: Derived6, count: int): int = count + 6
-method dynamic_dispatch(foo: Derived7, count: int): int = count + 7
-method dynamic_dispatch(foo: Derived8, count: int): int = count + 8
-method dynamic_dispatch(foo: Derived9, count: int): int = count + 9
-method dynamic_dispatch(foo: Derived10, count: int): int = count + 10
+method dynamic_dispatch(foo: Derived1, count: int): int = count &#43; 1
+method dynamic_dispatch(foo: Derived2, count: int): int = count &#43; 2
+method dynamic_dispatch(foo: Derived3, count: int): int = count &#43; 3
+method dynamic_dispatch(foo: Derived4, count: int): int = count &#43; 4
+method dynamic_dispatch(foo: Derived5, count: int): int = count &#43; 5
+method dynamic_dispatch(foo: Derived6, count: int): int = count &#43; 6
+method dynamic_dispatch(foo: Derived7, count: int): int = count &#43; 7
+method dynamic_dispatch(foo: Derived8, count: int): int = count &#43; 8
+method dynamic_dispatch(foo: Derived9, count: int): int = count &#43; 9
+method dynamic_dispatch(foo: Derived10, count: int): int = count &#43; 10
 
 var foo: Base = new(Base)
 var start = cpuTime()
 for i in 0..99999999:
     discard foo.dynamic_dispatch(i)
     
-echo &quot;Time taken: &quot;, cpuTime() - start # Time taken: 1.342
+echo &#34;Time taken: &#34;, cpuTime() - start # Time taken: 1.342
 
 foo = new(Derived10)
 start = cpuTime()
 for i in 0..99999999:
     discard foo.dynamic_dispatch(i)
     
-echo &quot;Time taken: &quot;, cpuTime() - start # Time taken: 0.672
+echo &#34;Time taken: &#34;, cpuTime() - start # Time taken: 0.672
 
 start = cpuTime()
 for i in 0..99999999:
     discard foo.static_dispatch(i)
     
-echo &quot;Time taken: &quot;, cpuTime() - start # Time taken: 0.055
-</code></pre><p>调用 <code>Base</code> 的 <code>dynamic_dispatch</code> 方法所消耗时间是调用 <code>Derived10</code> 方法的两倍多。而 <code>proc</code> 关键字定义的静态分发耗时仅是动态分发的 1/10，之所以性能提升那么大，主要原因大概有两个。首先是 CPU 分支预测命中导致的性能提升，其次是编译器将函数调用优化为内联展开。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Nim/>Nim</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/Zettelkasten-method-and-bi-directional-links-is-not-necessary/ class="left arrow">上一篇：<br>不要迷信卢曼卡片盒方法和双向链笔记</a>
+echo &#34;Time taken: &#34;, cpuTime() - start # Time taken: 0.055</code></pre><p>调用 <code>Base</code> 的 <code>dynamic_dispatch</code> 方法所消耗时间是调用 <code>Derived10</code> 方法的两倍多。而 <code>proc</code> 关键字定义的静态分发耗时仅是动态分发的 1/10，之所以性能提升那么大，主要原因大概有两个。首先是 CPU 分支预测命中导致的性能提升，其次是编译器将函数调用优化为内联展开。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Nim/>Nim</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/Zettelkasten-method-and-bi-directional-links-is-not-necessary/ class="left arrow">上一篇：<br>不要迷信卢曼卡片盒方法和双向链笔记</a>
 <a href=/posts/python-libraries-and-packages/ class="right arrow">下一篇：<br>Python 库资源收集</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2023-03-15 06:20:50.851579203 +0000 UTC m=+0.254071223">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
+<a href=# class=top>返回顶部</a></div></main><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-17 03:31:10.651897185 +0000 UTC m=+0.250650576">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
 <script src=/js/main.js></script></body></html>

@@ -1,13 +1,5 @@
 <!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>让 FastRoute 支持 URL 反向解析 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
-<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.2.2/mermaid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script>mermaid.initialize({startOnLoad:!0})</script><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>让 FastRoute 支持 URL 反向解析</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2019-12-17 00:00:00 +0000 UTC" data-pagefind-meta=日期>2019年12月17日</time>
@@ -26,7 +18,7 @@ class Router extends BaseRouter
     /**
      * @var array
      */
-    protected static $routeMethods = ['get', 'post', 'put', 'delete', 'patch', 'head'];
+    protected static $routeMethods = [&#39;get&#39;, &#39;post&#39;, &#39;put&#39;, &#39;delete&#39;, &#39;patch&#39;, &#39;head&#39;];
 
     /**
      * @var string
@@ -63,8 +55,7 @@ class Router extends BaseRouter
 
         return in_array($name, static::$routeMethods) ? static::createUrl($arguments[0]) : $returnValue;
     }
-}
-</code></pre><pre><code class=language-php>&lt;?php
+}</code></pre><pre><code class=language-php>&lt;?php
 /**
  * Url.php
 **/
@@ -106,7 +97,7 @@ class Url
         $routes = $routeParser-&gt;parse($this-&gt;route);
 
         foreach ($routes as $route) {
-            $parsedUrl = '';
+            $parsedUrl = &#39;&#39;;
             $i = 0;
             foreach ($route as $part) {
                 if (is_string($part)) {
@@ -115,9 +106,9 @@ class Url
                 }
     
                 if ($i === count($arguments)) {
-                    throw new LogicException('Not enough parameters given');
+                    throw new LogicException(&#39;Not enough parameters given&#39;);
                 }
-                $parsedUrl .= $arguments[$i++];
+                $parsedUrl .= $arguments[$i&#43;&#43;];
             }
     
             if ($i === count($arguments)) {
@@ -126,11 +117,10 @@ class Url
         }
 
         throw new LogicException(
-            sprintf('The arguments does not matched for the route \'%s\'.', $this-&gt;name)
+            sprintf(&#39;The arguments does not matched for the route \&#39;%s\&#39;.&#39;, $this-&gt;name)
         );
     }
-}
-</code></pre><pre><code class=language-php>&lt;?php
+}</code></pre><pre><code class=language-php>&lt;?php
 /**
  * UrlManager.php
 **/
@@ -156,7 +146,7 @@ class UrlManager
     {
         if (isset($this-&gt;urls[$url-&gt;name])) {
             throw new RuntimeException(
-                sprintf('Cannot add the url named \'%s\'. A duplicate name exists.', $url-&gt;name)
+                sprintf(&#39;Cannot add the url named \&#39;%s\&#39;. A duplicate name exists.&#39;, $url-&gt;name)
             );
         }
 
@@ -167,7 +157,7 @@ class UrlManager
     {
         if (! isset($this-&gt;urls[$name])) {
             throw new RuntimeException(
-                sprintf('The url named \'%s\' does not exists.', $name)
+                sprintf(&#39;The url named \&#39;%s\&#39; does not exists.&#39;, $name)
             );
         }
 
@@ -185,8 +175,7 @@ class UrlManager
 
         return static::$manager;
     }
-}
-</code></pre><p>修改项目中的 <code>config\routes.php</code> 配置文件：</p><pre><code class=language-php>&lt;?php
+}</code></pre><p>修改项目中的 <code>config\routes.php</code> 配置文件：</p><pre><code class=language-php>&lt;?php
 
 declare(strict_types=1);
 /**
@@ -200,14 +189,19 @@ declare(strict_types=1);
 
 use App\Http\Router;
 
-Router::get('/user/{id}', 'App\Controller\UserController@info')-&gt;name('user-info');
-</code></pre><p>使用 URL 反向解析：</p><pre><code class=language-php>&lt;?php
+Router::get(&#39;/user/{id}&#39;, &#39;App\Controller\UserController@info&#39;)-&gt;name(&#39;user-info&#39;);</code></pre><p>使用 URL 反向解析：</p><pre><code class=language-php>&lt;?php
 
 use App\Http\UrlManager;
 
-// 返回 '/user/123'
-$url = UrlManager::getManager()-&gt;reverse('user-info', 123);
-</code></pre></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/PHP/>PHP</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/french-onion-soup/ class="left arrow">上一篇：<br>法式洋葱汤</a>
+// 返回 &#39;/user/123&#39;
+$url = UrlManager::getManager()-&gt;reverse(&#39;user-info&#39;, 123);</code></pre></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/PHP/>PHP</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/french-onion-soup/ class="left arrow">上一篇：<br>法式洋葱汤</a>
 <a href=/posts/three-hundred-Song-Ci/ class="right arrow">下一篇：<br>宋词三百首</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2023-03-15 06:20:51.210054576 +0000 UTC m=+0.612546596">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
+<a href=# class=top>返回顶部</a></div></main><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-17 03:31:11.182409701 +0000 UTC m=+0.781163092">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
 <script src=/js/main.js></script></body></html>

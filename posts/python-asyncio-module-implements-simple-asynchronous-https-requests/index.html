@@ -1,13 +1,5 @@
 <!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Python asyncio 模块实现简单异步 https 请求 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
-<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.2.2/mermaid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script>mermaid.initialize({startOnLoad:!0})</script><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>Python asyncio 模块实现简单异步 https 请求</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2022-11-11 00:00:00 +0000 UTC" data-pagefind-meta=日期>2022年11月11日</time>
@@ -16,44 +8,44 @@ import ssl
 import io
 import pprint
 
-HTTP_HOST = 'www.baidu.com'
-HTTP_REQUEST = 'GET / HTTP/1.1\r\nHOST: {host}\r\n\r\n'.format(host=HTTP_HOST).encode()
+HTTP_HOST = &#39;www.baidu.com&#39;
+HTTP_REQUEST = &#39;GET / HTTP/1.1\r\nHOST: {host}\r\n\r\n&#39;.format(host=HTTP_HOST).encode()
 HTTP_TIMEOUT = 2.0    # 请求超时
 
 class HttpRequestProtocol(asyncio.Protocol):
     def _set_future_result(self, future, result=None):
-        '''
+        &#39;&#39;&#39;
         从异步等待返回
-        '''
+        &#39;&#39;&#39;
         if not future.cancelled() and not future.done():
             future.set_result(result)
 
     def _parse_response(self):
-        '''
+        &#39;&#39;&#39;
         从返回的数据中解析 Http 响应体
-        '''
-        if 'headers' in self._response:
-            content_length = int(self._response['headers']['Content-Length'])
-            if self._response_data.tell() &lt; content_length + self._response_body_offset:
+        &#39;&#39;&#39;
+        if &#39;headers&#39; in self._response:
+            content_length = int(self._response[&#39;headers&#39;][&#39;Content-Length&#39;])
+            if self._response_data.tell() &lt; content_length &#43; self._response_body_offset:
                 return False
             self._response_data.seek(self._response_body_offset)
-            self._response['body'] = self._response_data.read(content_length)
+            self._response[&#39;body&#39;] = self._response_data.read(content_length)
             self._response_data.close()
             return self._response
         else:
             response_part = self._response_data.getvalue()
-            header_end_offset = response_part.find(b'\r\n\r\n')
+            header_end_offset = response_part.find(b&#39;\r\n\r\n&#39;)
             if header_end_offset &lt; 0:
                 return False
             
-            self._response_body_offset = header_end_offset + 4
+            self._response_body_offset = header_end_offset &#43; 4
             header_data = response_part[:header_end_offset]
-            headers = header_data.decode().split('\r\n')
-            self._response['status'] = headers[0]
-            self._response['headers'] = {_[0]: _[1] for _ in \
-                [[__.strip() for __ in _.split(':', 1)] for _ in headers[1:]]}
-            if 'Content-Length' not in self._response['headers']:
-                raise ValueError('响应数据丢失 &quot;Content-Length&quot; 头部，无法处理该响应')
+            headers = header_data.decode().split(&#39;\r\n&#39;)
+            self._response[&#39;status&#39;] = headers[0]
+            self._response[&#39;headers&#39;] = {_[0]: _[1] for _ in \
+                [[__.strip() for __ in _.split(&#39;:&#39;, 1)] for _ in headers[1:]]}
+            if &#39;Content-Length&#39; not in self._response[&#39;headers&#39;]:
+                raise ValueError(&#39;响应数据丢失 &#34;Content-Length&#34; 头部，无法处理该响应&#39;)
             return self._parse_response()
 
     def __init__(self, on_data_received, on_connection_lost):
@@ -64,9 +56,9 @@ class HttpRequestProtocol(asyncio.Protocol):
         self._response_body_offset = 0
 
     def data_received(self, data):
-        '''
+        &#39;&#39;&#39;
         每次收到服务器返回的数据，都尝试能否解析出完整的响应
-        '''
+        &#39;&#39;&#39;
         self._response_data.write(data)
         response = self._parse_response()
         if response:
@@ -74,7 +66,7 @@ class HttpRequestProtocol(asyncio.Protocol):
             self._set_future_result(self.on_data_received, response)
 
     def connection_lost(self, exc):
-        print('与服务器连接已关闭: {0}'.format(exc))
+        print(&#39;与服务器连接已关闭: {0}&#39;.format(exc))
         self._set_future_result(self.on_connection_lost)
 
 
@@ -90,7 +82,7 @@ async def main():
     ssl_context = ssl.create_default_context()
     ssl_transport = await loop.start_tls(transport, protocol, ssl_context)
     ssl_transport.write(HTTP_REQUEST)
-    print('发送请求: {!r}'.format(HTTP_REQUEST))
+    print(&#39;发送请求: {!r}&#39;.format(HTTP_REQUEST))
 
     try:
         # 等待请求返回响应
@@ -99,9 +91,9 @@ async def main():
     except (asyncio.exceptions.CancelledError, 
             asyncio.exceptions.InvalidStateError,
             TimeoutError):
-        print('请求失败')
+        print(&#39;请求失败&#39;)
     except (TypeError, ValueError):
-        print('收到异常数据')
+        print(&#39;收到异常数据&#39;)
     finally:
         # 如果要维持长连接，此处不要关闭 transport
         transport.close()
@@ -112,35 +104,34 @@ async def main():
     finally:
         transport.close()
 
-if __name__ == '__main__':
+if __name__ == &#39;__main__&#39;:
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        pass
-</code></pre><h1 id=版本二>版本二</h1><p>使用 <code>asyncio.open_connection()</code> 。</p><pre><code class=language-python>import asyncio
+        pass</code></pre><h1 id=版本二>版本二</h1><p>使用 <code>asyncio.open_connection()</code> 。</p><pre><code class=language-python>import asyncio
 import ssl
 import pprint
 
 
 async def main():
     reader, writer = await asyncio.open_connection(
-        'www.baidu.com', 
+        &#39;www.baidu.com&#39;, 
         443, 
         ssl=ssl.create_default_context()
     )
     writer.writelines([
-        b'GET / HTTP/1.1\r\n'
-        b'HOST: www.baidu.com\r\n'
-        b'\r\n'
+        b&#39;GET / HTTP/1.1\r\n&#39;
+        b&#39;HOST: www.baidu.com\r\n&#39;
+        b&#39;\r\n&#39;
     ])
     await writer.drain()
-    raw_repsonse_header = await reader.readuntil(b'\r\n\r\n')
+    raw_repsonse_header = await reader.readuntil(b&#39;\r\n\r\n&#39;)
     response_headers = {_[0]: _[1] for _ in \
-        [[__.strip() for __ in _.split(b':', 1)] for _ in raw_repsonse_header.split(b'\r\n')[1:-2]]}
+        [[__.strip() for __ in _.split(b&#39;:&#39;, 1)] for _ in raw_repsonse_header.split(b&#39;\r\n&#39;)[1:-2]]}
     
-    if b'Content-Length' not in response_headers:
-        raise ValueError('响应数据丢失 &quot;Content-Length&quot; 头部，无法处理该响应')
-    content_length = int(response_headers[b'Content-Length'])
+    if b&#39;Content-Length&#39; not in response_headers:
+        raise ValueError(&#39;响应数据丢失 &#34;Content-Length&#34; 头部，无法处理该响应&#39;)
+    content_length = int(response_headers[b&#39;Content-Length&#39;])
     repsonse_body = await reader.readexactly(content_length)
     pprint.pprint(response_headers)
     pprint.pprint(repsonse_body)
@@ -148,15 +139,12 @@ async def main():
     await writer.wait_closed()
 
 
-if __name__ == '__main__':
-    asyncio.run(main())
-</code></pre><p>此版本的缺陷是必须指定 hostname 。如果 <code>asyncio.open_connection()</code> 的 <code>host</code> 参数使用 IP 地址，那么必须同时传递 <code>server_hostname</code> 参数，否则会报错。下面代码会抛出 <code>ssl.SSLCertVerificationError</code> 异常：</p><pre><code>reader, writer = await asyncio.open_connection(
-    '112.80.248.75', 
+if __name__ == &#39;__main__&#39;:
+    asyncio.run(main())</code></pre><p>此版本的缺陷是必须指定 hostname 。如果 <code>asyncio.open_connection()</code> 的 <code>host</code> 参数使用 IP 地址，那么必须同时传递 <code>server_hostname</code> 参数，否则会报错。下面代码会抛出 <code>ssl.SSLCertVerificationError</code> 异常：</p><pre><code class=language->reader, writer = await asyncio.open_connection(
+    &#39;112.80.248.75&#39;, 
     443, 
     ssl=ssl.create_default_context()
-)
-</code></pre><p>异常信息：</p><pre><code class=language-text>ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: IP address mismatch, certificate is not valid for '112.80.248.75'. (_ssl.c:992)
-</code></pre><h1 id=版本三>版本三</h1><p>在版本二的基础上进行改进，不要求验证证书的 hostname 。照着 <code>asyncio.streams</code> 的代码依样画葫芦：</p><pre><code class=language-python>import asyncio
+)</code></pre><p>异常信息：</p><pre><code class=language-text>ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: IP address mismatch, certificate is not valid for &#39;112.80.248.75&#39;. (_ssl.c:992)</code></pre><h1 id=版本三>版本三</h1><p>在版本二的基础上进行改进，不要求验证证书的 hostname 。照着 <code>asyncio.streams</code> 的代码依样画葫芦：</p><pre><code class=language-python>import asyncio
 import ssl
 import pprint
 from asyncio.streams import _DEFAULT_LIMIT, StreamReader, StreamReaderProtocol, StreamWriter
@@ -165,11 +153,11 @@ from asyncio.streams import _DEFAULT_LIMIT, StreamReader, StreamReaderProtocol, 
 class TlsStreamReaderProtocol(StreamReaderProtocol):
     def eof_received(self):
         super().eof_received()
-        &quot;&quot;&quot;
+        &#34;&#34;&#34;
         如果这里返回 True
         会打印下面的提示信息
         returning true from eof_received() has no effect when using ssl
-        &quot;&quot;&quot;
+        &#34;&#34;&#34;
         return False
 
 
@@ -188,22 +176,22 @@ async def open_connection(host=None, port=None, *,
 
 async def main():
     reader, writer = await open_connection(
-        '112.80.248.75', 
+        &#39;112.80.248.75&#39;, 
         443,
     )
     writer.writelines([
-        b'GET / HTTP/1.1\r\n'
-        b'HOST: www.baidu.com\r\n'
-        b'\r\n'
+        b&#39;GET / HTTP/1.1\r\n&#39;
+        b&#39;HOST: www.baidu.com\r\n&#39;
+        b&#39;\r\n&#39;
     ])
     await writer.drain()
-    raw_repsonse_header = await reader.readuntil(b'\r\n\r\n')
+    raw_repsonse_header = await reader.readuntil(b&#39;\r\n\r\n&#39;)
     response_headers = {_[0]: _[1] for _ in \
-        [[__.strip() for __ in _.split(b':', 1)] for _ in raw_repsonse_header.split(b'\r\n')[1:-2]]}
+        [[__.strip() for __ in _.split(b&#39;:&#39;, 1)] for _ in raw_repsonse_header.split(b&#39;\r\n&#39;)[1:-2]]}
     
-    if b'Content-Length' not in response_headers:
-        raise ValueError('响应数据丢失 &quot;Content-Length&quot; 头部，无法处理该响应')
-    content_length = int(response_headers[b'Content-Length'])
+    if b&#39;Content-Length&#39; not in response_headers:
+        raise ValueError(&#39;响应数据丢失 &#34;Content-Length&#34; 头部，无法处理该响应&#39;)
+    content_length = int(response_headers[b&#39;Content-Length&#39;])
     repsonse_body = await reader.readexactly(content_length)
     pprint.pprint(response_headers)
     pprint.pprint(repsonse_body)
@@ -211,9 +199,15 @@ async def main():
     await writer.wait_closed()
 
 
-if __name__ == '__main__':
-    asyncio.run(main())
-</code></pre></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/chinese-web-typesetting-design-suggestions/ class="left arrow">上一篇：<br>中文网页排版设计建议</a>
+if __name__ == &#39;__main__&#39;:
+    asyncio.run(main())</code></pre></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/chinese-web-typesetting-design-suggestions/ class="left arrow">上一篇：<br>中文网页排版设计建议</a>
 <a href=/moments/202211/1668125577/ class="right arrow">下一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2023-03-15 06:20:50.857416506 +0000 UTC m=+0.259908526">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
+<a href=# class=top>返回顶部</a></div></main><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-17 03:31:10.66227918 +0000 UTC m=+0.261032471">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
 <script src=/js/main.js></script></body></html>

@@ -1,13 +1,5 @@
 <!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>优化托管在 DigitalOcean 的 Mastodon &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
-<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/mermaid/9.2.2/mermaid.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
-<script>mermaid.initialize({startOnLoad:!0})</script><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>优化托管在 DigitalOcean 的 Mastodon</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2022-09-01 00:00:00 +0000 UTC" data-pagefind-meta=日期>2022年9月1日</time>
@@ -15,47 +7,34 @@
 chmod 600 /swap
 mkswap /swap
 swapon /swap
-echo '/swap none swap sw 0 0' | tee -a /etc/fstab
-</code></pre><h2 id=禁用-unattended-upgrades-服务>禁用 unattended-upgrades 服务</h2><p>Droplet 实例启动后，CPU 占用马上就 100% 了。用 top 命令一查，发现一个叫 unattended-upgrades 进程丧心病狂地跑满了 CPU。禁用该服务：</p><pre><code class=language-bash>systemctl stop unattended-upgrades
-systemctl disable unattended-upgrades
-</code></pre><h2 id=限制-journal-日志大小>限制 Journal 日志大小</h2><p>使用 <code>journalctl --disk-usage</code> 命令查看日志使用的硬盘空间。系统长期运行时，Journal 日志日积月累会占用硬盘空间大小非常可观。可以按时间或大小保留 Journal 日志。下面命令让日志最多保留 7 天、占用 100 MB 空间：</p><pre><code class=language-bash>journalctl --vacuum-time=7d
-journalctl --vacuum-size=100M
-</code></pre><p>也可以开启日志的持久化限制。编辑配置文件 <code>/etc/systemd/journald.conf</code>，开启如下任一配置即可：</p><pre><code class=language-ini>MaxRetentionSec=7day
-SystemMaxUse=100M
-</code></pre><p>重启 journal 服务使配置生效：</p><pre><code class=language-bash>systemctl restart systemd-journald
-</code></pre><h2 id=ruby-使用-jemalloc-内存分配器>Ruby 使用 Jemalloc 内存分配器</h2><p>Ruby 进程是占用内存的大头。<a href=https://jemalloc.net/ target=_blank rel=noopener>Jemalloc</a> 是一款通用的内存分配器，支持对包括 Ruby 在内的多种语言进行内存使用的优化。</p><pre><code class=language-bash>apt install libjemalloc-dev
+echo &#39;/swap none swap sw 0 0&#39; | tee -a /etc/fstab</code></pre><h2 id=禁用-unattended-upgrades-服务>禁用 unattended-upgrades 服务</h2><p>Droplet 实例启动后，CPU 占用马上就 100% 了。用 top 命令一查，发现一个叫 unattended-upgrades 进程丧心病狂地跑满了 CPU。禁用该服务：</p><pre><code class=language-bash>systemctl stop unattended-upgrades
+systemctl disable unattended-upgrades</code></pre><h2 id=限制-journal-日志大小>限制 Journal 日志大小</h2><p>使用 <code>journalctl --disk-usage</code> 命令查看日志使用的硬盘空间。系统长期运行时，Journal 日志日积月累会占用硬盘空间大小非常可观。可以按时间或大小保留 Journal 日志。下面命令让日志最多保留 7 天、占用 100 MB 空间：</p><pre><code class=language-bash>journalctl --vacuum-time=7d
+journalctl --vacuum-size=100M</code></pre><p>也可以开启日志的持久化限制。编辑配置文件 <code>/etc/systemd/journald.conf</code>，开启如下任一配置即可：</p><pre><code class=language-ini>MaxRetentionSec=7day
+SystemMaxUse=100M</code></pre><p>重启 journal 服务使配置生效：</p><pre><code class=language-bash>systemctl restart systemd-journald</code></pre><h2 id=ruby-使用-jemalloc-内存分配器>Ruby 使用 Jemalloc 内存分配器</h2><p>Ruby 进程是占用内存的大头。<a href=https://jemalloc.net/ target=_blank rel=noopener>Jemalloc</a> 是一款通用的内存分配器，支持对包括 Ruby 在内的多种语言进行内存使用的优化。</p><pre><code class=language-bash>apt install libjemalloc-dev
 su - mastodon
 RUBY_CONFIGURE_OPTS=--with-jemalloc rbenv install 2.6.6
 rbenv global 2.6.6
-ruby -r rbconfig -e &quot;puts RbConfig::CONFIG['MAINLIBS']&quot;
-</code></pre><p>如果终端返回字符串中包含 <code>-ljemalloc</code> 则表示安装成功。</p><h2 id=修改-worker-进程数量>修改 Worker 进程数量</h2><p>Mastodon 有三种进程：</p><ul><li>Web (Puma)</li><li>Streaming API</li><li>后台进程 (Sidekiq)</li></ul><p>可以将 Web 进程减少到一个，线程数控制在 10 个以内；Streaming 进程减少到一个；Sidekiq 进程减少到四个。</p><p>首先，打开并修改配置文件：</p><pre><code class=language-bash>su - mastodon
+ruby -r rbconfig -e &#34;puts RbConfig::CONFIG[&#39;MAINLIBS&#39;]&#34;</code></pre><p>如果终端返回字符串中包含 <code>-ljemalloc</code> 则表示安装成功。</p><h2 id=修改-worker-进程数量>修改 Worker 进程数量</h2><p>Mastodon 有三种进程：</p><ul><li>Web (Puma)</li><li>Streaming API</li><li>后台进程 (Sidekiq)</li></ul><p>可以将 Web 进程减少到一个，线程数控制在 10 个以内；Streaming 进程减少到一个；Sidekiq 进程减少到四个。</p><p>首先，打开并修改配置文件：</p><pre><code class=language-bash>su - mastodon
 cd /home/mastodon/live
-nano .env.production
-</code></pre><p>在配置文件中添加如下内容：</p><pre><code class=language-ini>WEB_CONCURRENCY=1
+nano .env.production</code></pre><p>在配置文件中添加如下内容：</p><pre><code class=language-ini>WEB_CONCURRENCY=1
 MAX_THREADS=10
-STREAMING_CLUSTER_NUM=1
-</code></pre><p>然后，打开 Sidekiq 服务配置文件：</p><pre><code class=language-bash>nano /etc/systemd/system/mastodon-sidekiq.service
-</code></pre><p>将文件中的 <code>bundle exec sidekiq -c 25</code> 修改为 <code>bundle exec sidekiq -c 4</code>，保存后退出编辑。运行命令重新载入 systemd 配置：</p><pre><code class=language-bash>systemctl daemon-reload
-</code></pre><h2 id=重启服务>重启服务</h2><p>修改完毕后，重启服务使配置生效：</p><pre><code class=language-bash>systemctl restart mastodon-sidekiq
+STREAMING_CLUSTER_NUM=1</code></pre><p>然后，打开 Sidekiq 服务配置文件：</p><pre><code class=language-bash>nano /etc/systemd/system/mastodon-sidekiq.service</code></pre><p>将文件中的 <code>bundle exec sidekiq -c 25</code> 修改为 <code>bundle exec sidekiq -c 4</code>，保存后退出编辑。运行命令重新载入 systemd 配置：</p><pre><code class=language-bash>systemctl daemon-reload</code></pre><h2 id=重启服务>重启服务</h2><p>修改完毕后，重启服务使配置生效：</p><pre><code class=language-bash>systemctl restart mastodon-sidekiq
 systemctl restart mastodon-streaming
 systemctl restart mastodon-web
-systemctl restart postgresql
-</code></pre><h2 id=释放硬盘空间>释放硬盘空间</h2><p>定期清理缓存和媒体文件，可以有效地减缓硬盘空间的消耗速度。创建 <code>/home/mastodon/mastodon-clear.sh</code> 脚本，内容如下：</p><pre><code class=language-bash>#!/usr/bin/env bash
-export PATH=&quot;/home/mastodon/.rbenv/bin:$PATH&quot;
-eval &quot;$(rbenv init -)&quot;
+systemctl restart postgresql</code></pre><h2 id=释放硬盘空间>释放硬盘空间</h2><p>定期清理缓存和媒体文件，可以有效地减缓硬盘空间的消耗速度。创建 <code>/home/mastodon/mastodon-clear.sh</code> 脚本，内容如下：</p><pre><code class=language-bash>#!/usr/bin/env bash
+export PATH=&#34;/home/mastodon/.rbenv/bin:$PATH&#34;
+eval &#34;$(rbenv init -)&#34;
 /home/mastodon/live/bin/tootctl statuses remove
 /home/mastodon/live/bin/tootctl preview_cards remove
 /home/mastodon/live/bin/tootctl media remove --days=7
 /home/mastodon/live/bin/tootctl media remove-orphans
-/home/mastodon/live/bin/tootctl cache clear
-</code></pre><p>其中 <code>--day=7</code> 参数表示删除 7 天以前的站外媒体文件，可以修改为其他天数。然后通过 systemd 定时运行该脚本。</p><p>创建 <code>/etc/systemd/system/mastodon-clear.service</code> 配置文件，内容如下：</p><pre><code class=language-ini>[Unit]
+/home/mastodon/live/bin/tootctl cache clear</code></pre><p>其中 <code>--day=7</code> 参数表示删除 7 天以前的站外媒体文件，可以修改为其他天数。然后通过 systemd 定时运行该脚本。</p><p>创建 <code>/etc/systemd/system/mastodon-clear.service</code> 配置文件，内容如下：</p><pre><code class=language-ini>[Unit]
 Description=Mastodon data cleaning service
 
 [Service]
 User=mastodon
-Environment=&quot;RAILS_ENV=production&quot;
-ExecStart=/bin/bash /home/mastodon/mastodon-clear.sh
-</code></pre><p>创建 <code>/etc/systemd/system/mastodon-clear.timer</code> 配置文件，内容如下：</p><pre><code class=language-ini>[Unit]
+Environment=&#34;RAILS_ENV=production&#34;
+ExecStart=/bin/bash /home/mastodon/mastodon-clear.sh</code></pre><p>创建 <code>/etc/systemd/system/mastodon-clear.timer</code> 配置文件，内容如下：</p><pre><code class=language-ini>[Unit]
 Description=Mastodon data cleaning timer
 
 [Timer]
@@ -63,10 +42,15 @@ OnCalendar=*-*-* 17:00
 Unit=mastodon-clear.service
 
 [Install]
-WantedBy=timers.target
-</code></pre><p>其中 <code>OnCalendar=*-*-* 17:00</code> 表示服务器时间每天下午五点执行清理数据脚本。由于服务器默认使用 UTC 时间，这个时间相当于东八区的凌晨一点，也可以修改为其他时间。</p><p>最后启动定时器：</p><pre><code class=language-bash>systemctl start mastodon-clear.timer
-systemctl enable mastodon-clear.timer
-</code></pre><h2 id=其他>其他</h2><h3 id=全文检索>全文检索</h3><p>Mastodon 使用 ElasticSearch 作为搜索引擎，需要安装插件才能支持中文搜索。ES 的内存和硬盘占用也很可观，小型实例建议不要开启。</p><h3 id=媒体文件>媒体文件</h3><p>用户上传的图片视频等媒体文件保存在 <code>~/live/public/system/</code> 路径下。为了节省本地硬盘空间，可以将媒体文件迁移到云存储服务器，支持 Amazon S3、Google Cloud 或 Wasabi 等。有人推荐使用 Scaleway 云存储，因为有 75G 的免费空间和每月 75G 的免费流量，但是超额仍需付费。如果对每个月流量没有把握，还是谨慎开启。详细配置可以参考<a href=https://pullopen.github.io/%E7%AB%99%E7%82%B9%E7%BB%B4%E6%8A%A4/2020/07/22/Move-mastodon-media-to-Scaleway.html target=_blank rel=noopener>这篇</a>文章。</p><h3 id=中继>中继</h3><p>开启中继会导致硬盘空间使用率快速上涨，需要谨慎开启。下面两个是可用的中文长毛象中继：</p><ul><li><a href=https://relay.nya.one/inbox target=_blank rel=noopener>https://relay.nya.one/inbox</a></li><li><a href=https://relay.acg.mn/inbox target=_blank rel=noopener>https://relay.acg.mn/inbox</a></li></ul><h3 id=群组>群组</h3><p>群组是一种长毛象机器人，它会转发所有 @ 它的嘟文，相当于一个关注即可参与的公共讨论区。<a href=https://ovo.st/club/board target=_blank rel=noopener>@board@ovo.st</a> 是最常用的中文群组，也可以在 <a href=https://ovo.st/ target=_blank rel=noopener>https://ovo.st/</a> 找到其他热门群组。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/%E7%AC%94%E8%AE%B0/>笔记</a></li><li>#<a data-pagefind-filter=标签 href=/tags/Mastodon/>Mastodon</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/carmina-burana/ class="left arrow">上一篇：<br>布兰诗歌</a>
+WantedBy=timers.target</code></pre><p>其中 <code>OnCalendar=*-*-* 17:00</code> 表示服务器时间每天下午五点执行清理数据脚本。由于服务器默认使用 UTC 时间，这个时间相当于东八区的凌晨一点，也可以修改为其他时间。</p><p>最后启动定时器：</p><pre><code class=language-bash>systemctl start mastodon-clear.timer
+systemctl enable mastodon-clear.timer</code></pre><h2 id=其他>其他</h2><h3 id=全文检索>全文检索</h3><p>Mastodon 使用 ElasticSearch 作为搜索引擎，需要安装插件才能支持中文搜索。ES 的内存和硬盘占用也很可观，小型实例建议不要开启。</p><h3 id=媒体文件>媒体文件</h3><p>用户上传的图片视频等媒体文件保存在 <code>~/live/public/system/</code> 路径下。为了节省本地硬盘空间，可以将媒体文件迁移到云存储服务器，支持 Amazon S3、Google Cloud 或 Wasabi 等。有人推荐使用 Scaleway 云存储，因为有 75G 的免费空间和每月 75G 的免费流量，但是超额仍需付费。如果对每个月流量没有把握，还是谨慎开启。详细配置可以参考<a href=https://pullopen.github.io/%E7%AB%99%E7%82%B9%E7%BB%B4%E6%8A%A4/2020/07/22/Move-mastodon-media-to-Scaleway.html target=_blank rel=noopener>这篇</a>文章。</p><h3 id=中继>中继</h3><p>开启中继会导致硬盘空间使用率快速上涨，需要谨慎开启。下面两个是可用的中文长毛象中继：</p><ul><li><a href=https://relay.nya.one/inbox target=_blank rel=noopener>https://relay.nya.one/inbox</a></li><li><a href=https://relay.acg.mn/inbox target=_blank rel=noopener>https://relay.acg.mn/inbox</a></li></ul><h3 id=群组>群组</h3><p>群组是一种长毛象机器人，它会转发所有 @ 它的嘟文，相当于一个关注即可参与的公共讨论区。<a href=https://ovo.st/club/board target=_blank rel=noopener>@board@ovo.st</a> 是最常用的中文群组，也可以在 <a href=https://ovo.st/ target=_blank rel=noopener>https://ovo.st/</a> 找到其他热门群组。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/%E7%AC%94%E8%AE%B0/>笔记</a></li><li>#<a data-pagefind-filter=标签 href=/tags/Mastodon/>Mastodon</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/carmina-burana/ class="left arrow">上一篇：<br>布兰诗歌</a>
 <a href=/moments/202209/1662011753/ class="right arrow">下一篇</a>
-<a href=# class=top>返回顶部</a></div></main><footer><span>&copy; <time datetime="2023-03-15 06:20:50.94828285 +0000 UTC m=+0.350774770">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
+<a href=# class=top>返回顶部</a></div></main><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-17 03:31:10.765037112 +0000 UTC m=+0.363790403">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a> and <a href=https://pagefind.app>Pagefind</a>, theme by <a href=https://github.com/EmielH/tale-hugo>Tale</a>.</span></footer><script src=/js/page.js></script>
 <script src=/js/main.js></script></body></html>
