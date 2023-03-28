@@ -1,0 +1,73 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Pynecone 拔草 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153840298-1"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","UA-153840298-1")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>Pynecone 拔草</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas</span>
+<span>于&nbsp;</span><time datetime="2023-03-28 00:00:00 +0000 UTC" data-pagefind-meta=日期>2023年3月28日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p><a href=https://pynecone.io/ target=_blank rel=noopener>Pynecone</a> 是一个纯 python 的 Web App 开发框架。它的后端基于 Python 的 <a href=https://fastapi.tiangolo.com/ target=_blank rel=noopener>FastAPI</a> 框架，前端基于 Node.js 的 <a href=https://nextjs.org/ target=_blank rel=noopener>Next.js</a> 框架。但使用它不需要书写任何前端代码，可以完全用 Python 一把梭。听上去非常诱人，但实际如何呢？</p><p>一个简单 Pynecone 应用的代码如下：</p><pre><code class=language-python>import pynecone as pc
+
+
+class State(pc.State):
+    hello: str = &#39;Hello, World!&#39;
+    
+    def goodbye(self):
+        self.text = &#39;Goodbye, World!&#39;
+
+def index():
+    return pc.text(State.hello, on_click=State.goodbye)
+
+app = pc.App(state=State)
+app.add_page(index, route=&#39;/&#39;)
+app.compile()</code></pre><p>Pynecone 会为每个 Session 维护一个 State 上下文，这个状态数据是保存在服务器端的。<strong>开发者无法直接操作网页 DOM</strong> ，只能通过修改 State 的 Props 来间接改变视图。其原理是， Pynecone 生成的前端代码会通过一个 WebSocket 连接和后端进行交互。当用户进行了某个前端操作后，前端会将该事件通过 WebSocket 连接发送给后端，后端将改变后的 State 返回给前端，最后前端更新视图。由于所有前端操作都需要和后端交互，<strong>在网络不佳的情况下，会导致前端操作响应很慢</strong>。</p><p>前端每次调用后端的事件处理器只能获取一次 State ，因此如果一次事件要触发多次 State 改变，需要通过「 Event Chains 」来实现。比如，点击一个按钮，按钮状态变成不可用，当后端处理完毕后，按钮状态再恢复为可用。官方示例代码如下：</p><pre><code class=language-python>import asyncio
+
+
+class ChainExampleState(pc.State):
+    count = 0
+    show_progress = False
+
+    def toggle_progress(self):
+        self.show_progress = not self.show_progress
+
+    async def increment(self):
+        await asyncio.sleep(0.5)
+        self.count &#43;= 1
+
+
+def index():
+    return pc.cond(
+        ChainExampleState.show_progress,
+        pc.circular_progress(is_indeterminate=True),
+        pc.heading(
+            ChainExampleState.count,
+            on_click=[
+                ChainExampleState.toggle_progress,
+                ChainExampleState.increment,
+                ChainExampleState.toggle_progress,
+            ],
+            _hover={&#34;cursor&#34;: &#34;pointer&#34;},
+        ),
+    )</code></pre><p>但是，<strong>Event Chains 不是原子的，可能会导致视图停留在「脏」状态</strong>。在网络抖动的情况下，事件链中的处理器可能无法全部被成功执行，或者前端没有正确接收到状态的更新。以上面的代码为例， <code>on_click</code> 事件链中第二个 <code>ChainExampleState.toggle_progress</code> 可能没有执行成功， <code>ChainExampleState.show_progress</code> 一直为 <code>True</code> ，导致前端视图一直卡在 <code>circular_progress</code> 状态。即便刷新页面也无法从这种「脏」状态中摆脱出来。</p><p>另外，<strong>Page 中的代码无法直接访问 State 的 Props</strong> 。例如，下面的代码是错误的：</p><pre><code class=language-python>class State(pc.State):
+    is_goodbye: bool = True
+
+def index():
+    if State.is_goodbye:
+        return pc.text(&#39;Goodbye, World!&#39;)
+    else:
+        return pc.text(&#39;Hello, World!&#39;)</code></pre><p>在 Page 代码中，必须使用 <code>pc.cond()</code> 和 <code>pc.foreach()</code> 来处理业务逻辑。上面的代码需要写作：</p><pre><code class=language-python>class State(pc.State):
+    is_goodbye: bool = True
+
+def index():
+    return pc.cond(
+        State.is_goodbye,
+        pc.text(&#39;Goodbye, World!&#39;),
+        pc.text(&#39;Hello, World!&#39;)
+    )</code></pre><p>但是仅凭 <code>pc.cond()</code> 和 <code>pc.foreach()</code> 根本不足以处理复杂逻辑。</p><p>总得来说， Pynecone 适合用来快速搭建原型，但根本不适合用在生产环境。这仅仅是个大号的玩具罢了。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/do-you-need-to-get-off-when-driving-a-non-motorized-vehicle-to-cross-the-road/ class="left arrow">上一篇：<br>非机动车过马路要下车推行吗？</a>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script>
+<script src=/js/main.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-28 08:59:49.702179328 +0000 UTC m=+0.266144294">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
