@@ -7,13 +7,13 @@
 
 
 class State(pc.State):
-    hello: str = &#39;Hello, World!&#39;
+    text: str = &#39;Hello, World!&#39;
     
     def goodbye(self):
         self.text = &#39;Goodbye, World!&#39;
 
 def index():
-    return pc.text(State.hello, on_click=State.goodbye)
+    return pc.text(State.text, on_click=State.goodbye)
 
 app = pc.App(state=State)
 app.add_page(index, route=&#39;/&#39;)
@@ -70,4 +70,4 @@ def index():
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-28 08:59:49.702179328 +0000 UTC m=+0.266144294">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-28 09:47:29.556872492 +0000 UTC m=+0.316056722">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
