@@ -60,7 +60,55 @@ def index():
         State.is_goodbye,
         pc.text(&#39;Goodbye, World!&#39;),
         pc.text(&#39;Hello, World!&#39;)
-    )</code></pre><p>但是仅凭 <code>pc.cond()</code> 和 <code>pc.foreach()</code> 根本不足以处理复杂逻辑。</p><p>总得来说， Pynecone 适合用来快速搭建原型，但根本不适合用在生产环境。这仅仅是个大号的玩具罢了。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/do-you-need-to-get-off-when-driving-a-non-motorized-vehicle-to-cross-the-road/ class="left arrow">上一篇：<br>非机动车过马路要下车推行吗？</a>
+    )</code></pre><p>但是仅凭 <code>pc.cond()</code> 和 <code>pc.foreach()</code> 根本不足以处理复杂逻辑。</p><p>总得来说， Pynecone 适合用来快速搭建原型，但根本不适合用在生产环境。这仅仅是个大号的玩具罢了。</p><hr><h1 id=如何部署-pynecone-应用>如何部署 Pynecone 应用</h1><p>首先，需要安装 Nginx 和 Supervisor 。这里以 Ubuntu 系统为例：</p><pre><code class=language-shell>sudo apt install nginx supervisor</code></pre><p>配置以 <code>my.app</code> 作为站点域名为例。</p><h2 id=生成代码>生成代码</h2><p>修改项目 <code>pcconfig.py</code> 配置：</p><pre><code class=language-python>import pynecone as pc
+
+config = pc.Config(
+    app_name=&#34;myapp&#34;,
+    db_url=&#34;sqlite:///pynecone.db&#34;,
+    env=pc.Env.PROD,
+    api_url=&#34;http://my.app&#34;,    # 修改此处
+)</code></pre><p>运行命令生成项目的前、后端代码：</p><pre><code class=language-shell>pc export</code></pre><p>该命令会在当前目录下生成 <code>frontend.zip</code> 和 <code>backend.zip</code> 两个文件。同时，该命令也会在项目的 <code>.web/_static</code> 路径下生成前端静态文件。</p><h2 id=配置-nginx>配置 Nginx</h2><p>假设项目代码路径为 <code>/data/myapp</code> 。编辑 Nginx 默认配置文件 <code>/etc/nginx/sites-available/default</code> ：</p><pre><code class=language-nginx>map $http_upgrade $connection_upgrade {
+    default upgrade;
+    &#39;&#39;      close;
+}
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /data/myapp/.web/_static;    # 修改此处
+
+    index index.html;
+
+    server_name my.app;    # 修改此处
+
+    location / {
+        try_files $uri $uri/ $uri.html @api;
+    }
+    location @api {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+    }
+}</code></pre><p>执行 <code>nginx -s reload</code> 命令使配置生效。</p><h2 id=配置-supervisor>配置 Supervisor</h2><p>为项目创建 Python 环境：</p><pre><code class=language-shell>cd /data/myapp
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt</code></pre><p>新建配置文件 <code>/etc/supervisor/conf.d/myapp.conf</code> ：</p><pre><code class=language-ini>[program:myapp]
+process_name=myapp-backend
+directory=/data/myapp
+command=/data/myapp/.venv/bin/pc run --no-frontend --env prod
+environment=PATH=&#34;/data/myapp/.venv/bin:$PATH&#34;
+autostart=true
+autorestart=true
+startretries=10
+exitcodes=0
+stopsignal=KILL
+stopwaitsecs=10
+redirect_stderr=true
+stopasgroup=true
+killasgroup=true</code></pre><p>启动后端服务：</p><pre><code class=language-shell>sudo supervisorctl reload
+sudo supervisorctl update</code></pre><p>就此，配置完毕。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/do-you-need-to-get-off-when-driving-a-non-motorized-vehicle-to-cross-the-road/ class="left arrow">上一篇：<br>非机动车过马路要下车推行吗？</a>
 <a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script>
 <script src=/js/main.js></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
@@ -70,4 +118,4 @@ def index():
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-28 09:47:29.556872492 +0000 UTC m=+0.316056722">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-29 03:53:57.671277687 +0000 UTC m=+0.332377994">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
