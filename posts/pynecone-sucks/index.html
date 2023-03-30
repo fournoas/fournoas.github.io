@@ -68,7 +68,7 @@ def index():
 
 def index():
     pc.vstack(
-        pc.input(on_change=State.set_text),
+        pc.input(value=State.text, on_change=State.set_text),
         pc.button(&#39;SUBMIT&#39;, on_click=State.submit),
     )</code></pre><p>这种解决方案非常荒诞：用户每次修改输入框内容都需要和服务器交互，另外还无法在开启输入法的时候正常输入。</p><p>总得来说， Pynecone 适合用来快速搭建原型，但根本不适合用在生产环境。这仅仅是个大号的玩具罢了。</p><hr><h1 id=如何部署-pynecone-应用>如何部署 Pynecone 应用</h1><p>首先，需要安装 Nginx 和 Supervisor 。这里以 Ubuntu 系统为例：</p><pre><code class=language-shell>sudo apt install nginx supervisor</code></pre><p>配置以 <code>my.app</code> 作为站点域名为例。</p><h2 id=生成代码>生成代码</h2><p>修改项目 <code>pcconfig.py</code> 配置：</p><pre><code class=language-python>import pynecone as pc
 
@@ -128,4 +128,4 @@ sudo supervisorctl update</code></pre><p>就此，配置完毕。</p></div><div 
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-30 02:55:20.460478556 +0000 UTC m=+0.239214650">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-30 03:29:29.156099588 +0000 UTC m=+0.282646901">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
