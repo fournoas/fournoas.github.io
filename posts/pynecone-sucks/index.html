@@ -17,7 +17,7 @@ def index():
 
 app = pc.App(state=State)
 app.add_page(index, route=&#39;/&#39;)
-app.compile()</code></pre><p>Pynecone 会为每个 Session 维护一个 State 上下文，这个状态数据是保存在服务器端的。<strong>开发者无法直接操作网页 DOM</strong> ，只能通过修改 State 的 Props 来间接改变视图。其原理是， Pynecone 生成的前端代码会通过一个 WebSocket 连接和后端进行交互。当用户进行了某个前端操作后，前端会将该事件通过 WebSocket 连接发送给后端，后端将改变后的 State 返回给前端，最后前端更新视图。由于所有前端操作都需要和后端交互，<strong>在网络不佳的情况下，会导致前端操作响应很慢</strong>。</p><p>前端每次调用后端的事件处理器只能获取一次 State ，因此如果一次事件要触发多次 State 改变，需要通过「 Event Chains 」来实现。比如，点击一个按钮，按钮状态变成不可用，当后端处理完毕后，按钮状态再恢复为可用。官方示例代码如下：</p><pre><code class=language-python>import asyncio
+app.compile()</code></pre><p>Pynecone 会为每个 Session 维护一个 State 上下文，这个状态数据是保存在服务器端的，只能通过修改 State 的 Props 来间接改变视图。其原理是， Pynecone 生成的前端代码会通过一个 WebSocket 连接和后端进行交互。当用户进行了某个前端操作后，前端会将该事件通过 WebSocket 连接发送给后端，后端将改变后的 State 返回给前端，最后前端更新视图。由于所有前端操作都需要和后端交互，<strong>在网络不佳的情况下，会导致前端操作响应很慢</strong>。</p><p>前端每次调用后端的事件处理器只能获取一次 State ，因此如果一次事件要触发多次 State 改变，需要通过「 Event Chains 」来实现。比如，点击一个按钮，按钮状态变成不可用，当后端处理完毕后，按钮状态再恢复为可用。官方示例代码如下：</p><pre><code class=language-python>import asyncio
 
 
 class ChainExampleState(pc.State):
@@ -60,7 +60,17 @@ def index():
         State.is_goodbye,
         pc.text(&#39;Goodbye, World!&#39;),
         pc.text(&#39;Hello, World!&#39;)
-    )</code></pre><p>但是仅凭 <code>pc.cond()</code> 和 <code>pc.foreach()</code> 根本不足以处理复杂逻辑。</p><p>总得来说， Pynecone 适合用来快速搭建原型，但根本不适合用在生产环境。这仅仅是个大号的玩具罢了。</p><hr><h1 id=如何部署-pynecone-应用>如何部署 Pynecone 应用</h1><p>首先，需要安装 Nginx 和 Supervisor 。这里以 Ubuntu 系统为例：</p><pre><code class=language-shell>sudo apt install nginx supervisor</code></pre><p>配置以 <code>my.app</code> 作为站点域名为例。</p><h2 id=生成代码>生成代码</h2><p>修改项目 <code>pcconfig.py</code> 配置：</p><pre><code class=language-python>import pynecone as pc
+    )</code></pre><p>但是仅凭 <code>pc.cond()</code> 和 <code>pc.foreach()</code> 根本不足以处理复杂逻辑。</p><p><strong>由于 Pynecone 无法直接操作网页 DOM ，有些常规开发时稀松平常的业务场景，在 Pynecone 中变得难以实现</strong>。比如，一个由一个按钮和一个输入框组成的表单，当用户点击按钮后，提交输入框中的内容并清空输入框。在 Pynecone 框架下，如果需要操作输入框的内容，需要将 Value 绑定到 State 的某个 Var ，并通过 <code>on_change</code> 事件来处理内容修改：</p><pre><code class=language-python>class State(pc.State):
+    text: str = &#39;&#39;
+    
+    def submit(self):
+        text = &#39;&#39;
+
+def index():
+    pc.vstack(
+        pc.input(on_change=State.set_text),
+        pc.button(&#39;SUBMIT&#39;, on_click=State.submit),
+    )</code></pre><p>这种解决方案非常荒诞：用户每次修改输入框内容都需要和服务器交互，另外还无法在开启输入法的时候正常输入。</p><p>总得来说， Pynecone 适合用来快速搭建原型，但根本不适合用在生产环境。这仅仅是个大号的玩具罢了。</p><hr><h1 id=如何部署-pynecone-应用>如何部署 Pynecone 应用</h1><p>首先，需要安装 Nginx 和 Supervisor 。这里以 Ubuntu 系统为例：</p><pre><code class=language-shell>sudo apt install nginx supervisor</code></pre><p>配置以 <code>my.app</code> 作为站点域名为例。</p><h2 id=生成代码>生成代码</h2><p>修改项目 <code>pcconfig.py</code> 配置：</p><pre><code class=language-python>import pynecone as pc
 
 config = pc.Config(
     app_name=&#34;myapp&#34;,
@@ -118,4 +128,4 @@ sudo supervisorctl update</code></pre><p>就此，配置完毕。</p></div><div 
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-29 09:32:04.081472183 +0000 UTC m=+0.259091338">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-03-30 02:55:20.460478556 +0000 UTC m=+0.239214650">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
