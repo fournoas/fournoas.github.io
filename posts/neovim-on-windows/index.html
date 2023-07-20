@@ -1,0 +1,204 @@
+<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Windows 下使用 Neovim &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>Windows 下使用 Neovim</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas</span>
+<span>于&nbsp;</span><time datetime="2023-07-20 00:00:00 +0000 UTC" data-pagefind-meta=日期>2023年7月20日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/using/>Using</a></li></ul></div><p>虽然在 Windows 下的 VSCode 用得挺好，但还是想折腾一下 Neovim 试试。Neovim 安装完毕后只是一个简陋的编辑器，需要自己配置和安装各种插件才能进行日常使用，幸好已经有很多现成的开源配置项目，像 <a href=https://astronvim.com/ target=_blank rel=noopener>AstroNvim</a> 和 <a href=https://www.lazyvim.org/ target=_blank rel=noopener>LazyVim</a> 等。经过试用，发现 AstroNvim 在 Windows 上有一些为解决的 BUG ，比如一直报「 E65: Illegal back reference 」错误。此外， AstroNvim 的代码也比较混乱。因此，最后选择使用 LazyVim 的配置。</p><h2 id=安装-lazyvim>安装 LazyVim</h2><blockquote><p>本文所有软件和工具安装都使用 Scoop 。安装 Scoop 可以参考之前的文章《<a href=/posts/windows-package-managers/#%e5%ae%89%e8%a3%85-1>Windows 包管理工具</a>》。</p></blockquote><p>为了显示 Neovim 界面中的图标，需要安装一款 <a href=https://www.nerdfonts.com/font-downloads target=_blank rel=noopener>Nerd Font</a> 字体，这里选择 <a href=https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/UbuntuMono.zip target=_blank rel=noopener>UbuntuMono Nerd Font</a> 字体。首先，打开系统的「字体设置」页面，将下载的字体文件拖进虚线框中进行安装：</p><p><img src=install-font.png alt=安装字体></p><p>接下来，打开 Windows 终端的「设置」页面，在「配置文件 - 默认值 - 其他设置 - 外观」的「字体」下拉框中，选中「 UbuntuMono Nerd Font 」字体并保存：</p><p><img src=set-terminal-font.png alt=设置终端字体></p><p>由于众所周知的原因，安装前需要配置科学上网（根据自己的网络环境修改代理服务器地址）：</p><pre><code class=language-powershell>$Env:http_proxy=&#39;http://127.0.0.1:7890&#39;
+$Env:https_proxy=&#39;http://127.0.0.1:7890&#39;
+scoop config proxy 127.0.0.1:7890</code></pre><p>安装必要组件：</p><pre><code class=language-powershell>scoop install windows-terminal neovim git lazygit gcc ripgrep fd unzip tree-sitter</code></pre><blockquote><p>虽然 LazyVim 官方文档要求 Windows 下安装 <a href=https://github.com/alacritty/alacritty target=_blank rel=noopener>alacritty</a> 或 <a href=https://github.com/wez/wezterm target=_blank rel=noopener>wezterm</a> 终端，但其实 Windows Terminal 已经足够了。</p></blockquote><p>为 Git 访问 GitHub 设置代理：</p><pre><code class=language-powershell>git config --global http.https://github.com.proxy socks5://127.0.0.1:7890</code></pre><p>安装 LazyVim 配置：</p><pre><code class=language-powershell>git clone https://github.com/LazyVim/starter $env:LOCALAPPDATA\nvim --depth=1</code></pre><h2 id=初始运行>初始运行</h2><p>在命令行中使用 <code>nvim</code> 命令就可以启动 LazyVim 了。程序第一次运行时会自动下载和安装插件。如果遇到网络问题而导致安装失败也没关系，按下 <code>R</code> （大写）重新安装直至成功为止。所有插件安装成功后， <code>nvim-treesitter</code> 还会继续安装组件，等所有插件和组件安装完毕后，按下 <code>q</code> 退出安装界面。</p><p><img src=lazyvim-installed.png alt="LazyVim 初始化安装"></p><p>意外的是，在 <code>nvim-treesitter</code> 安装 <code>regex</code> 组件时遇到了奇怪的错误：</p><p><img src=nvim-treesitter-regex-error.png alt=nvim-treesitter-regex-error></p><p>这是 Git 报的错，原因是 <a href=https://github.com/tree-sitter/tree-sitter-regex target=_blank rel=noopener>tree-sitter-regex</a> 仓库 checkout 了一个无效的 commit ID 。这应该是 <code>nvim-treesitter</code> 的一个 BUG 。</p><p>打开 <code>%LOCALAPPDATA%\nvim-data\lazy\nvim-treesitter\lockfile.json</code> 文件，定位到第 438 行：</p><pre><code data-ln-selected=438 data-ln-start-from=437 class=language-json>   &#34;regex&#34;: {
+     &#34;revision&#34;: &#34;17a3293714312c691ef14217f60593a3d093381c&#34;
+   },</code></pre><p>将 <code>revision</code> 的值改为 <code>2354482d7e2e8f8ff33c1ef6c8aa5690410fbc96</code> 并保存，运行 VIM 命令 <code>:TSUpdate all</code> 强制更新。</p><p>最后运行 VIM 命令 <code>:checkhealth</code> 进行检查：</p><pre><code class=language-text>==============================================================================
+lazy: require(&#34;lazy.health&#34;).check()
+
+lazy.nvim ~
+- OK Git installed
+- OK no existing packages found by other package managers
+- OK packer_compiled.lua not found
+- WARNING {flash.nvim}: unknown key &lt;vscode&gt;
+
+==============================================================================
+lazyvim: require(&#34;lazyvim.health&#34;).check()
+
+LazyVim ~
+- OK Using Neovim &gt;= 0.8.0
+- OK `git` is installed
+- OK `rg` is installed
+- OK `fd` is installed
+- OK `lazygit` is installed
+
+==============================================================================
+noice: require(&#34;noice.health&#34;).check()
+
+noice.nvim ~
+- OK **Neovim** &gt;= 0.8.0
+- OK Not running inside **Neovide**
+- OK You&#39;re using a GUI that should work ok
+- OK **vim.go.lazyredraw** is not enabled
+- OK **nvim-notify** is installed
+- OK **TreeSitter vim** parser is installed
+- OK **TreeSitter regex** parser is installed
+- OK **TreeSitter lua** parser is installed
+- OK **TreeSitter bash** parser is installed
+- OK **TreeSitter markdown** parser is installed
+- OK **TreeSitter markdown_inline** parser is installed
+- OK `vim.notify` is set to **Noice**
+- OK `vim.lsp.handlers[&#34;textDocument/hover&#34;]` is set to **Noice**
+- OK `vim.lsp.handlers[&#34;textDocument/signatureHelp&#34;]` is set to **Noice**
+- OK `vim.lsp.handlers[&#34;window/showMessage&#34;]` is set to **Noice**
+- OK `vim.lsp.util.convert_input_to_markdown_lines` is set to **Noice**
+- OK `vim.lsp.util.stylize_markdown` is set to **Noice**
+
+==============================================================================
+nvim: require(&#34;nvim.health&#34;).check()
+
+Configuration ~
+- OK no issues found
+
+Runtime ~
+- OK $VIMRUNTIME: D:\Apps\scoop\local\apps\neovim\current\share\nvim\runtime
+
+Performance ~
+- OK Build type: RelWithDebInfo
+
+Remote Plugins ~
+- OK Up to date
+
+==============================================================================
+nvim-treesitter: require(&#34;nvim-treesitter.health&#34;).check()
+
+Installation ~
+- OK `tree-sitter` found 0.20.8 (0c49d6745b3fc4822ab02e0018770cd6383a779c) (parser generator, only needed for :TSInstallFromGrammar)
+- OK `node` found v20.4.0 (only needed for :TSInstallFromGrammar)
+- OK `git` executable found.
+- OK `gcc` executable found. Selected from { vim.NIL, &#34;cc&#34;, &#34;gcc&#34;, &#34;clang&#34;, &#34;cl&#34;, &#34;zig&#34; }
+  Version: gcc (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders) 13.1.0
+- OK Neovim was compiled with tree-sitter runtime ABI version 14 (required &gt;=13). Parsers must be compatible with runtime ABI.
+
+OS Info:
+{
+  machine = &#34;x86_64&#34;,
+  release = &#34;10.0.19045&#34;,
+  sysname = &#34;Windows_NT&#34;,
+  version = &#34;Windows 10 IoT Enterprise&#34;
+} ~
+
+Parser/Features         H L F I J
+  - bash                ✓ ✓ ✓ . ✓
+  - c                   ✓ ✓ ✓ ✓ ✓
+  - html                ✓ ✓ ✓ ✓ ✓
+  - javascript          ✓ ✓ ✓ ✓ ✓
+  - json                ✓ ✓ ✓ ✓ .
+  - lua                 ✓ ✓ ✓ ✓ ✓
+  - luadoc              ✓ . . . .
+  - luap                ✓ . . . .
+  - markdown            ✓ . ✓ ✓ ✓
+  - markdown_inline     ✓ . . . ✓
+  - php                 ✓ ✓ ✓ ✓ ✓
+  - python              ✓ ✓ ✓ ✓ ✓
+  - query               ✓ ✓ ✓ ✓ ✓
+  - regex               ✓ . . . .
+  - tsx                 ✓ ✓ ✓ ✓ ✓
+  - typescript          ✓ ✓ ✓ ✓ ✓
+  - vim                 ✓ ✓ ✓ . ✓
+  - vimdoc              ✓ . . . ✓
+  - yaml                ✓ ✓ ✓ ✓ ✓
+
+  Legend: H[ighlight], L[ocals], F[olds], I[ndents], In[j]ections
+         &#43;) multiple parsers found, only one will be used
+         x) errors found in the query, try to run :TSUpdate {lang} ~
+
+==============================================================================
+provider: health#provider#check
+
+Clipboard (optional) ~
+- OK Clipboard tool found: win32yank
+
+Python 3 provider (optional) ~
+- WARNING No Python executable found that can `import neovim`. Using the first available executable for diagnostics.
+- WARNING Could not load Python 3:
+  D:\Apps\scoop\local\shims\python3.EXE does not have the &#34;neovim&#34; module.
+  python3.10 not found in search path or not executable.
+  python3.9 not found in search path or not executable.
+  python3.8 not found in search path or not executable.
+  python3.7 not found in search path or not executable.
+  D:\Apps\scoop\local\apps\python\current\python.EXE does not have the &#34;neovim&#34; module.
+  - ADVICE:
+    - See :help |provider-python| for more information.
+    - You may disable this provider (and warning) by adding `let g:loaded_python3_provider = 0` to your init.vim
+- Executable: Not found
+
+Python virtualenv ~
+- OK no $VIRTUAL_ENV
+
+Ruby provider (optional) ~
+- WARNING `ruby` and `gem` must be in $PATH.
+  - ADVICE:
+    - Install Ruby and verify that `ruby` and `gem` commands work.
+
+Node.js provider (optional) ~
+- Node.js: v20.4.0
+- WARNING Missing &#34;neovim&#34; npm (or yarn, pnpm) package.
+  - ADVICE:
+    - Run in shell: npm install -g neovim
+    - Run in shell (if you use yarn): yarn global add neovim
+    - Run in shell (if you use pnpm): pnpm install -g neovim
+    - You may disable this provider (and warning) by adding `let g:loaded_node_provider = 0` to your init.vim
+
+Perl provider (optional) ~
+- WARNING No usable perl executable found
+
+==============================================================================
+vim.lsp: require(&#34;vim.lsp.health&#34;).check()
+
+- LSP log level : WARN
+- Log path: C:\Users\fournoas\AppData\Local\nvim-data\lsp.log
+- Log size: 0 KB
+
+vim.lsp: Active Clients ~
+- No active clients
+
+==============================================================================
+vim.treesitter: require(&#34;vim.treesitter.health&#34;).check()
+
+- Nvim runtime ABI version: 14
+- OK Parser: bash       ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\bash.so
+- OK Parser: c          ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\c.so
+- OK Parser: html       ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\html.so
+- OK Parser: javascript ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\javascript.so
+- OK Parser: json       ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\json.so
+- OK Parser: lua        ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\lua.so
+- OK Parser: luadoc     ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\luadoc.so
+- OK Parser: luap       ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\luap.so
+- OK Parser: markdown   ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\markdown.so
+- OK Parser: markdown_inline ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\markdown_inline.so
+- OK Parser: php        ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\php.so
+- OK Parser: python     ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\python.so
+- OK Parser: query      ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\query.so
+- OK Parser: regex      ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\regex.so
+- OK Parser: tsx        ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\tsx.so
+- OK Parser: typescript ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\typescript.so
+- OK Parser: vim        ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\vim.so
+- OK Parser: vimdoc     ABI: 14, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\vimdoc.so
+- OK Parser: yaml       ABI: 13, path: C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\yaml.so
+- OK Parser: c          ABI: 14, path: D:\Apps\scoop\local\apps\neovim\current\lib\nvim\parser\c.dll
+- OK Parser: lua        ABI: 14, path: D:\Apps\scoop\local\apps\neovim\current\lib\nvim\parser\lua.dll
+- OK Parser: query      ABI: 14, path: D:\Apps\scoop\local\apps\neovim\current\lib\nvim\parser\query.dll
+- OK Parser: vim        ABI: 14, path: D:\Apps\scoop\local\apps\neovim\current\lib\nvim\parser\vim.dll
+- OK Parser: vimdoc     ABI: 14, path: D:\Apps\scoop\local\apps\neovim\current\lib\nvim\parser\vimdoc.dll
+
+==============================================================================
+which-key: require(&#34;which-key.health&#34;).check()
+
+WhichKey: checking conflicting keymaps ~
+- WARNING conflicting keymap exists for mode **&#34;n&#34;**, lhs: **&#34;gc&#34;**
+- rhs: ` `</code></pre><h2 id=安装-lsp>安装 LSP</h2><p>运行 VIM 命令 <code>:Mason</code> 打开 mason.nvim 配置界面，按 <code>2</code> 进入 LSP 配置页面。如果需要安装 Python 的 LSP ，按下 <code>ctrl + f</code> ，输入 <code>python</code> 然后回车，可以看到所有的 Python LSP ，选中其中的 <code>pyright</code> ，按下 <code>i</code> 进行安装（ BTW ：按 <code>X</code> 卸载）。</p><p><img src=mason.png alt=Mason></p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/vim/>vim</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/vagrant-ssh-requires-password/ class="left arrow">上一篇：<br>Vagrant SSH 登录要求密码</a>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script>
+<script src=/js/main.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-07-20 10:25:52.542860919 +0000 UTC m=+0.371226308">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
