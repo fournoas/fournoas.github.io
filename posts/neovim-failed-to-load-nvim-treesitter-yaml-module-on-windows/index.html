@@ -1,0 +1,61 @@
+<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Windows 下 Neovim 的 nvim.treesitter 插件无法加载 yaml 模块 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>Windows 下 Neovim 的 nvim.treesitter 插件无法加载 yaml 模块</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas</span>
+<span>于&nbsp;</span><time datetime="2023-07-24 00:00:00 +0000 UTC" data-pagefind-meta=日期>2023年7月24日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/using/>Using</a></li></ul></div><p>Windows 下使用 LazyVim 配置的 Neovim 打开 YAML 文件报错：</p><pre><code class=language-text>Error detected while processing BufReadPost Autocommands for &#34;*&#34;:
+Error executing lua callback: ...ocal/apps/neovim/current/share/nvim/runtime/filetype.lua:21: Error executing lua: ...ocal/apps/neovim/current/share/nvim/runtime/filetype.lua:22: BufReadPost Autocommands for &#34;*&#34;..FileType Autocommands for &#34;*&#34;: Vim(append):Error executing lua callback: Failed to load parser for language &#39;yaml&#39;: uv_dlopen: The specified procedure could not be found.
+
+stack traceback:
+        [C]: in function &#39;_ts_add_language&#39;
+        ...rrent/share/nvim/runtime/lua/vim/treesitter/language.lua:99: in function &#39;add&#39;
+        ...t/share/nvim/runtime/lua/vim/treesitter/languagetree.lua:98: in function &#39;new&#39;
+        ...neovim/current/share/nvim/runtime/lua/vim/treesitter.lua:61: in function &#39;_create_parser&#39;
+        ...neovim/current/share/nvim/runtime/lua/vim/treesitter.lua:131: in function &#39;get_parser&#39;
+        ...neovim/current/share/nvim/runtime/lua/vim/treesitter.lua:459: in function &#39;start&#39;
+        ...a/lazy/nvim-treesitter/lua/nvim-treesitter/highlight.lua:20: in function &#39;attach&#39;
+        ...ata/lazy/nvim-treesitter/lua/nvim-treesitter/configs.lua:509: in function &#39;attach_module&#39;
+        ...ata/lazy/nvim-treesitter/lua/nvim-treesitter/configs.lua:532: in function &#39;reattach_module&#39;
+        ...ata/lazy/nvim-treesitter/lua/nvim-treesitter/configs.lua:133: in function &lt;...ata/lazy/nvim-treesitter/lua/nvim-treesitter/configs.lua:132&gt;
+        [C]: in function &#39;nvim_cmd&#39;
+        ...ocal/apps/neovim/current/share/nvim/runtime/filetype.lua:22: in function &lt;...ocal/apps/neovim/current/share/nvim/runtime/filetype.lua:21&gt;
+        [C]: in function &#39;nvim_buf_call&#39;
+        ...ocal/apps/neovim/current/share/nvim/runtime/filetype.lua:21: in function &lt;...ocal/apps/neovim/current/share/nvim/runtime/filetype.lua:10&gt;
+stack traceback:
+        [C]: in function &#39;nvim_cmd&#39;
+        ...ocal/apps/neovim/current/share/nvim/runtime/filetype.lua:22: in function &lt;...ocal/apps/neovim/current/share/nvim/runtime/filetype.lua:21&gt;
+        [C]: in function &#39;nvim_buf_call&#39;
+        ...ocal/apps/neovim/current/share/nvim/runtime/filetype.lua:21: in function &lt;...ocal/apps/neovim/current/share/nvim/runtime/filetype.lua:10&gt;
+stack traceback:
+        [C]: in function &#39;nvim_buf_call&#39;
+        ...ocal/apps/neovim/current/share/nvim/runtime/filetype.lua:21: in function &lt;...ocal/apps/neovim/current/share/nvim/runtime/filetype.lua:10&gt;</code></pre><p>此前已使用 <code>:TSInstall yaml</code> 命令安装了 <code>nvim.treesitter</code> 插件的 YAML 解析模块。运行 <code>:checkhealth nvim-treesitter</code> 命令检查，发现如下问题：</p><pre><code class=language-text>The following errors have been detected: ~
+- ERROR yaml(highlights): Failed to load parser for language &#39;yaml&#39;: uv_dlopen: The specified procedure could not be found.
+  
+  yaml(highlights) is concatenated from the following files:
+  | [ERROR]:&#34;C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\queries\yaml\highlights.scm&#34;, failed to load: Failed to load parser for language &#39;yaml&#39;: uv_dlopen: The specified procedure could not be found.
+- ERROR yaml(locals): Failed to load parser for language &#39;yaml&#39;: uv_dlopen: The specified procedure could not be found.
+  
+  yaml(locals) is concatenated from the following files:
+  | [ERROR]:&#34;C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\queries\yaml\locals.scm&#34;, failed to load: Failed to load parser for language &#39;yaml&#39;: uv_dlopen: The specified procedure could not be found.
+- ERROR yaml(folds): Failed to load parser for language &#39;yaml&#39;: uv_dlopen: The specified procedure could not be found.
+  
+  yaml(folds) is concatenated from the following files:
+  | [ERROR]:&#34;C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\queries\yaml\folds.scm&#34;, failed to load: Failed to load parser for language &#39;yaml&#39;: uv_dlopen: The specified procedure could not be found.
+- ERROR yaml(indents): Failed to load parser for language &#39;yaml&#39;: uv_dlopen: The specified procedure could not be found.
+  
+  yaml(indents) is concatenated from the following files:
+  | [ERROR]:&#34;C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\queries\yaml\indents.scm&#34;, failed to load: Failed to load parser for language &#39;yaml&#39;: uv_dlopen: The specified procedure could not be found.
+- ERROR yaml(injections): Failed to load parser for language &#39;yaml&#39;: uv_dlopen: The specified procedure could not be found.
+  
+  yaml(injections) is concatenated from the following files:
+  | [ERROR]:&#34;C:\Users\fournoas\AppData\Local\nvim-data\lazy\nvim-treesitter\queries\yaml\injections.scm&#34;, failed to load: Failed to load parser for language &#39;yaml&#39;: uv_dlopen: The specified procedure could not be found.</code></pre><p>按照插件<a href=https://github.com/nvim-treesitter/nvim-treesitter/wiki/Windows-support#troubleshooting target=_blank rel=noopener>官方文档</a>的解决方法，只要将默认编译器改成 clang 就可以了。而目前使用的编译器是 gcc 。</p><p>退出 Neovim 进程，删除 <code>%LOCALAPPDATA%\nvim-data\lazy\nvim-treesitter\parser\yaml.so</code> 文件，设置环境变量，将默认编译器设置为 clang ：</p><pre><code class=language-powershell>$env:CC=&#34;clang&#34;</code></pre><p>重新启动 Neovim 会自动安装 YAML 模块，也可以通过命令 <code>:TSInstall yaml</code> 手动安装。安装完毕后，用 <code>:checkhealth</code> 命令再次检查，发现 YAML 模块已经成功被加载。完美~</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Neovim/>Neovim</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/neovim-on-windows/ class="left arrow">上一篇：<br>Windows 下使用 Neovim</a>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script>
+<script src=/js/main.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-07-24 08:46:59.871127647 +0000 UTC m=+0.329495247">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
