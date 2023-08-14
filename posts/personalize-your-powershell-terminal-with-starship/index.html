@@ -1,0 +1,142 @@
+<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="之前一直使用 Oh My Posh 进行个性化（美化）提示符定制。不过 Oh My Posh 配置起来比较麻烦，就一直在使用官方提供的默认配置。不过在默认配置下有些特性用户体验不怎么好，比如在提示符中显示无意义的用户名，又或者当前路径过长导致输入命令换行。 最近又试用了另一款类似的软件，名叫 Starship 。也许是受到其官网宣传忽"><title>通过 Starship 个性化定制 PowerShell 终端 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>通过 Starship 个性化定制 PowerShell 终端</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas</span>
+<span>于&nbsp;</span><time datetime="2023-08-14 00:00:00 +0000 UTC" data-pagefind-meta=日期>2023年8月14日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/using/>Using</a></li></ul></div><p>之前一直使用 <a href=https://ohmyposh.dev/ target=_blank rel=noopener>Oh My Posh</a> 进行个性化（美化）提示符定制。不过 Oh My Posh 配置起来比较麻烦，就一直在使用官方提供的默认配置。不过在默认配置下有些特性用户体验不怎么好，比如在提示符中显示无意义的用户名，又或者当前路径过长导致输入命令换行。</p><p>最近又试用了另一款类似的软件，名叫 <a href=https://starship.rs/ target=_blank rel=noopener>Starship</a> 。也许是受到其官网宣传忽悠的心理作用，感觉 Starship 的启动速度要比 Oh My Posh 快一些。此外， Starship 的配置也要比 Oh My Posh 简单一些。因此，决定抛弃 Oh My Posh ，改用 Starship 。</p><p>Starship 默认配置下不显示用户名、会自动截断当前路径、命令输入提示符会另起一行，这些特性本来已经满足了我的需求，不过考虑到 Starship 的配置相对容易，所以还是可以折腾一下的。</p><h2 id=安装>安装</h2><p>为了更好地体验 Starship 美化后的终端，推荐使用 Windows 终端。另外，为了显示图标，还需要安装一款 Nerd Font 字体。Starship 可以通过 WinGet 或 Chocolatey 等包管理器进行安装。这里统一使用 Scoop 进行安装：</p><pre><code class=language-powershell>scoop bucket add nerd-fonts
+scoop install starship windows-terminal UbuntuMono-NF</code></pre><p>安装完毕后，为 Starship 配置 PowerShell 的启动脚本：</p><pre><code class=language-powershell>notepad $PROFILE</code></pre><p>写入内容：</p><pre><code class=language-powershell># $env:STARSHIP_CONFIG = &#34;~\.config\starship.toml&#34;
+Invoke-Expression (&amp;starship init powershell)</code></pre><p>Starship 的默认配置文件保存在 <code>~\.config\starship.toml</code> ，可以在此处修改为其他路径。</p><p>最后，在 Windows 终端里设置默认字体为 Ubuntu Nerd Font 。</p><p><img src=windows-terminal.png alt=windows-terminal></p><h2 id=配置>配置</h2><p>编辑 Starship 配置文件 <code>~\.config\starship.toml</code> ，写入如下内容：</p><pre><code class=language-toml>add_newline = false
+scan_timeout = 100
+format = &#39;$all$line_break$env_var$character&#39;
+
+[env_var.VIRTUAL_ENV]
+format = &#39;venv:[$env_value]($style) &#39;
+style = &#39;yellow bold&#39;
+
+[time]
+disabled = false
+format = &#39;🕙[$time]($style) &#39;
+
+[directory]
+format = &#34;[](243)[ $path]($style)[$read_only]($read_only_style)[](243) &#34;
+style = &#34;bg:243&#34;
+truncation_symbol = &#39;…/&#39;
+
+[cmd_duration]
+min_time = 100
+format = &#39;🐌[$duration](bold yellow) &#39;
+
+[aws]
+symbol = &#34;  &#34;
+
+[buf]
+symbol = &#34; &#34;
+
+[c]
+symbol = &#34; &#34;
+
+[conda]
+symbol = &#34; &#34;
+
+[dart]
+symbol = &#34; &#34;
+
+[docker_context]
+symbol = &#34; &#34;
+
+[elixir]
+symbol = &#34; &#34;
+
+[elm]
+symbol = &#34; &#34;
+
+[fossil_branch]
+symbol = &#34; &#34;
+
+[git_branch]
+symbol = &#34; &#34;
+format = &#34;[$symbol$branch(:$remote_branch)]($style) &#34;
+style = &#34;bold yellow&#34;
+
+[git_status]
+conflicted = &#39;🏳&#39;
+ahead = &#39;🏎💨&#39;
+behind = &#39;😰&#39;
+diverged = &#39;😵&#39;
+up_to_date = &#39;✓&#39;
+untracked = &#39;🤷&#39;
+stashed = &#39;📦&#39;
+modified = &#39;📝&#39;
+staged = &#39;[&#43;&#43;\($count\)](green)&#39;
+renamed = &#39;👅&#39;
+deleted = &#39;🗑&#39;
+
+[golang]
+symbol = &#34; &#34;
+
+[guix_shell]
+symbol = &#34; &#34;
+
+[haskell]
+symbol = &#34; &#34;
+
+[haxe]
+symbol = &#34; &#34;
+
+[hg_branch]
+symbol = &#34; &#34;
+
+[hostname]
+ssh_symbol = &#34; &#34;
+
+[java]
+symbol = &#34; &#34;
+
+[julia]
+symbol = &#34; &#34;
+
+[lua]
+symbol = &#34; &#34;
+
+[meson]
+symbol = &#34;󰔷 &#34;
+
+[nim]
+symbol = &#34;󰆥 &#34;
+
+[nix_shell]
+symbol = &#34; &#34;
+
+[nodejs]
+symbol = &#34; &#34;
+
+[package]
+symbol = &#34;󰏗 &#34;
+
+[pijul_channel]
+symbol = &#34; &#34;
+
+[python]
+symbol = &#34; &#34;
+
+[erlang]
+symbol = &#34;󰟔 &#34;
+
+[ruby]
+symbol = &#34; &#34;
+
+[rust]
+symbol = &#34; &#34;
+
+[scala]
+symbol = &#34; &#34;</code></pre><p>该配置文件的作用如下：</p><ul><li>重新定义了各语言的图标</li><li>当命令执行耗时超过 100 ms 时，显示执行时长</li><li>显示当前时间</li><li>重新排列了显示布局</li><li>显示完整的 Python 虚拟环境路径</li></ul></div><div class=taxonomy data-pagefind-ignore></div><div class=pagination data-pagefind-ignore><a href=/posts/python-development-with-neovim/ class="left arrow">上一篇：<br>使用 Neovim 进行 Python 开发</a>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script>
+<script src=/js/main.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-14 10:39:52.834497228 +0000 UTC m=+0.713040458">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
