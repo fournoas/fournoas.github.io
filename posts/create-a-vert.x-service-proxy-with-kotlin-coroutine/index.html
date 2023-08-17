@@ -3,7 +3,7 @@
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>创建支持 Kotlin 协程的 Vert.x 服务代理</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2020-11-26 00:00:00 +0000 UTC" data-pagefind-meta=日期>2020年11月26日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>Vert.x 官方的 Service Proxies 文档写得很糟糕。本文提供一个方法，可用于创建支持 Kotlin 协程的 Vert.x 服务代理。</p><h3 id=服务接口和实现>服务接口和实现</h3><p>新建 <code>TestService.kt</code>、<code>TestServiceImpl.kt</code>、<code>package-info.java</code> 三个文件：</p><pre><code class=language-kotlin>// TestService.kt
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>Vert.x 官方的 Service Proxies 文档写得很糟糕。本文提供一个方法，可用于创建支持 Kotlin 协程的 Vert.x 服务代理。</p><h3 id=服务接口和实现>服务接口和实现</h3><p>新建 <code>TestService.kt</code>、<code>TestServiceImpl.kt</code>、<code>package-info.java</code> 三个文件：</p><pre><span class=code-lang>KOTLIN</span><code class=language-kotlin>// TestService.kt
 package io.vertx.samples.services
 
 import io.vertx.codegen.annotations.ProxyGen
@@ -15,7 +15,7 @@ import io.vertx.core.Handler
 @VertxGen
 interface TestService {
     fun test(text: String, handler: Handler&lt;AsyncResult&lt;String&gt;&gt;)
-}</code></pre><pre><code class=language-kotlin>// TestServiceImpl.kt
+}</code></pre><pre><span class=code-lang>KOTLIN</span><code class=language-kotlin>// TestServiceImpl.kt
 package io.vertx.samples.services
 
 import io.vertx.core.AsyncResult
@@ -26,11 +26,11 @@ class TestServiceImpl : TestService {
     override fun test(text: String, handler: Handler&lt;AsyncResult&lt;String&gt;&gt;) {
         handler.handle(Future.succeededFuture(&#34;echo: $text&#34;))
     }
-}</code></pre><pre><code class=language-java>// package-info.java
+}</code></pre><pre><span class=code-lang>JAVA</span><code class=language-java>// package-info.java
 @ModuleGen(groupPackage = &#34;io.vertx.samples&#34;, name = &#34;services&#34;)
 package io.vertx.samples.services;
 
-import io.vertx.codegen.annotations.ModuleGen;</code></pre><h3 id=构建脚本>构建脚本</h3><p>此处使用 Gradle 作为项目构建工具、kotlin 作为 DSL。修改 <code>build.gradle.kts</code>文件：</p><pre><code class=language-kotlin>plugins {
+import io.vertx.codegen.annotations.ModuleGen;</code></pre><h3 id=构建脚本>构建脚本</h3><p>此处使用 Gradle 作为项目构建工具、kotlin 作为 DSL。修改 <code>build.gradle.kts</code>文件：</p><pre><span class=code-lang>KOTLIN</span><code class=language-kotlin>plugins {
     val kotlinVersion = &#34;1.3.72&#34;
     // 添加 kapt 插件
     kotlin(&#34;kapt&#34;) version kotlinVersion
@@ -49,11 +49,11 @@ dependencies {
     kapt(&#34;io.vertx:vertx-codegen:$vertxVersion:processor&#34;)
     compileOnly(&#34;io.vertx:vertx-codegen:$vertxVersion&#34;)
     ... ...
-}</code></pre><p>运行 <code>gradle build</code> 后，分别会在 <code>build\generated\source\kapt\main</code> 目录下生成 <code>io.vertx.samples.services.TestServiceVertxEBProxy</code>和 <code>io.vertx.samples.services.TestServiceVertxProxyHandler</code> 两个 Java 类，以及 <code>build\generated\source\kaptKotlin\main</code> 目录下生成 <code>io.vertx.samples.kotlin.services.TestService</code> 的 Kotlin 类扩展方法。</p><h3 id=注册服务>注册服务</h3><pre><code class=language-kotlin>import io.vertx.serviceproxy.ServiceBinder
+}</code></pre><p>运行 <code>gradle build</code> 后，分别会在 <code>build\generated\source\kapt\main</code> 目录下生成 <code>io.vertx.samples.services.TestServiceVertxEBProxy</code>和 <code>io.vertx.samples.services.TestServiceVertxProxyHandler</code> 两个 Java 类，以及 <code>build\generated\source\kaptKotlin\main</code> 目录下生成 <code>io.vertx.samples.kotlin.services.TestService</code> 的 Kotlin 类扩展方法。</p><h3 id=注册服务>注册服务</h3><pre><span class=code-lang>KOTLIN</span><code class=language-kotlin>import io.vertx.serviceproxy.ServiceBinder
 
 val service = TestServiceImpl()
 val binder = ServiceBinder(vertx)
-val consumer = binder.setAddress(&#34;service.address&#34;).register(TestService::class.java, service)</code></pre><h3 id=调用服务>调用服务</h3><pre><code class=language-kotlin>import io.vertx.serviceproxy.ServiceProxyBuilder
+val consumer = binder.setAddress(&#34;service.address&#34;).register(TestService::class.java, service)</code></pre><h3 id=调用服务>调用服务</h3><pre><span class=code-lang>KOTLIN</span><code class=language-kotlin>import io.vertx.serviceproxy.ServiceProxyBuilder
 
 val builder = ServiceProxyBuilder(vertx).setAddress(&#34;service.address&#34;)
 val service = builder.build(TestService::class.java)
@@ -69,4 +69,4 @@ val result = service.testAwait(&#34;Hello&#34;)</code></pre><p>该方法可以�
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-17 03:47:33.233482192 +0000 UTC m=+0.526993921">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-17 04:41:59.899530457 +0000 UTC m=+0.457398046">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>

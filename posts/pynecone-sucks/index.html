@@ -1,9 +1,9 @@
-<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Pynecone 是一个纯 python 的 Web App 开发框架。它的后端基于 Python 的 FastAPI 框架，前端基于 Node.js 的 Next.js 框架。但使用它不需要书写任何前端代码，可以完全用 Python 一把梭。听上去非常诱人，但实际如何呢？ 一个简单 Pynecone 应用的代码如下： import pynecone as pc class State(pc.State): text: str = 'Hello, World!' def goodbye(self): self.text = 'Goodbye, World!' def index(): return pc.text(State.text, on_click=State.goodbye) app = pc.App(state=State) app.add_page(index, route='/') app.compile() Pynecone 会为每个 Session 维护一个 State 上下文，这个状态数据是"><title>Pynecone 拔草 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Pynecone 是一个纯 python 的 Web App 开发框架。它的后端基于 Python 的 FastAPI 框架，前端基于 Node.js 的 Next.js 框架。但使用它不需要书写任何前端代码，可以完全用 Python 一把梭。听上去非常诱人，但实际如何呢？ 一个简单 Pynecone 应用的代码如下： PYTHONimport pynecone as pc class State(pc.State): text: str = 'Hello, World!' def goodbye(self): self.text = 'Goodbye, World!' def index(): return pc.text(State.text, on_click=State.goodbye) app = pc.App(state=State) app.add_page(index, route='/') app.compile() Pynecone 会为每个 Session 维护一个 State 上下文，这个状态数据是"><title>Pynecone 拔草 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
 <link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>Pynecone 拔草</h1><h1 class=post-subtitle>附应用的手动部署方法</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2023-03-28 00:00:00 +0000 UTC" data-pagefind-meta=日期>2023年3月28日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p><a href=https://pynecone.io/ target=_blank rel=noopener>Pynecone</a> 是一个纯 python 的 Web App 开发框架。它的后端基于 Python 的 <a href=https://fastapi.tiangolo.com/ target=_blank rel=noopener>FastAPI</a> 框架，前端基于 Node.js 的 <a href=https://nextjs.org/ target=_blank rel=noopener>Next.js</a> 框架。但使用它不需要书写任何前端代码，可以完全用 Python 一把梭。听上去非常诱人，但实际如何呢？</p><p>一个简单 Pynecone 应用的代码如下：</p><pre><code class=language-python>import pynecone as pc
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p><a href=https://pynecone.io/ target=_blank rel=noopener>Pynecone</a> 是一个纯 python 的 Web App 开发框架。它的后端基于 Python 的 <a href=https://fastapi.tiangolo.com/ target=_blank rel=noopener>FastAPI</a> 框架，前端基于 Node.js 的 <a href=https://nextjs.org/ target=_blank rel=noopener>Next.js</a> 框架。但使用它不需要书写任何前端代码，可以完全用 Python 一把梭。听上去非常诱人，但实际如何呢？</p><p>一个简单 Pynecone 应用的代码如下：</p><pre><span class=code-lang>PYTHON</span><code class=language-python>import pynecone as pc
 
 
 class State(pc.State):
@@ -17,7 +17,7 @@ def index():
 
 app = pc.App(state=State)
 app.add_page(index, route=&#39;/&#39;)
-app.compile()</code></pre><p>Pynecone 会为每个 Session 维护一个 State 上下文，这个状态数据是保存在服务器端的，只能通过修改 State 的 Props 来间接改变视图。其原理是， Pynecone 生成的前端代码会通过一个 WebSocket 连接和后端进行交互。当用户进行了某个前端操作后，前端会将该事件通过 WebSocket 连接发送给后端，后端将改变后的 State 返回给前端，最后前端更新视图。由于所有前端操作都需要和后端交互，<strong>在网络不佳的情况下，会导致前端操作响应很慢</strong>。</p><p>前端每次调用后端的事件处理器只能获取一次 State ，因此如果一次事件要触发多次 State 改变，需要通过「 Event Chains 」来实现。比如，点击一个按钮，按钮状态变成不可用，当后端处理完毕后，按钮状态再恢复为可用。官方示例代码如下：</p><pre><code class=language-python>import asyncio
+app.compile()</code></pre><p>Pynecone 会为每个 Session 维护一个 State 上下文，这个状态数据是保存在服务器端的，只能通过修改 State 的 Props 来间接改变视图。其原理是， Pynecone 生成的前端代码会通过一个 WebSocket 连接和后端进行交互。当用户进行了某个前端操作后，前端会将该事件通过 WebSocket 连接发送给后端，后端将改变后的 State 返回给前端，最后前端更新视图。由于所有前端操作都需要和后端交互，<strong>在网络不佳的情况下，会导致前端操作响应很慢</strong>。</p><p>前端每次调用后端的事件处理器只能获取一次 State ，因此如果一次事件要触发多次 State 改变，需要通过「 Event Chains 」来实现。比如，点击一个按钮，按钮状态变成不可用，当后端处理完毕后，按钮状态再恢复为可用。官方示例代码如下：</p><pre><span class=code-lang>PYTHON</span><code class=language-python>import asyncio
 
 
 class ChainExampleState(pc.State):
@@ -45,14 +45,14 @@ def index():
             ],
             _hover={&#34;cursor&#34;: &#34;pointer&#34;},
         ),
-    )</code></pre><p>但是，<strong>Event Chains 不是原子的，可能会导致视图停留在「脏」状态</strong>。在网络抖动的情况下，事件链中的处理器可能无法全部被成功执行，或者前端没有正确接收到状态的更新。以上面的代码为例， <code>on_click</code> 事件链中第二个 <code>ChainExampleState.toggle_progress</code> 可能没有执行成功， <code>ChainExampleState.show_progress</code> 一直为 <code>True</code> ，导致前端视图一直卡在 <code>circular_progress</code> 状态。即便刷新页面也无法从这种「脏」状态中摆脱出来。</p><p>另外，<strong>Page 中的代码无法直接访问 State 的 Props</strong> 。例如，下面的代码是错误的：</p><pre><code class=language-python>class State(pc.State):
+    )</code></pre><p>但是，<strong>Event Chains 不是原子的，可能会导致视图停留在「脏」状态</strong>。在网络抖动的情况下，事件链中的处理器可能无法全部被成功执行，或者前端没有正确接收到状态的更新。以上面的代码为例， <code>on_click</code> 事件链中第二个 <code>ChainExampleState.toggle_progress</code> 可能没有执行成功， <code>ChainExampleState.show_progress</code> 一直为 <code>True</code> ，导致前端视图一直卡在 <code>circular_progress</code> 状态。即便刷新页面也无法从这种「脏」状态中摆脱出来。</p><p>另外，<strong>Page 中的代码无法直接访问 State 的 Props</strong> 。例如，下面的代码是错误的：</p><pre><span class=code-lang>PYTHON</span><code class=language-python>class State(pc.State):
     is_goodbye: bool = True
 
 def index():
     if State.is_goodbye:
         return pc.text(&#39;Goodbye, World!&#39;)
     else:
-        return pc.text(&#39;Hello, World!&#39;)</code></pre><p>在 Page 代码中，必须使用 <code>pc.cond()</code> 和 <code>pc.foreach()</code> 来处理业务逻辑。上面的代码需要写作：</p><pre><code class=language-python>class State(pc.State):
+        return pc.text(&#39;Hello, World!&#39;)</code></pre><p>在 Page 代码中，必须使用 <code>pc.cond()</code> 和 <code>pc.foreach()</code> 来处理业务逻辑。上面的代码需要写作：</p><pre><span class=code-lang>PYTHON</span><code class=language-python>class State(pc.State):
     is_goodbye: bool = True
 
 def index():
@@ -60,7 +60,7 @@ def index():
         State.is_goodbye,
         pc.text(&#39;Goodbye, World!&#39;),
         pc.text(&#39;Hello, World!&#39;)
-    )</code></pre><p>但是仅凭 <code>pc.cond()</code> 和 <code>pc.foreach()</code> 根本不足以处理复杂逻辑。</p><p><strong>由于 Pynecone 无法直接操作网页 DOM ，有些常规开发时稀松平常的业务场景，在 Pynecone 中变得难以实现</strong>。比如，一个由一个按钮和一个输入框组成的表单，当用户点击按钮后，提交输入框中的内容并清空输入框。在 Pynecone 框架下，如果需要操作输入框的内容，需要将 Value 绑定到 State 的某个 Var ，并通过 <code>on_change</code> 事件来处理内容修改：</p><pre><code class=language-python>class State(pc.State):
+    )</code></pre><p>但是仅凭 <code>pc.cond()</code> 和 <code>pc.foreach()</code> 根本不足以处理复杂逻辑。</p><p><strong>由于 Pynecone 无法直接操作网页 DOM ，有些常规开发时稀松平常的业务场景，在 Pynecone 中变得难以实现</strong>。比如，一个由一个按钮和一个输入框组成的表单，当用户点击按钮后，提交输入框中的内容并清空输入框。在 Pynecone 框架下，如果需要操作输入框的内容，需要将 Value 绑定到 State 的某个 Var ，并通过 <code>on_change</code> 事件来处理内容修改：</p><pre><span class=code-lang>PYTHON</span><code class=language-python>class State(pc.State):
     text: str = &#39;&#39;
     
     def submit(self):
@@ -70,14 +70,14 @@ def index():
     pc.vstack(
         pc.input(value=State.text, on_change=State.set_text),
         pc.button(&#39;SUBMIT&#39;, on_click=State.submit),
-    )</code></pre><p>这种解决方案非常荒诞：用户每次修改输入框内容都需要和服务器交互，另外还无法在开启输入法的时候正常输入。</p><p>总得来说， Pynecone 适合用来快速搭建原型，但根本不适合用在生产环境。这仅仅是个大号的玩具罢了。</p><hr><h1 id=如何部署-pynecone-应用>如何部署 Pynecone 应用</h1><p>首先，需要安装 Nginx 和 Supervisor 。这里以 Ubuntu 系统为例：</p><pre><code class=language-shell>sudo apt install nginx supervisor</code></pre><p>配置以 <code>my.app</code> 作为站点域名为例。</p><h2 id=生成代码>生成代码</h2><p>修改项目 <code>pcconfig.py</code> 配置：</p><pre><code class=language-python>import pynecone as pc
+    )</code></pre><p>这种解决方案非常荒诞：用户每次修改输入框内容都需要和服务器交互，另外还无法在开启输入法的时候正常输入。</p><p>总得来说， Pynecone 适合用来快速搭建原型，但根本不适合用在生产环境。这仅仅是个大号的玩具罢了。</p><hr><h1 id=如何部署-pynecone-应用>如何部署 Pynecone 应用</h1><p>首先，需要安装 Nginx 和 Supervisor 。这里以 Ubuntu 系统为例：</p><pre><span class=code-lang>SHELL</span><code class=language-shell>sudo apt install nginx supervisor</code></pre><p>配置以 <code>my.app</code> 作为站点域名为例。</p><h2 id=生成代码>生成代码</h2><p>修改项目 <code>pcconfig.py</code> 配置：</p><pre><span class=code-lang>PYTHON</span><code class=language-python>import pynecone as pc
 
 config = pc.Config(
     app_name=&#34;myapp&#34;,
     db_url=&#34;sqlite:///pynecone.db&#34;,
     env=pc.Env.PROD,
     api_url=&#34;http://my.app&#34;,    # 修改此处
-)</code></pre><p>运行命令生成项目的前、后端代码：</p><pre><code class=language-shell>pc export</code></pre><p>该命令会在当前目录下生成 <code>frontend.zip</code> 和 <code>backend.zip</code> 两个文件。同时，该命令也会在项目的 <code>.web/_static</code> 路径下生成前端静态文件。</p><h2 id=配置-nginx>配置 Nginx</h2><p>假设项目代码路径为 <code>/data/myapp</code> 。编辑 Nginx 默认配置文件 <code>/etc/nginx/sites-available/default</code> ：</p><pre><code class=language-nginx>map $http_upgrade $connection_upgrade {
+)</code></pre><p>运行命令生成项目的前、后端代码：</p><pre><span class=code-lang>SHELL</span><code class=language-shell>pc export</code></pre><p>该命令会在当前目录下生成 <code>frontend.zip</code> 和 <code>backend.zip</code> 两个文件。同时，该命令也会在项目的 <code>.web/_static</code> 路径下生成前端静态文件。</p><h2 id=配置-nginx>配置 Nginx</h2><p>假设项目代码路径为 <code>/data/myapp</code> 。编辑 Nginx 默认配置文件 <code>/etc/nginx/sites-available/default</code> ：</p><pre><span class=code-lang>NGINX</span><code class=language-nginx>map $http_upgrade $connection_upgrade {
     default upgrade;
     &#39;&#39;      close;
 }
@@ -101,10 +101,10 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
     }
-}</code></pre><p>执行 <code>nginx -s reload</code> 命令使配置生效。</p><h2 id=配置-supervisor>配置 Supervisor</h2><p>为项目创建 Python 环境：</p><pre><code class=language-shell>cd /data/myapp
+}</code></pre><p>执行 <code>nginx -s reload</code> 命令使配置生效。</p><h2 id=配置-supervisor>配置 Supervisor</h2><p>为项目创建 Python 环境：</p><pre><span class=code-lang>SHELL</span><code class=language-shell>cd /data/myapp
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt</code></pre><p>新建配置文件 <code>/etc/supervisor/conf.d/myapp.conf</code> ：</p><pre><code class=language-ini>[program:myapp]
+pip install -r requirements.txt</code></pre><p>新建配置文件 <code>/etc/supervisor/conf.d/myapp.conf</code> ：</p><pre><span class=code-lang>INI</span><code class=language-ini>[program:myapp]
 process_name=myapp-backend
 directory=/data/myapp
 command=/data/myapp/.venv/bin/pc run --no-frontend --env prod
@@ -117,7 +117,7 @@ stopsignal=KILL
 stopwaitsecs=10
 redirect_stderr=true
 stopasgroup=true
-killasgroup=true</code></pre><p>启动后端服务：</p><pre><code class=language-shell>sudo supervisorctl reload
+killasgroup=true</code></pre><p>启动后端服务：</p><pre><span class=code-lang>SHELL</span><code class=language-shell>sudo supervisorctl reload
 sudo supervisorctl update</code></pre><p>就此，配置完毕。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/do-you-need-to-get-off-when-driving-a-non-motorized-vehicle-to-cross-the-road/ class="left arrow">上一篇：<br>非机动车过马路要下车推行吗？</a>
 <a href=/moments/202303/1680235628/ class="right arrow">下一篇</a>
 <a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script>
@@ -130,4 +130,4 @@ sudo supervisorctl update</code></pre><p>就此，配置完毕。</p></div><div 
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-17 03:47:33.026816861 +0000 UTC m=+0.320328690">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-17 04:41:59.721667757 +0000 UTC m=+0.279535346">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>

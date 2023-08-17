@@ -3,7 +3,7 @@
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>Laravel 强制 api 路由组返回 JSON</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2020-09-01 00:00:00 +0000 UTC" data-pagefind-meta=日期>2020年9月1日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>Laravel 的默认错误处理器通过 <code>Illuminate\Http\Request</code> 的 <code>expectsJson()</code> 方法来决定是否将错误信息渲染成 JSON 格式输出。这要求将请求头的 <code>Accept</code> 字段设置为 <code>application/json</code>。本文提供一种方法，在尽可能减少代码的情况下，强制让 api 路由组中的所有错误响应变成 JSON 格式，而不依赖于请求的 <code>Accept</code> 头部。</p><p>第一步，新建 <code>ExpectsJson</code> 中间件，内容如下：</p><pre><code class=language-php>&lt;?php
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>Laravel 的默认错误处理器通过 <code>Illuminate\Http\Request</code> 的 <code>expectsJson()</code> 方法来决定是否将错误信息渲染成 JSON 格式输出。这要求将请求头的 <code>Accept</code> 字段设置为 <code>application/json</code>。本文提供一种方法，在尽可能减少代码的情况下，强制让 api 路由组中的所有错误响应变成 JSON 格式，而不依赖于请求的 <code>Accept</code> 头部。</p><p>第一步，新建 <code>ExpectsJson</code> 中间件，内容如下：</p><pre><span class=code-lang>PHP</span><code class=language-php>&lt;?php
 
 namespace App\Http\Middleware;
 
@@ -27,7 +27,7 @@ class ExpectsJson
 
         return $next($request);
     }
-}</code></pre><p>第二步，启用该中间件。修改 <code>app\Http\Kernel.php</code> 文件：</p><pre><code class=language-php>/**
+}</code></pre><p>第二步，启用该中间件。修改 <code>app\Http\Kernel.php</code> 文件：</p><pre><span class=code-lang>PHP</span><code class=language-php>/**
  * The application&#39;s route middleware groups.
  *
  * @var array
@@ -66,4 +66,4 @@ protected $middlewarePriority = [
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-17 03:47:33.017310279 +0000 UTC m=+0.310822108">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-17 04:41:59.713403464 +0000 UTC m=+0.271271153">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>

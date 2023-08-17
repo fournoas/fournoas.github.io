@@ -3,7 +3,7 @@
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>让 FastRoute 支持 URL 反向解析</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas</span>
 <span>于&nbsp;</span><time datetime="2019-12-17 00:00:00 +0000 UTC" data-pagefind-meta=日期>2019年12月17日</time>
-<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p><a href=https://github.com/nikic/FastRoute target=_blank rel=noopener>FastRoute</a> 是一款高性能路由组件，需要运行于 PHP 7.1 及以上版本。很多 PHP Web 框架都用它作为默认路由。然而这款路由组件不支持 URL 反向解析。</p><p><a href=https://www.hyperf.io/ target=_blank rel=noopener>Hyperf</a> 框架也采用了这款路由组件，以下代码可以让 Hyperf 支持 URL 反向解析：</p><pre><code class=language-php>&lt;?php
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p><a href=https://github.com/nikic/FastRoute target=_blank rel=noopener>FastRoute</a> 是一款高性能路由组件，需要运行于 PHP 7.1 及以上版本。很多 PHP Web 框架都用它作为默认路由。然而这款路由组件不支持 URL 反向解析。</p><p><a href=https://www.hyperf.io/ target=_blank rel=noopener>Hyperf</a> 框架也采用了这款路由组件，以下代码可以让 Hyperf 支持 URL 反向解析：</p><pre><span class=code-lang>PHP</span><code class=language-php>&lt;?php
 /**
  * Router.php
 **/
@@ -55,7 +55,7 @@ class Router extends BaseRouter
 
         return in_array($name, static::$routeMethods) ? static::createUrl($arguments[0]) : $returnValue;
     }
-}</code></pre><pre><code class=language-php>&lt;?php
+}</code></pre><pre><span class=code-lang>PHP</span><code class=language-php>&lt;?php
 /**
  * Url.php
 **/
@@ -120,7 +120,7 @@ class Url
             sprintf(&#39;The arguments does not matched for the route \&#39;%s\&#39;.&#39;, $this-&gt;name)
         );
     }
-}</code></pre><pre><code class=language-php>&lt;?php
+}</code></pre><pre><span class=code-lang>PHP</span><code class=language-php>&lt;?php
 /**
  * UrlManager.php
 **/
@@ -175,7 +175,7 @@ class UrlManager
 
         return static::$manager;
     }
-}</code></pre><p>修改项目中的 <code>config\routes.php</code> 配置文件：</p><pre><code class=language-php>&lt;?php
+}</code></pre><p>修改项目中的 <code>config\routes.php</code> 配置文件：</p><pre><span class=code-lang>PHP</span><code class=language-php>&lt;?php
 
 declare(strict_types=1);
 /**
@@ -189,7 +189,7 @@ declare(strict_types=1);
 
 use App\Http\Router;
 
-Router::get(&#39;/user/{id}&#39;, &#39;App\Controller\UserController@info&#39;)-&gt;name(&#39;user-info&#39;);</code></pre><p>使用 URL 反向解析：</p><pre><code class=language-php>&lt;?php
+Router::get(&#39;/user/{id}&#39;, &#39;App\Controller\UserController@info&#39;)-&gt;name(&#39;user-info&#39;);</code></pre><p>使用 URL 反向解析：</p><pre><span class=code-lang>PHP</span><code class=language-php>&lt;?php
 
 use App\Http\UrlManager;
 
@@ -206,4 +206,4 @@ $url = UrlManager::getManager()-&gt;reverse(&#39;user-info&#39;, 123);</code></p
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-17 03:47:33.386214853 +0000 UTC m=+0.679726682">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-17 04:42:00.044394165 +0000 UTC m=+0.602261854">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
