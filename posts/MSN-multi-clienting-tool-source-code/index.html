@@ -6,158 +6,158 @@
 <span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><blockquote><p>网上偶然拾得本人于 2006 年所写的 <strong>MSN Messenger</strong> 双/多开工具的源代码。此即时通讯软件早于 2013 年便已停止服务，而今再看昔日所写代码不甚感慨，遂记录于此，以兹纪念。</p><p>2021年5月17日</p></blockquote><pre><span class=code-lang>C&#43;&#43;</span><code class=language-c++>#pragma comment(linker,&#34;/subsystem:windows&#34;)
 #pragma comment(linker,&#34;/align:4096&#34;)
 #define MSN_APP &#34;\\MSN Messenger\\msnmsgr.exe&#34;
-#define TF_BIT	0x100
+#define TF_BIT    0x100
 #include &lt;windows.h&gt;
 #include &lt;map&gt;
 
 using namespace std;
 
-map &lt;DWORD, HANDLE&gt;	ThreadList;
-HANDLE			hTargetProcess;
-DWORD			dwMainThreadId;
+map &lt;DWORD, HANDLE&gt;    ThreadList;
+HANDLE            hTargetProcess;
+DWORD            dwMainThreadId;
 
 DWORD GetRetAddress( LPVOID lpBsp )
 {
-	DWORD dwBytesRead, dwRetAddress;
-	if ( ReadProcessMemory( hTargetProcess, lpBsp, &amp;dwRetAddress, sizeof(DWORD), &amp;dwBytesRead ) )
-	{
-		return(dwRetAddress);
-	}
-	return(NULL);
+    DWORD dwBytesRead, dwRetAddress;
+    if ( ReadProcessMemory( hTargetProcess, lpBsp, &amp;dwRetAddress, sizeof(DWORD), &amp;dwBytesRead ) )
+    {
+        return(dwRetAddress);
+    }
+    return(NULL);
 }
 
 
 LPVOID g_lpGetLastErrorRet;
 int SetHook( bool bSet )
 {
-	static bool	bInitial;
-	static LPVOID	lpGetLastErrorRet;
-	BYTE		bytOriginalOpCode = 0xC3;
-	if ( !bInitial )
-	{
-		BYTE	lpCode[32];
-		LPVOID	lpGetLastError;
-		lpGetLastError = GetProcAddress( GetModuleHandle( &#34;kernel32.dll&#34; ), &#34;GetLastError&#34; );
-		DWORD dwBytesRead;
+    static bool    bInitial;
+    static LPVOID    lpGetLastErrorRet;
+    BYTE        bytOriginalOpCode = 0xC3;
+    if ( !bInitial )
+    {
+        BYTE    lpCode[32];
+        LPVOID    lpGetLastError;
+        lpGetLastError = GetProcAddress( GetModuleHandle( &#34;kernel32.dll&#34; ), &#34;GetLastError&#34; );
+        DWORD dwBytesRead;
 /* ReadProcessMemory(hTargetProcess,lpGetLastError,&amp;bytOriginalOpCode,sizeof(BYTE),&amp;dwBytesRead); */
-		ReadProcessMemory( hTargetProcess, lpGetLastError, &amp;lpCode, sizeof(lpCode), &amp;dwBytesRead );
-		for ( int i = 0; i &lt; 32; i&#43;&#43; )
-		{
-			if ( 0xC3 == lpCode[i] )
-			{
-				g_lpGetLastErrorRet = lpGetLastErrorRet = (LPVOID) ( ( (DWORD) lpGetLastError) &#43; i);
-				break;
-			}
-		}
-		bInitial = true;
-	}
-	BYTE				bytBreakOpCode = 0xCC;
-	DWORD				dwBytesReadWrite;
-	MEMORY_BASIC_INFORMATION	mbi;
-	VirtualQueryEx( hTargetProcess, lpGetLastErrorRet, &amp;mbi, sizeof(mbi) );
-	VirtualProtectEx( hTargetProcess, mbi.BaseAddress, mbi.RegionSize, PAGE_EXECUTE_READWRITE, &amp;mbi.Protect );
-	if ( bSet )
-	{
-		WriteProcessMemory( hTargetProcess, lpGetLastErrorRet, &amp;bytBreakOpCode, sizeof(BYTE), &amp;dwBytesReadWrite );
-	}else{
-		WriteProcessMemory( hTargetProcess, lpGetLastErrorRet, &amp;bytOriginalOpCode, sizeof(BYTE), &amp;dwBytesReadWrite );
-	}
-	FlushInstructionCache( hTargetProcess, lpGetLastErrorRet, sizeof(BYTE) );
-	return(TRUE);
+        ReadProcessMemory( hTargetProcess, lpGetLastError, &amp;lpCode, sizeof(lpCode), &amp;dwBytesRead );
+        for ( int i = 0; i &lt; 32; i&#43;&#43; )
+        {
+            if ( 0xC3 == lpCode[i] )
+            {
+                g_lpGetLastErrorRet = lpGetLastErrorRet = (LPVOID) ( ( (DWORD) lpGetLastError) &#43; i);
+                break;
+            }
+        }
+        bInitial = true;
+    }
+    BYTE                bytBreakOpCode = 0xCC;
+    DWORD                dwBytesReadWrite;
+    MEMORY_BASIC_INFORMATION    mbi;
+    VirtualQueryEx( hTargetProcess, lpGetLastErrorRet, &amp;mbi, sizeof(mbi) );
+    VirtualProtectEx( hTargetProcess, mbi.BaseAddress, mbi.RegionSize, PAGE_EXECUTE_READWRITE, &amp;mbi.Protect );
+    if ( bSet )
+    {
+        WriteProcessMemory( hTargetProcess, lpGetLastErrorRet, &amp;bytBreakOpCode, sizeof(BYTE), &amp;dwBytesReadWrite );
+    }else{
+        WriteProcessMemory( hTargetProcess, lpGetLastErrorRet, &amp;bytOriginalOpCode, sizeof(BYTE), &amp;dwBytesReadWrite );
+    }
+    FlushInstructionCache( hTargetProcess, lpGetLastErrorRet, sizeof(BYTE) );
+    return(TRUE);
 }
 
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 /* int main() */
 {
-	char			lpApplication[MAX_PATH];
-	STARTUPINFO		si;
-	PROCESS_INFORMATION	pi;
-	ZeroMemory( &amp;si, sizeof(si) );
-	ZeroMemory( &amp;pi, sizeof(pi) );
-	si.cb = sizeof(si);
-	GetEnvironmentVariable( &#34;ProgramFiles&#34;, lpApplication, MAX_PATH );
-	strcat( lpApplication, MSN_APP );
-	if ( !CreateProcess( lpApplication, NULL, NULL, NULL, FALSE, DEBUG_ONLY_THIS_PROCESS, NULL, NULL, &amp;si, &amp;pi ) )
-	{
-		MessageBox( GetDesktopWindow(), &#34;Fail to launch \&#34;msnmsgr.exe\&#34;!&#34;, &#34;Error&#34;, MB_OK | MB_ICONSTOP );
-		return(FALSE);
-	}
-	DEBUG_EVENT	de;
-	BOOL		bContinue = TRUE, bInitial = FALSE;
-	DWORD		dwContinueStatus;
-	CONTEXT		context;
-	ZeroMemory( &amp;context, sizeof(context) );
-	UINT uHookCount = 0;
-	while ( bContinue )
-	{
-		bContinue		= WaitForDebugEvent( &amp;de, INFINITE );
-		dwContinueStatus	= DBG_CONTINUE;
-		switch ( de.dwDebugEventCode )
-		{
-		case CREATE_THREAD_DEBUG_EVENT:
-			ThreadList[de.dwThreadId] = de.u.CreateThread.hThread;
-			break;
-		case CREATE_PROCESS_DEBUG_EVENT:
-			hTargetProcess			= de.u.CreateProcessInfo.hProcess;
-			ThreadList[de.dwThreadId]	= de.u.CreateProcessInfo.hThread;
-			dwMainThreadId			= de.dwThreadId;
-			break;
-		case EXIT_PROCESS_DEBUG_EVENT:
-			bContinue = FALSE;
-			break;
-		case EXCEPTION_DEBUG_EVENT:
-			switch ( de.u.Exception.ExceptionRecord.ExceptionCode )
-			{
-			case EXCEPTION_SINGLE_STEP:
-				if ( uHookCount &lt; 3 )
-				{
-					context.ContextFlags = CONTEXT_FULL;
-					if ( GetThreadContext( ThreadList[de.dwThreadId], &amp;context ) )
-					{
-						SetHook( TRUE );
-					}
-				}
-				break;
-			case EXCEPTION_BREAKPOINT:
-				dwContinueStatus = de.u.Exception.dwFirstChance ? DBG_CONTINUE : DBG_EXCEPTION_NOT_HANDLED;
-				if ( !bInitial )
-				{
-					SetHook( TRUE );
-					bInitial = TRUE;
-				}
-				context.ContextFlags = CONTEXT_FULL;
-				if ( GetThreadContext( ThreadList[de.dwThreadId], &amp;context ) )
-				{
-					if ( (context.Eip - 1) == (DWORD) g_lpGetLastErrorRet )
-					{
+    char            lpApplication[MAX_PATH];
+    STARTUPINFO        si;
+    PROCESS_INFORMATION    pi;
+    ZeroMemory( &amp;si, sizeof(si) );
+    ZeroMemory( &amp;pi, sizeof(pi) );
+    si.cb = sizeof(si);
+    GetEnvironmentVariable( &#34;ProgramFiles&#34;, lpApplication, MAX_PATH );
+    strcat( lpApplication, MSN_APP );
+    if ( !CreateProcess( lpApplication, NULL, NULL, NULL, FALSE, DEBUG_ONLY_THIS_PROCESS, NULL, NULL, &amp;si, &amp;pi ) )
+    {
+        MessageBox( GetDesktopWindow(), &#34;Fail to launch \&#34;msnmsgr.exe\&#34;!&#34;, &#34;Error&#34;, MB_OK | MB_ICONSTOP );
+        return(FALSE);
+    }
+    DEBUG_EVENT    de;
+    BOOL        bContinue = TRUE, bInitial = FALSE;
+    DWORD        dwContinueStatus;
+    CONTEXT        context;
+    ZeroMemory( &amp;context, sizeof(context) );
+    UINT uHookCount = 0;
+    while ( bContinue )
+    {
+        bContinue        = WaitForDebugEvent( &amp;de, INFINITE );
+        dwContinueStatus    = DBG_CONTINUE;
+        switch ( de.dwDebugEventCode )
+        {
+        case CREATE_THREAD_DEBUG_EVENT:
+            ThreadList[de.dwThreadId] = de.u.CreateThread.hThread;
+            break;
+        case CREATE_PROCESS_DEBUG_EVENT:
+            hTargetProcess            = de.u.CreateProcessInfo.hProcess;
+            ThreadList[de.dwThreadId]    = de.u.CreateProcessInfo.hThread;
+            dwMainThreadId            = de.dwThreadId;
+            break;
+        case EXIT_PROCESS_DEBUG_EVENT:
+            bContinue = FALSE;
+            break;
+        case EXCEPTION_DEBUG_EVENT:
+            switch ( de.u.Exception.ExceptionRecord.ExceptionCode )
+            {
+            case EXCEPTION_SINGLE_STEP:
+                if ( uHookCount &lt; 3 )
+                {
+                    context.ContextFlags = CONTEXT_FULL;
+                    if ( GetThreadContext( ThreadList[de.dwThreadId], &amp;context ) )
+                    {
+                        SetHook( TRUE );
+                    }
+                }
+                break;
+            case EXCEPTION_BREAKPOINT:
+                dwContinueStatus = de.u.Exception.dwFirstChance ? DBG_CONTINUE : DBG_EXCEPTION_NOT_HANDLED;
+                if ( !bInitial )
+                {
+                    SetHook( TRUE );
+                    bInitial = TRUE;
+                }
+                context.ContextFlags = CONTEXT_FULL;
+                if ( GetThreadContext( ThreadList[de.dwThreadId], &amp;context ) )
+                {
+                    if ( (context.Eip - 1) == (DWORD) g_lpGetLastErrorRet )
+                    {
 /* printf(&#34;Return Address: 0x%08X\n&#34;,GetRetAddress((LPVOID)context.Esp)); */
-						if ( 0x00700000 &gt; GetRetAddress( (LPVOID) context.Esp ) &amp;&amp; de.dwThreadId == dwMainThreadId )
-						{
-							if ( ERROR_ALREADY_EXISTS == context.Eax )
-							{
-								context.Eax = 0;
-								uHookCount&#43;&#43;;
-							}
-						}
-						SetHook( FALSE );
-						context.Eip--;
-						context.EFlags |= TF_BIT;
-						SetThreadContext( ThreadList[de.dwThreadId], &amp;context );
-						dwContinueStatus = DBG_CONTINUE;
-					}
-				}
-				break;
-			default: dwContinueStatus = DBG_EXCEPTION_NOT_HANDLED;
-			}
-			break;
+                        if ( 0x00700000 &gt; GetRetAddress( (LPVOID) context.Esp ) &amp;&amp; de.dwThreadId == dwMainThreadId )
+                        {
+                            if ( ERROR_ALREADY_EXISTS == context.Eax )
+                            {
+                                context.Eax = 0;
+                                uHookCount&#43;&#43;;
+                            }
+                        }
+                        SetHook( FALSE );
+                        context.Eip--;
+                        context.EFlags |= TF_BIT;
+                        SetThreadContext( ThreadList[de.dwThreadId], &amp;context );
+                        dwContinueStatus = DBG_CONTINUE;
+                    }
+                }
+                break;
+            default: dwContinueStatus = DBG_EXCEPTION_NOT_HANDLED;
+            }
+            break;
 /* default: */
-		}
-		ContinueDebugEvent( de.dwProcessId, de.dwThreadId, dwContinueStatus );
-	}
-	CloseHandle( pi.hProcess );
-	CloseHandle( pi.hThread );
-	return(TRUE);
+        }
+        ContinueDebugEvent( de.dwProcessId, de.dwThreadId, dwContinueStatus );
+    }
+    CloseHandle( pi.hProcess );
+    CloseHandle( pi.hThread );
+    return(TRUE);
 }</code></pre><p>MSN Messenger 通过创建全局互斥量来保证系统中同时只能运行一个进程。伪代码如下：</p><pre><span class=code-lang>C&#43;&#43;</span><code class=language-c++>hMutex = CreateMutex(NULL, FALSE, &#34;MSNMessengerIsRunning&#34;);
 
 if (GetLastError() == ERROR_ALREADY_EXISTS) 
@@ -176,4 +176,4 @@ if (GetLastError() == ERROR_ALREADY_EXISTS)
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-17 05:21:05.472118002 +0000 UTC m=+0.331008890">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-18 05:32:14.730900293 +0000 UTC m=+0.253279921">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
