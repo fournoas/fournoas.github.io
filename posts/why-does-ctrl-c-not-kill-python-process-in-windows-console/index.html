@@ -45,7 +45,7 @@ int main()
     while (true) {
         Sleep(1000);
     }
-}	</code></pre><p>上面的代码运行结果为：</p><pre><span class=code-lang>TEXT</span><code class=language-text>Main Thread Id:28476
+}	</code></pre><p>上面的代码运行结果为：</p><pre><code class=language-text>Main Thread Id:28476
 Signal Handler Thread Id:20392</code></pre><p>观察结果可以发现，信号处理器运行的线程 ID 和主线程 ID 不一致，说明 <code>SignalHandler</code> 运行在新线程中。然而我们回过头观察本文第二段 Python 代码发现：在 <code>signal_handler</code> 中抛出的 <code>KeyboardInterrupt</code> 异常可以被主线程的代码捕获到。这是不是说明 Python 的信号处理机制和 Windows 底层的不一致？我们用下面的代码来验证猜想：</p><pre><span class=code-lang>PYTHON</span><code class=language-python>import signal
 import time
 import threading
@@ -61,7 +61,7 @@ try:
     while True:
         time.sleep(1)
 except KeyboardInterrupt:
-    pass</code></pre><p>上面的代码运行结果为：</p><pre><span class=code-lang>TEXT</span><code class=language-text>Main Thread Id: 19644
+    pass</code></pre><p>上面的代码运行结果为：</p><pre><code class=language-text>Main Thread Id: 19644
 Signal Handler Thread Id: 19644</code></pre><p>信号处理器运行的线程 ID 和主线程 ID 一致，说明 <code>signal_handler</code> 运行在主线程中。Python 文档中对此的解释如下：</p><blockquote><p>A Python signal handler does not get executed inside the low-level (C) signal handler. Instead, the low-level signal handler sets a flag which tells the <a href=https://docs.python.org/3/glossary.html#term-virtual-machine target=_blank rel=noopener>virtual machine</a> to execute the corresponding Python signal handler at a later point(for example at the next <a href=https://docs.python.org/3/glossary.html#term-bytecode target=_blank rel=noopener>bytecode</a> instruction).</p><p>A long-running calculation implemented purely in C (such as regular expression matching on a large body of text) may run uninterrupted for an arbitrary amount of time, regardless of any signals received. The Python signal handlers will be called when the calculation finishes.</p><p>Python signal handlers are always executed in the main Python thread of the main interpreter, even if the signal was received in another thread.</p></blockquote><p>此处的 low-level signals 指的是 POSIX signals 或者 ANSI C signals。在不同的操作系统下，low-level signal handler 的实现方式是不一样的。而 Python 的 signal 是在 low-level signals 的基础上的进一步封装。</p><p>当 Python 进程接收到信号后，low-level signal handler 仅设置一个标志来告知 VM 有待处理的信号。运行于主线程中的 VM 每次执行 bytecode 前会先检查这个标志位，如果有待处理的信号则会调用 Python 中注册的信号处理器。也就是说，<strong>当 Python 进程收到信号后，主线程将会中断执行，转而调用注册的信号处理器。但是主线程只能在 VM 的 bytecode 指令之间中断，如果 Python 主线程此时正阻塞在 Windows API 或其他 Native 代码内，VM 是无法主动从阻塞状态中返回的。如此一来，VM 将没有机会去检查那个标志位，也无法调用信号处理器。那么对用户来说，就发生了使用 <code>Ctrl+C</code> 无法终止 Python 命令行进程的现象。</strong></p><p>下面给出一个不太优雅的解决方案：</p><pre><span class=code-lang>PYTHON</span><code class=language-python>import threading
 import socket
 
@@ -92,4 +92,4 @@ except KeyboardInterrupt:
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-18 05:32:14.866945426 +0000 UTC m=+0.389325054">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-18 06:03:22.310158361 +0000 UTC m=+0.537546825">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>

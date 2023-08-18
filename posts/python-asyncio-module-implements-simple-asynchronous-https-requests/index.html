@@ -140,11 +140,11 @@ async def main():
 
 
 if __name__ == &#39;__main__&#39;:
-    asyncio.run(main())</code></pre><p>此版本的缺陷是必须指定 hostname 。如果 <code>asyncio.open_connection()</code> 的 <code>host</code> 参数使用 IP 地址，那么必须同时传递 <code>server_hostname</code> 参数，否则会报错。下面代码会抛出 <code>ssl.SSLCertVerificationError</code> 异常：</p><pre><span class=code-lang></span><code class=language->reader, writer = await asyncio.open_connection(
+    asyncio.run(main())</code></pre><p>此版本的缺陷是必须指定 hostname 。如果 <code>asyncio.open_connection()</code> 的 <code>host</code> 参数使用 IP 地址，那么必须同时传递 <code>server_hostname</code> 参数，否则会报错。下面代码会抛出 <code>ssl.SSLCertVerificationError</code> 异常：</p><pre><code class=language->reader, writer = await asyncio.open_connection(
     &#39;112.80.248.75&#39;, 
     443, 
     ssl=ssl.create_default_context()
-)</code></pre><p>异常信息：</p><pre><span class=code-lang>TEXT</span><code class=language-text>ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: IP address mismatch, certificate is not valid for &#39;112.80.248.75&#39;. (_ssl.c:992)</code></pre><h1 id=版本三>版本三</h1><p>在版本二的基础上进行改进，不要求验证证书的 hostname 。照着 <code>asyncio.streams</code> 的代码依样画葫芦：</p><pre><span class=code-lang>PYTHON</span><code class=language-python>import asyncio
+)</code></pre><p>异常信息：</p><pre><code class=language-text>ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: IP address mismatch, certificate is not valid for &#39;112.80.248.75&#39;. (_ssl.c:992)</code></pre><h1 id=版本三>版本三</h1><p>在版本二的基础上进行改进，不要求验证证书的 hostname 。照着 <code>asyncio.streams</code> 的代码依样画葫芦：</p><pre><span class=code-lang>PYTHON</span><code class=language-python>import asyncio
 import ssl
 import pprint
 from asyncio.streams import _DEFAULT_LIMIT, StreamReader, StreamReaderProtocol, StreamWriter
@@ -212,4 +212,4 @@ if __name__ == &#39;__main__&#39;:
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-18 05:32:14.748777037 +0000 UTC m=+0.271156665">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-18 06:03:22.148645645 +0000 UTC m=+0.376034009">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>

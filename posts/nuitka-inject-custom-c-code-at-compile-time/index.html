@@ -58,7 +58,7 @@ print(&#34;Nuitka&#34;)</code></pre><p>首先安装 Nuitka 和建议安装的三
         while os.path.exists(pause_nuitka):
             time.sleep(1)
 
-    return result</code></pre><p>这几行代码的意思是：如果当前目录下存在 <code>pause_nuitka</code> 文件，则一直保持休眠，直到该文件被删除。</p><p>在当前目录下创建 <code>pause_nuitka</code> 文件后再次执行 Nuitka 打包命令。果然如期待的一样中断了：</p><pre><span class=code-lang>TEXT</span><code class=language-text>Nuitka-Options:INFO: Used command line options: --standalone --output-dir=build --onefile .\main.py
+    return result</code></pre><p>这几行代码的意思是：如果当前目录下存在 <code>pause_nuitka</code> 文件，则一直保持休眠，直到该文件被删除。</p><p>在当前目录下创建 <code>pause_nuitka</code> 文件后再次执行 Nuitka 打包命令。果然如期待的一样中断了：</p><pre><code class=language-text>Nuitka-Options:INFO: Used command line options: --standalone --output-dir=build --onefile .\main.py
 Nuitka:INFO: Starting Python compilation with Nuitka &#39;1.4.3&#39; on Python &#39;3.10&#39; commercial grade &#39;not installed&#39;.
 Nuitka:INFO: Completed Python level compilation and optimization.
 Nuitka:INFO: Generating source code for C backend compiler.
@@ -83,14 +83,14 @@ int wmain(int argc, wchar_t **argv) {
 #else
 int main(int argc, char **argv) {
 #endif
-#endif</code></pre><p>删除 <code>pause_nuitka</code> 文件， Nuitka 继续执行：</p><pre><span class=code-lang>TEXT</span><code class=language-text>Nuitka-Scons:INFO: Onefile linking program with 1 files (no progress information available).
+#endif</code></pre><p>删除 <code>pause_nuitka</code> 文件， Nuitka 继续执行：</p><pre><code class=language-text>Nuitka-Scons:INFO: Onefile linking program with 1 files (no progress information available).
 Nuitka-Scons:INFO: Compiled 1 C files using clcache with 0 cache hits and 1 cache misses.
 Nuitka-Onefile:INFO: Keeping onefile build directory &#39;build\main.onefile-build&#39;.
 Nuitka-Onefile:INFO: Using compression for onefile payload.
 Nuitka-Onefile:INFO: Onefile payload compression ratio (31.67%) size 18276430 to 5788244.
 Nuitka:INFO: Keeping dist folder &#39;build\main.dist&#39; for inspection, no need to use it.
 Nuitka:INFO: Keeping build directory &#39;build\main.build&#39;.
-Nuitka:INFO: Successfully created &#39;main.exe&#39;. </code></pre><p>运行生成的 main.exe 程序，果然成功弹出了系统关于对话框。至此，试验成功！</p><p>如果将此处的注入的 <code>ShellAbout</code> 替换成 <code>MessageBox</code> 则编译会报错：</p><pre><span class=code-lang>TEXT</span><code class=language-text>Unexpected output from this command:
+Nuitka:INFO: Successfully created &#39;main.exe&#39;. </code></pre><p>运行生成的 main.exe 程序，果然成功弹出了系统关于对话框。至此，试验成功！</p><p>如果将此处的注入的 <code>ShellAbout</code> 替换成 <code>MessageBox</code> 则编译会报错：</p><pre><code class=language-text>Unexpected output from this command:
 link /nologo /LTCG /CGTHREADS:16 /INCREMENTAL:NO /OUT:C:\nuitka-demo\build\main.exe Shell32.lib imagehlp.lib &#34;static_src\OnefileBootstrap.obj&#34;
 OnefileBootstrap.obj : error LNK2001: 无法解析的外部符号 __imp_MessageBoxA
 C:\nuitka-demo\build\main.exe : fatal error LNK1120: 1 个无法解析的外部命令</code></pre><p>这是因为 Nuitka 默认的 scons 脚本仅 link 了 Shell32.lib 和 imagehlp.lib 两个库，而调用 MessageBox 需要 link User32.lib 库。在 <a href=https://github.com/Nuitka/Nuitka/blob/0cdeb6aa4983c45ebef57e716d76a0433da98b80/nuitka/build/Onefile.scons#L475 target=_blank rel=noopener>nuitka/build/Onefile.scons</a> 文件中添加 User32.lib 库：</p><pre><span class=code-lang>PYTHON</span><code data-ln-selected=477 data-ln-start-from=475 class=language-python>if win_target:
@@ -107,4 +107,4 @@ C:\nuitka-demo\build\main.exe : fatal error LNK1120: 1 个无法解析的外部�
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-18 05:32:14.736454907 +0000 UTC m=+0.258834535">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-18 06:03:22.142804869 +0000 UTC m=+0.370193233">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
