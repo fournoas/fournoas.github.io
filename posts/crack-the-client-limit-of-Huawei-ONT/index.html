@@ -15,8 +15,8 @@ shell
 tftp -l /mnt/jffs2/hw_ctree.xml -p 192.168.1.142
 </code></pre><p>执行成功后，可以在tftpd64的”<code>Current Directory</code>“下找到”<code>hw_ctree.xml</code>“文件。运行”<code>华为光猫配置文件加解密工具.exe</code>“进行解码：</p><p><img src=ill-9.png alt=点击”解密“按钮></p><p>用7-zip或其他压缩软件打开刚才生成的”<code>hw_ctree.xml.gz</code>“文件，获得解码后的”<code>hw_ctree.xml</code>“配置文件：</p><p><img src=ill-10.png alt=获得解码后的配置文件></p><p>用文本编辑器打开解码后的”<code>hw_ctree.xml</code>“，找到”<code>TotalTerminalNumber</code>“，可以看到默认值是10。将该值改成100（也可以修改成更大的数字）后保存。</p><p><img src=ill-11.png alt=修改配置文件中的最大连接设备数></p><p>用7-zip或其他压缩软件将修改后的”<code>hw_ctree.xml</code>“压缩成gzip格式的压缩包：</p><p><img src=ill-12.png alt=压缩&amp;quot;hw_ctree.xml“文件></p><p>并将生成的”<code>hw_ctree.gz</code>“文件用”<code>华为光猫配置文件加解密工具.exe</code>“工具进行编码：</p><p><img src=ill-13.png alt=点击”加密“按钮></p><p>最后将生成的新配置文件”<code>hw_ctree.xml</code>“上传到路由器覆盖原来的配置文件。运行命令：</p><pre><span class=code-lang>SHELL</span><code class=language-shell>su
 shell
-tftp -l /mnt/jffs2/hw_ctree.xml -r hw_ctree.xml -g 192.168.1.142</code></pre><p>重启路由器后使配置生效。自此，你的路由器就已经可以连接100个设备了。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/%E7%BD%91%E7%BB%9C/>网络</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/a-free-rent-phone-card-of-US-telecom-carrier/ class="right arrow">上一篇：<br>0月租美国实体电话卡</a>
-<a href=/moments/201905/1558765535/ class="left arrow">下一篇</a>
+tftp -l /mnt/jffs2/hw_ctree.xml -r hw_ctree.xml -g 192.168.1.142</code></pre><p>重启路由器后使配置生效。自此，你的路由器就已经可以连接100个设备了。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/%E7%BD%91%E7%BB%9C/>网络</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/posts/a-free-rent-phone-card-of-US-telecom-carrier/ class="left arrow">上一篇：<br>0月租美国实体电话卡</a>
+<a href=/moments/201905/1558765535/ class="right arrow">下一篇</a>
 <a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script>
 <script src=/js/main.js></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
@@ -27,4 +27,4 @@ tftp -l /mnt/jffs2/hw_ctree.xml -r hw_ctree.xml -g 192.168.1.142</code></pre><p>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-21 03:43:30.35924107 +0000 UTC m=+0.695282144">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-08-21 04:23:27.200516148 +0000 UTC m=+0.583623559">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
