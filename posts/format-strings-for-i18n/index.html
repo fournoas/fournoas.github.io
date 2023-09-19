@@ -40,7 +40,8 @@ msgstr &#34;你好，世界！\n&#34;</code></pre><p>使用 <code>msgfmt</code> 
     denominator=denominator, 
     numerator=numerator)</code></pre><p>PHP 的字符串格式化函数 <code>sprintf()</code> 支持 POSIX 扩展风格的格式化占位符：</p><pre><span class=code-lang>PHP</span><code class=language-php>sprintf(&#39;completed %1$d of %2$d&#39;, $denominator, $numerator);</code></pre><p>特别要注意的是，不要在代码中使用部分高级语言提供的字符串插值（ <a href=https://en.wikipedia.org/wiki/String_interpolation target=_blank rel=noopener>String interpolation</a> ）特性。因为这种字符串会动态格式化，运行时不会保留字面上的静态字符串，导致不能被正确翻译。所谓「字符串插值」就是在字符串内部可以直接使用变量名来拼接字符串。支持该特性的高级语言包括但不限于：</p><ul><li>PHP</li><li>Ruby</li><li>C#</li><li>Python</li><li>Dart</li><li>JavaScript / TypeScript</li><li>Kotlin</li><li>Julia</li><li>Rust</li><li>Swift</li><li>Scala</li></ul><p>以 PHP 为例，它的字符串插值如下：</p><pre><span class=code-lang>PHP</span><code class=language-php>$denominator = 1;
 $numerator = 2;
-echo &#34;completed $denominator of $numerator&#34;;</code></pre></div><div class=taxonomy data-pagefind-ignore></div><div class=pagination data-pagefind-ignore><a href=/posts/text-editor-cudatext-simplified-chinese-translation-package/ class="right arrow">下一篇：<br>文本编辑器 CudaText 简体中文汉化包</a>
+echo &#34;completed $denominator of $numerator&#34;;</code></pre></div><div class=taxonomy data-pagefind-ignore></div><div class=pagination data-pagefind-ignore><a href=/posts/auto-build-a-git-branch-by-github-actions/ class="left arrow">上一篇：<br>通过 GitHub Actions 自动构建分支</a>
+<a href=/posts/text-editor-cudatext-simplified-chinese-translation-package/ class="right arrow">下一篇：<br>文本编辑器 CudaText 简体中文汉化包</a>
 <a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script>
 <script src=/js/main.js></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
@@ -52,4 +53,4 @@ echo &#34;completed $denominator of $numerator&#34;;</code></pre></div><div clas
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
 <script src=/js/code.js></script>
-<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-09-15 11:10:04.527498647 +0000 UTC m=+0.464936894">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-09-19 10:27:44.828415202 +0000 UTC m=+0.525903768">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
