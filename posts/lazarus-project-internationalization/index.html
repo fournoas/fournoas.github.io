@@ -1,0 +1,118 @@
+<!doctype html><html lang=zh-CN><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Lazarus 是一个与 Delphi 兼容的跨平台 RAD 集成开发环境。和 Delphi 一样， Lazarus 可以拖放组件，快速开发 GUI 应用程序。它使用 Free Pascal 作为后端编译器。当前的 Lazarus 版本是 2.2.6 ，内置的 Free Pascal 编译器版本是 3.2.2 。 修复 Free Pascal 中 gettext 包的缺陷 Free Pascal 包含 gettext 包，可以用来实现软件国际化。但是当前版本 gettext 中的 GetLanguageIDs 过程在 Windows 系统下存在缺陷： PASCAL{$ifdef windows} procedure GetLanguageIDs(var Lang, FallbackLang: string); var Buffer: array[1..4] of"><title>Lazarus 项目支持多语言国际化 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script>
+<link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>Lazarus 项目支持多语言国际化</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas</span>
+<span>于&nbsp;</span><time datetime="2023-10-07 00:00:00 +0000 UTC" data-pagefind-meta=日期>2023年10月7日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p><a href=https://www.lazarus-ide.org/ target=_blank rel=noopener>Lazarus</a> 是一个与 Delphi 兼容的跨平台 RAD 集成开发环境。和 Delphi 一样， Lazarus 可以拖放组件，快速开发 GUI 应用程序。它使用 <a href=https://www.freepascal.org/ target=_blank rel=noopener>Free Pascal</a> 作为后端编译器。当前的 Lazarus 版本是 2.2.6 ，内置的 Free Pascal 编译器版本是 3.2.2 。</p><h2 id=修复-free-pascal-中-gettext-包的缺陷>修复 Free Pascal 中 gettext 包的缺陷</h2><p>Free Pascal 包含 <a href="https://gitlab.com/freepascal.org/fpc/source/-/blob/fixes_3_2/packages/fcl-base/src/gettext.pp?ref_type=heads" target=_blank rel=noopener>gettext</a> 包，可以用来实现软件国际化。但是当前版本 gettext 中的 <code>GetLanguageIDs</code> 过程在 Windows 系统下存在缺陷：</p><figure class=code><pre><span class=code-lang>PASCAL</span><code data-ln-selected data-ln-start-from=287 class=language-pascal>{$ifdef windows}
+procedure GetLanguageIDs(var Lang, FallbackLang: string);
+var
+  Buffer: array[1..4] of {$ifdef Wince}WideChar{$else}char{$endif};
+  Country: string;
+  UserLCID: LCID;
+begin
+  //defaults
+  Lang := &#39;&#39;;
+  FallbackLang:=&#39;&#39;;
+  UserLCID := GetUserDefaultLCID;
+  if GetLocaleInfo(UserLCID, LOCALE_SABBREVLANGNAME, @Buffer[1], 4)&lt;&gt;0 then
+    FallbackLang := lowercase(copy(Buffer,1,2));
+  if GetLocaleInfo(UserLCID, LOCALE_SABBREVCTRYNAME, @Buffer[1], 4)&lt;&gt;0 then begin
+    Country := copy(Buffer,1,2);
+
+    // some 2 letter codes are not the first two letters of the 3 letter code
+    // there are probably more, but first let us see if there are translations
+    if (Buffer=&#39;PRT&#39;) then Country:=&#39;PT&#39;;
+
+    Lang := FallbackLang&#43;&#39;_&#39;&#43;Country;
+  end;
+end;</code></pre><figcaption>gettext.pp</figcaption></figure><p>在简体中文的 Windows 环境中，该过程输出的 <code>Lang</code> 值是 <code>ch_CH</code> ，而不是期望的 <code>zh_CN</code> 。虽然在最新的 <a href=https://gitlab.com/freepascal.org/fpc/source target=_blank rel=noopener>FPCSource</a> 源代码中已经修复了这个问题，但事实上修复方案是有问题的：</p><figure class=code><pre><span class=code-lang>PASCAL</span><code data-ln-selected data-ln-start-from=303 class=language-pascal>{$ifdef windows}
+procedure GetLanguageIDs(var Lang, FallbackLang:AnsiString );
+var
+  Buffer: array[1..4] of {$ifdef Wince}WideChar{$else}AnsiChar{$endif};
+  Country: AnsiString;
+  UserLCID: LCID;
+begin
+  //defaults
+  Lang := &#39;&#39;;
+  FallbackLang:=&#39;&#39;;
+  UserLCID := GetUserDefaultLCID;
+  if GetLocaleInfo(UserLCID, LOCALE_SABBREVLANGNAME, @Buffer[1], 4)&lt;&gt;0 then begin
+    FallbackLang := lowercase(copy(Buffer,1,2));
+
+    // Chinese abbreviation should be zh instead of ch
+    if (Copy(Buffer,1,3)=&#39;CHS&#39;) or (Copy(Buffer,1,3)=&#39;CHT&#39;) then FallbackLang:=&#39;zh&#39;;
+  end;
+  if GetLocaleInfo(UserLCID, LOCALE_SABBREVCTRYNAME, @Buffer[1], 4)&lt;&gt;0 then begin
+    Country := copy(Buffer,1,2);
+
+    // some 2 letter codes are not the first two letters of the 3 letter code
+    // there are probably more, but first let us see if there are translations
+    if (Buffer=&#39;PRT&#39;) then Country:=&#39;PT&#39;;
+    
+    if (Copy(Buffer,1,3)=&#39;CHN&#39;) then Country:=&#39;CN&#39;;  
+
+    Lang := FallbackLang&#43;&#39;_&#39;&#43;Country;
+  end;
+end;</code></pre><figcaption>gettext.pp</figcaption></figure><p>可以看到，修复方法仅仅是为了中文环境做了特殊处理。然而引发这个缺陷的主要原因是代码中的 <code>GetLocaleInfo</code> 调用传递了错误的参数。</p><p>Windows API <a href=https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-getlocaleinfoa target=_blank rel=noopener>GetLocaleInfoA</a> 的原型如下：</p><pre><span class=code-lang>C&#43;&#43;</span><code class=language-c++>int GetLocaleInfoA(
+  [in]            LCID   Locale,
+  [in]            LCTYPE LCType,
+  [out, optional] LPSTR  lpLCData,
+  [in]            int    cchData
+);</code></pre><p>在 <code>GetLanguageIDs</code> 中调用该 API 时，第二个参数 <code>LCType</code> 分别传递的是 <code>LOCALE_SABBREVLANGNAME</code> 和 <code>LOCALE_SABBREVCTRYNAME</code> 。事实上在 Windows SDK 中已经明确标注了这两个常量已经过时，需要用 <code>LOCALE_SISO639LANGNAME</code> 和 <code>LOCALE_SISO3166CTRYNAME</code> 替代。</p><figure class=code><pre><span class=code-lang>C&#43;&#43;</span><code data-ln-selected data-ln-start-from class=language-c++>#define LOCALE_SABBREVLANGNAME        0x00000003   // DEPRECATED arbitrary abbreviated language name, LOCALE_SISO639LANGNAME instead.
+#define LOCALE_SABBREVCTRYNAME        0x00000007   // DEPRECATED arbitrary abbreviated country/region name, LOCALE_SISO3166CTRYNAME instead.</code></pre><figcaption>winnls.h</figcaption></figure><p>正确的修复方法是将 <code>GetLanguageIDs</code> 代码替换为：</p><pre><span class=code-lang>PASCAL</span><code class=language-pascal>{$ifdef windows}
+procedure GetLanguageIDs(var Lang, FallbackLang:AnsiString );
+var
+  Buffer: array[1..4] of {$ifdef Wince}WideChar{$else}AnsiChar{$endif};
+  Country: AnsiString;
+  UserLCID: LCID;
+begin
+  Lang := &#39;&#39;;
+  FallbackLang:=&#39;&#39;;
+  UserLCID := GetUserDefaultLCID;
+  if GetLocaleInfo(UserLCID, LOCALE_SISO639LANGNAME, @Buffer[1], 4)&lt;&gt;0 then begin
+    FallbackLang := lowercase(copy(Buffer,1,2));
+  end;
+  if GetLocaleInfo(UserLCID, LOCALE_SISO3166CTRYNAME, @Buffer[1], 4)&lt;&gt;0 then begin
+    Country := copy(Buffer,1,2);
+    Lang := FallbackLang&#43;&#39;_&#39;&#43;Country;
+  end;
+end;</code></pre><p>可以在当前项目下新建 gettext.pas 单元，并将修复的代码写入保存，用于覆盖编译器自带的 gettext 包。</p><h2 id=在-lazarus-项目中使用-gettext-本地化>在 Lazarus 项目中使用 gettext 本地化</h2><p>新建一个 Lazarus 项目，默认窗口名为 Form1 ，默认单元名为 Unit1 。假设要本地化的字符串是窗口的标题。</p><p>在主窗口单元中定义 <code>resourcestring</code> 节，在该节中声明所有需要翻译的资源字符串。并在 <code>uses</code> 节中引用 <code>gettext</code> 模块：</p><figure class=code><pre><span class=code-lang>PASCAL</span><code data-ln-selected data-ln-start-from class=language-pascal>unit Unit1;
+
+{$mode objfpc}{$H&#43;}
+
+interface
+
+resourcestring
+  Form1Caption = &#39;Form Caption&#39;
+
+uses
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, gettext;  </code></pre><figcaption>unit1.pas</figcaption></figure><p>为了方便管理，可以新建一个 strings.inc 文件，并将所有资源字符串保存在该文件中：</p><figure class=code><pre><span class=code-lang>PASCAL</span><code data-ln-selected data-ln-start-from class=language-pascal>Form1Caption = &#39;Form Caption&#39;;</code></pre><figcaption>strings.inc</figcaption></figure><p>也可以在主窗口单元中使用 <code>{$I}</code> 编译指令，将 strings.inc 的源代码包含进来：</p><figure class=code><pre><span class=code-lang>PASCAL</span><code data-ln-selected data-ln-start-from class=language-pascal>unit Unit1;
+
+{$mode objfpc}{$H&#43;}
+
+interface
+
+resourcestring
+  {$I strings.inc} </code></pre><figcaption>unit1.pas</figcaption></figure><p>为主窗口类添加 <code>Localize</code> 方法，并在主窗口的 <code>FormCreate</code> 事件中调用：</p><pre><span class=code-lang>PASCAL</span><code class=language-pascal>procedure TForm1.Localize();
+begin
+  TranslateResourceStrings(&#39;./lang/%s.mo&#39;);
+  Caption := Form1Caption;
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  Localize;
+end;</code></pre><p><code>TranslateResourceStrings</code> 会调用 <code>GetLanguageIDs</code> 获取本地语言代码，并将 <code>'./lang/%s.mo'</code> 中的 <code>%s</code> 替换成当前的语言代码。如果是简体中文环境，那么将加载 <code>./lang/zh_CN.mo</code> 文件。</p><p>项目编译后，会在当前项目路径的 lib\x86_64-win64 目录下生成一个 unit1.rsj 文件。用 Free Pascal 自带的 rstconv 命令生成 POT 文件：</p><pre><span class=code-lang>CMD</span><code class=language-cmd>rstconv -i unit1.rsj -o unit1.pot</code></pre><blockquote><p>rstconv 命令在 Larazus 安装路径下的 <code>fpc\3.2.2\bin\x86_64-win64</code> 目录内。</p></blockquote><p>然后通过 Poedit 翻译并生成 MO 文件。将文件命名为 zh_CN.mo ， 保存在项目 lang 目录下。在 Lazarus IDE 中按下 F9 ，就能看到窗体的标题显示为中文了。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Pascal/>Pascal</a></li><li>#<a data-pagefind-filter=标签 href=/tags/Lazarus/>Lazarus</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202310/1696724273/ class="left arrow">上一篇</a>
+<a href=/posts/auto-build-a-git-branch-by-github-actions/ class="right arrow">下一篇：<br>通过 GitHub Actions 自动构建分支</a>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script>
+<script src=/js/main.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script>
+<script src=/js/code.js></script>
+<script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2023-10-08 07:25:56.394955389 +0000 UTC m=+0.284700503">2023</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
