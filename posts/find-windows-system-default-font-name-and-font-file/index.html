@@ -1,0 +1,125 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="自 Windows Vista 和 Windows Server 2008 开始，操作系统界面默认的字体为 Segoe UI ，而 Windows XP 及之前的系统界面默认字体为 Tahoma 。不过 Segoe UI 字体的字形并不包含包括汉字在内的东亚文字。中文版 Windows 使用微软雅黑作为默认中文字体。 其他语言的默认字体见下表： 语言 字体 简体中文 Microsoft YaHei UI 繁体中文 Microsoft JhengHei UI 日文 Yu Gothic UI 韩文 Malgun Gothic 希伯来文 Gisha 泰文 Leelawadee 不过相较于"><title>获取 Windows 系统默认字体和对应的字体文件 &#183; 白汤四物</title>
+<link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>获取 Windows 系统默认字体和对应的字体文件</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas
+</span><span>于&nbsp;</span><time datetime="2024-03-08 00:00:00 +0000 UTC" data-pagefind-meta=日期>2024年3月8日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>自 Windows Vista 和 Windows Server 2008 开始，操作系统界面默认的字体为 <a href=https://learn.microsoft.com/en-us/typography/font-list/segoe-ui target=_blank rel=noopener>Segoe UI</a> ，而 Windows XP 及之前的系统界面默认字体为 Tahoma 。不过 Segoe UI 字体的字形并不包含包括汉字在内的东亚文字。中文版 Windows 使用微软雅黑作为默认中文字体。</p><p>其他语言的默认字体见下表：</p><table><thead><tr><th>语言</th><th>字体</th></tr></thead><tbody><tr><td>简体中文</td><td>Microsoft YaHei UI</td></tr><tr><td>繁体中文</td><td>Microsoft JhengHei UI</td></tr><tr><td>日文</td><td>Yu Gothic UI</td></tr><tr><td>韩文</td><td>Malgun Gothic</td></tr><tr><td>希伯来文</td><td>Gisha</td></tr><tr><td>泰文</td><td>Leelawadee</td></tr></tbody></table><p>不过相较于查表获取 Windows 系统的默认字体，使用 Windows API 来获取当前系统的默认字体会更加可靠。</p><h2 id=获取-windows-系统默认字体>获取 Windows 系统默认字体</h2><p>本文介绍有两种方法来获取 Windows 系统默认字体。第一种方法仅支持 Windows Vista 和 Windows Server 2003 及以上版本的 Windows 系统。第二种方法可以适用于 Windows XP 系统及更低版本的系统，但是没有实际测试过。</p><h3 id=方法一>方法一</h3><p>使用 <code>GetThemeFont</code> API 来获取系统默认字体：</p><pre><span class=code-lang>C&#43;&#43;</span><code class=language-c++>#include &lt;windows.h&gt;
+#include &lt;uxtheme.h&gt;
+#include &lt;vssym32.h&gt;
+#include &lt;stdio.h&gt;
+
+#pragma comment(lib, &#34;uxtheme&#34;)
+
+int main()
+{
+    LOGFONTW lf = { 0 };
+    HTHEME hTheme = OpenThemeData(0, VSCLASS_TEXTSTYLE);
+    if (hTheme)
+    {
+        if (SUCCEEDED(GetThemeFont(hTheme, 0, TEXT_BODYTEXT, 0, TMT_FONT, &amp;lf)))
+        {
+            wprintf(L&#34;System default font name is \&#34;%ls\&#34;\n&#34;, lf.lfFaceName);;
+        }
+        CloseThemeData(hTheme);
+    }
+
+    return 0;
+}</code></pre><h3 id=方法二>方法二</h3><p>使用 <code>SystemParametersInfo</code> API 来获取系统默认字体：</p><pre><span class=code-lang>C&#43;&#43;</span><code class=language-c++>#include &lt;windows.h&gt;
+#include &lt;stdio.h&gt;
+
+int main()
+{
+    LOGFONTW lf = { 0 };
+    if (SystemParametersInfoW(SPI_GETICONTITLELOGFONT, sizeof(LOGFONTW), &amp;lf, 0)) 
+    {
+        wprintf(L&#34;System default font name is \&#34;%ls\&#34;\n&#34;, lf.lfFaceName);
+    }
+    
+    return 0;
+}</code></pre><h2 id=获取对应的字体文件>获取对应的字体文件</h2><p>Windows 似乎没有提供 API 来找到字体对应的字体文件。不过我们可以在注册表路径 <code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts</code> 下找到系统所有的字体和对应的字体文件名。</p><blockquote><p>Windows 9X/Me 的注册表路径为 <code>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Fonts</code> 。不过对于这些上个世纪的操作系统，除非特殊情况，通常可以不用考虑。</p></blockquote><pre><span class=code-lang>C&#43;&#43;</span><code class=language-c++>#include &lt;windows.h&gt;
+#include &lt;wchar.h&gt;
+#include &lt;stdio.h&gt;
+
+BOOL GetFontFile(const wchar_t* fontName, wchar_t* fileName, size_t* fileNameSize)
+{
+    constexpr auto REG_SUBKEY_FONTS = L&#34;SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts&#34;;
+    constexpr auto REG_SAM_DESIRED = KEY_READ | KEY_QUERY_VALUE;
+    constexpr auto FONT_NAME_SEPARATOR = L&#39;&amp;&#39;;
+    constexpr auto FONT_NAME_TERMINATOR = L&#39;(&#39;;
+    constexpr auto FONT_NAME_SPACE = L&#39; &#39;;
+
+    BOOL result = FALSE;
+    HKEY fontsKey = NULL;
+    wchar_t valueName[MAX_PATH] = { 0 };
+    BYTE valueData[MAX_PATH] = { 0 };
+    DWORD valueNameSize = sizeof(valueName) / sizeof(wchar_t) - 1,
+          valueNameLength = valueNameSize,
+          valueType = 0,
+          valueDataSize = sizeof(valueData),
+          valueDataLength = valueDataSize,
+          index = 0,
+          fontNameLength = wcslen(fontName);
+
+    if (ERROR_SUCCESS != RegOpenKeyExW(HKEY_LOCAL_MACHINE, REG_SUBKEY_FONTS, 0, REG_SAM_DESIRED, &amp;fontsKey)) {
+        return FALSE;
+    }
+    
+    while (ERROR_SUCCESS == RegEnumValueW(fontsKey, index, valueName, &amp;valueNameLength, NULL, &amp;valueType, valueData, &amp;valueDataLength)) {
+        if (REG_SZ != valueType || valueNameLength &lt; fontNameLength) {
+            goto NEXT;
+        }
+
+        int fragmentLength, i, j;
+        const wchar_t *fragmentValueName;
+
+        for (i = 0, j = 0; i &lt; valueNameLength; i&#43;&#43;) {
+            if (FONT_NAME_SEPARATOR == valueName[i]) {
+                fragmentLength = FONT_NAME_SPACE == valueName[i - 1] ? i - j - 1 : i - j;
+                fragmentValueName = valueName &#43; j;
+                if (fragmentLength == fontNameLength &amp;&amp; 0 == wcsnicmp(fontName, fragmentValueName, fontNameLength)) {
+                    goto SUCCESS;
+                }
+                i &#43;= FONT_NAME_SPACE == valueName[i &#43; 1] ? 2 : 1;
+                j = i;
+            }
+            else if (FONT_NAME_TERMINATOR == valueName[i]) {
+                fragmentLength = FONT_NAME_SPACE == valueName[i - 1] ? i - j - 1 : i - j;
+                fragmentValueName = valueName &#43; j;
+                if (fragmentLength == fontNameLength &amp;&amp; 0 == wcsnicmp(fontName, fragmentValueName, fontNameLength)) {
+                    goto SUCCESS;
+                }
+                break;
+            }
+        }
+        fragmentLength = i - j;
+        fragmentValueName = valueName &#43; j;
+        if (fragmentLength == fontNameLength &amp;&amp; 0 == wcsnicmp(fontName, fragmentValueName, fontNameLength)) {
+            goto SUCCESS;
+        }
+NEXT:
+        valueNameLength = valueNameSize;
+        valueDataLength = valueDataSize;
+        index &#43;&#43;;
+        continue;
+SUCCESS:
+        if (NULL != fileNameSize &amp;&amp; *fileNameSize &lt; valueDataLength) {
+            result = FALSE;
+        }
+        else {
+            wcsncpy(fileName, (wchar_t*)valueData, valueDataLength);
+            result = TRUE;
+            if (NULL != fileNameSize) {
+                *fileNameSize = valueDataLength;
+            }
+        }
+        break;
+    }
+
+    RegCloseKey(fontsKey);
+    return result;
+}</code></pre><p>函数 <code>GetFontFile</code> 用于获取字体对应的字体文件名：</p><pre><span class=code-lang>C&#43;&#43;</span><code class=language-c++>BOOL GetFontFile(
+    [in]      const wchar_t* fontName, 
+    [out]     wchar_t*       fileName, 
+    [in, out] size_t*        fileNameSize
+);</code></pre><ul><li>参数 <code>fontName</code> 字体名称。</li><li>参数 <code>fileName</code> 返回字体文件名。</li><li>参数 <code>fileNameSize</code> 表示 <code>fileName</code> 的最大长度并返回文件名实际长度。如果参数值为 <code>NULL</code> ，则不对 <code>fileName</code> 进行数组越界检查。</li></ul><p>如果函数执行成功则返回 <code>TRUE</code> ，否则返回 <code>FALSE</code> 。函数执行失败可能由于读取注册表失败、字体未找到、参数 <code>fileName</code> 可用长度不足。</p><h2 id=参考>参考</h2><ol><li><a href=https://zh.wikipedia.org/wiki/Microsoft_Windows%e5%ad%97%e5%9e%8b%e5%88%97%e8%a1%a8 target=_blank rel=noopener>Microsoft Windows字体列表</a></li><li><a href=https://learn.microsoft.com/en-us/typography/font-list/ target=_blank rel=noopener>Microsoft Typography Font library</a></li><li><a href=https://learn.microsoft.com/en-us/typography/fonts/windows_10_font_list target=_blank rel=noopener>Microsoft Typography Font List Windows 10</a></li><li><a href=https://learn.microsoft.com/en-us/typography/fonts/windows_7_font_list target=_blank rel=noopener>Microsoft Typography Font List Windows 7</a></li></ol></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Windows/>Windows</a></li><li>#<a data-pagefind-filter=标签 href=/tags/C/C++/>C/C++</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202403/1709869113/ class="left arrow">上一篇</a>
+<a href=/moments/202403/1709538149/ class="right arrow">下一篇</a>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2024-03-08 10:18:28.629516585 +0000 UTC m=+0.873890464">2024</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
