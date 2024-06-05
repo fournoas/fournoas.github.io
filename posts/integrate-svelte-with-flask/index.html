@@ -1,0 +1,207 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="如果想在新项目中同时使用 Flask 后端和 Svelte 前端，可以通过 flask-svelte 进行创建。而对于已有项目，在不重构 Flask 项目目录结构的前提下，可以按照本文的方法集成 Svelte 前端。 假设现有的 Flask 项目目录结构如下： /home/user/my-project/ ├── app/ │ ├── __init__.py │ ├── models.py │ ├── views.py │ ├── templates/ │ │ └── index.html │ └── static/ │ └── style.css ├── tests/ │ └── test_app.py ├── venv/ ├─"><title>Flask 项目中使用 Svelte &#183; 白汤四物</title>
+<link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>Flask 项目中使用 Svelte</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas
+</span><span>于&nbsp;</span><time datetime="2024-06-05 00:00:00 +0000 UTC" data-pagefind-meta=日期>2024年6月5日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>如果想在新项目中同时使用 Flask 后端和 Svelte 前端，可以通过 <a href=https://github.com/priyanshu-shubham/flask-svelte target=_blank rel=noopener>flask-svelte</a> 进行创建。而对于已有项目，在不重构 Flask 项目目录结构的前提下，可以按照本文的方法集成 Svelte 前端。</p><p>假设现有的 Flask 项目目录结构如下：</p><pre><code class=language-text>/home/user/my-project/
+├── app/
+│   ├── __init__.py
+│   ├── models.py
+│   ├── views.py
+│   ├── templates/
+│   │   └── index.html
+│   └── static/
+│       └── style.css
+├── tests/
+│   └── test_app.py
+├── venv/
+├── setup.py
+└── MANIFEST.in</code></pre><p>创建一个同名的 Svelte 前端项目：</p><pre><span class=code-lang>SHELL</span><code class=language-shell>npx degit sveltejs/template my-project-frontend</code></pre><p>其目录结构如下：</p><pre><code class=language-text>/home/user/my-project-frontend/
+├── public/
+│   ├── favicon.png
+│   ├── global.css
+│   └── index.html
+├── scripts/
+│   └── setupTypeScript.js
+├── src/
+│   ├── App.svelte
+│   └── main.js
+├── package.json
+├── README.md
+└── rollup.config.js</code></pre><p>如果执行命令：</p><pre><span class=code-lang>SHELL</span><code class=language-shell>node scripts/setupTypeScript.js</code></pre><p>将项目转换为使用 TypeScript 语言，则目录结构如下：</p><pre><code class=language-text>/home/user/my-project-frontend/
+├── public/
+│   ├── favicon.png
+│   ├── global.css
+│   └── index.html
+├── src/
+│   ├── App.svelte
+│   ├── global.d.ts
+│   └── main.ts
+├── package.json
+├── README.md
+├── rollup.config.js
+├── svelte.config.js
+└── tsconfig.json</code></pre><p>将 <em>my-project-frontend/public/</em> 下的文件复制到 <em>my-project/static</em> 下；将 <em>my-project-frontend/src/</em> 下的文件复制到 <em>my-project/frontend/</em> 下；将 <em>my-project-frontend/</em> 下的文件复制到 <em>my-project/</em> 下。最后得到的项目目录结构如下：</p><pre><code class=language-text>/home/user/my-project/
+├── app/
+│   ├── __init__.py
+│   ├── models.py
+│   ├── views.py
+│   ├── frontend/
+│   │   ├── App.svelte
+│   │   ├── global.d.ts
+│   │   └── main.ts
+│   ├── templates/
+│   │   └── index.html
+│   └── static/
+│       ├── favicon.png
+│       ├── global.css
+│       └── index.html
+├── tests/
+│   └── test_app.py
+├── venv/
+├── setup.py
+├── MANIFEST.in
+├── package.json
+├── README.md
+├── rollup.config.js
+├── svelte.config.js
+└── tsconfig.json</code></pre><p>需要修改的文件有 <em>tsconfig.json</em>、<em>rollup.config.js</em>、<em>package.json</em>。修改内容见下面代码的高亮部分：</p><figure class=code><pre><span class=code-lang>JSON</span><code data-ln-selected=4,5 data-ln-start-from class=language-json>{
+  &#34;extends&#34;: &#34;@tsconfig/svelte/tsconfig.json&#34;,
+
+  &#34;include&#34;: [&#34;frontend/**/*&#34;],
+  &#34;exclude&#34;: [&#34;node_modules/*&#34;, &#34;__sapper__/*&#34;, &#34;static/*&#34;]
+}</code></pre><figcaption>tsconfig.json</figcaption></figure><figure class=code><pre><span class=code-lang>JAVASCRIPT</span><code data-ln-selected=35,40,76 data-ln-start-from class=language-javascript>import { spawn } from &#39;child_process&#39;;
+import svelte from &#39;rollup-plugin-svelte&#39;;
+import commonjs from &#39;@rollup/plugin-commonjs&#39;;
+import terser from &#39;@rollup/plugin-terser&#39;;
+import resolve from &#39;@rollup/plugin-node-resolve&#39;;
+import livereload from &#39;rollup-plugin-livereload&#39;;
+import css from &#39;rollup-plugin-css-only&#39;;
+import sveltePreprocess from &#39;svelte-preprocess&#39;;
+import typescript from &#39;@rollup/plugin-typescript&#39;;
+
+const production = !process.env.ROLLUP_WATCH;
+
+function serve() {
+    let server;
+
+    function toExit() {
+        if (server) server.kill(0);
+    }
+
+    return {
+        writeBundle() {
+            if (server) return;
+            server = spawn(&#39;npm&#39;, [&#39;run&#39;, &#39;start&#39;, &#39;--&#39;, &#39;--dev&#39;], {
+                stdio: [&#39;ignore&#39;, &#39;inherit&#39;, &#39;inherit&#39;],
+                shell: true
+            });
+
+            process.on(&#39;SIGTERM&#39;, toExit);
+            process.on(&#39;exit&#39;, toExit);
+        }
+    };
+}
+
+export default {
+    input: &#39;frontend/main.ts&#39;,
+    output: {
+        sourcemap: true,
+        format: &#39;iife&#39;,
+        name: &#39;app&#39;,
+        file: &#39;static/build/bundle.js&#39;
+    },
+    plugins: [
+        svelte({
+            preprocess: sveltePreprocess({ sourceMap: !production }),
+            compilerOptions: {
+                // enable run-time checks when not in production
+                dev: !production
+            }
+        }),
+        // we&#39;ll extract any component CSS out into
+        // a separate file - better for performance
+        css({ output: &#39;bundle.css&#39; }),
+
+        // If you have external dependencies installed from
+        // npm, you&#39;ll most likely need these plugins. In
+        // some cases you&#39;ll need additional configuration -
+        // consult the documentation for details:
+        // https://github.com/rollup/plugins/tree/master/packages/commonjs
+        resolve({
+            browser: true,
+            dedupe: [&#39;svelte&#39;],
+            exportConditions: [&#39;svelte&#39;]
+        }),
+        commonjs(),
+        typescript({
+            sourceMap: !production,
+            inlineSources: !production
+        }),
+
+        // In dev mode, call `npm run start` once
+        // the bundle has been generated
+        !production &amp;&amp; serve(),
+
+        // Watch the `public` directory and refresh the
+        // browser on changes when not in production
+        !production &amp;&amp; livereload(&#39;static&#39;),
+
+        // If we&#39;re building for production (npm run build
+        // instead of npm run dev), minify
+        production &amp;&amp; terser()
+    ],
+    watch: {
+        clearScreen: false
+    }
+};</code></pre><figcaption>rollup.config.js</figcaption></figure><figure class=code><pre><span class=code-lang>JSON</span><code data-ln-selected=9 data-ln-start-from class=language-json>{
+  &#34;name&#34;: &#34;svelte-app&#34;,
+  &#34;version&#34;: &#34;1.0.0&#34;,
+  &#34;private&#34;: true,
+  &#34;type&#34;: &#34;module&#34;,
+  &#34;scripts&#34;: {
+    &#34;build&#34;: &#34;rollup -c&#34;,
+    &#34;dev&#34;: &#34;rollup -c -w&#34;,
+    &#34;start&#34;: &#34;sirv static --no-clear&#34;,
+    &#34;check&#34;: &#34;svelte-check&#34;
+  },
+  &#34;devDependencies&#34;: {
+    &#34;@rollup/plugin-commonjs&#34;: &#34;^24.0.0&#34;,
+    &#34;@rollup/plugin-node-resolve&#34;: &#34;^15.0.0&#34;,
+    &#34;@rollup/plugin-terser&#34;: &#34;^0.4.0&#34;,
+    &#34;rollup&#34;: &#34;^3.15.0&#34;,
+    &#34;rollup-plugin-css-only&#34;: &#34;^4.3.0&#34;,
+    &#34;rollup-plugin-livereload&#34;: &#34;^2.0.0&#34;,
+    &#34;rollup-plugin-svelte&#34;: &#34;^7.1.2&#34;,
+    &#34;svelte&#34;: &#34;^3.55.0&#34;,
+    &#34;svelte-check&#34;: &#34;^3.0.0&#34;,
+    &#34;svelte-preprocess&#34;: &#34;^5.0.0&#34;,
+    &#34;@rollup/plugin-typescript&#34;: &#34;^11.0.0&#34;,
+    &#34;typescript&#34;: &#34;^4.9.0&#34;,
+    &#34;tslib&#34;: &#34;^2.5.0&#34;,
+    &#34;@tsconfig/svelte&#34;: &#34;^3.0.0&#34;
+  },
+  &#34;dependencies&#34;: {
+    &#34;sirv-cli&#34;: &#34;^2.0.0&#34;
+  }
+}</code></pre><figcaption>package.json</figcaption></figure><p>此外，由于 Flask 项目默认的静态资源路径 <code>static_url_path</code> 是 <em>/static</em>，为了兼容 Svelte，需要添加如下代码：</p><pre><span class=code-lang>PYTHON</span><code class=language-python>import app
+
+from flask import send_from_directory
+
+
+@app.route(&#39;/&lt;path:path&gt;&#39;)
+@app.route(&#39;/&#39;, defaults={&#39;path&#39;: &#39;index.html&#39;})
+def static_file(path):
+    return send_from_directory(app.static_folder, path)</code></pre><p>也可以使用模板来渲染主页：</p><pre><span class=code-lang>PYTHON</span><code class=language-python>import app
+
+from flask import send_from_directory, render_template
+
+
+@app.route(&#39;/&lt;path:path&gt;&#39;)
+def static_file(path):
+    return send_from_directory(app.static_folder, path)
+
+
+@app.route(&#39;/&#39;)
+def index():
+    return render_template(&#39;index.html&#39;)</code></pre></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Python/>Python</a></li><li>#<a data-pagefind-filter=标签 href=/tags/%E5%89%8D%E7%AB%AF/>前端</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a href=/moments/202406/1717344006/ class="right arrow">下一篇</a>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2024-06-05 05:58:22.157982206 +0000 UTC m=+0.683933654">2024</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
