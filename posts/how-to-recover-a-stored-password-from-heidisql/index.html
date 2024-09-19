@@ -1,4 +1,67 @@
-<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="HeidiSQL 是 Windows 平台上一个开源数据库管理工具，支持 MariaDB, MySQL, SQL Server, PostgreSQL, SQLite, Interbase 和 Firebird 。HeidiSQL 使用 Delphi 编写，和其他诸如 Navicat, DBeaver 等专业数据库管理工具相比， 它更加轻量、启动和响应速度更快。 HeidiSQL 将数据库密码加密后保存在配置文件中，不过这种加密方式非常简单。可以在 HeidiSQL 的源代码文件 source/apphelpers.pas 中找到加密和解密算法： PASCAL{*** Password-encryption, used to store session-passwords"><title>从 HeidiSQL 配置文件中找回数据库密码 &#183; 白汤四物</title>
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="HeidiSQL 是 Windows 平台上一个开源数据库管理工具，支持 MariaDB, MySQL, SQL Server, PostgreSQL, SQLite, Interbase 和 Firebird 。HeidiSQL 使用 Delphi 编写，和其他诸如 Navicat, DBeaver 等专业数据库管理工具相比， 它更加轻量、启动和响应速度更快。
+HeidiSQL 将数据库密码加密后保存在配置文件中，不过这种加密方式非常简单。可以在 HeidiSQL 的源代码文件 source/apphelpers.pas 中找到加密和解密算法：
+
+
+
+
+
+
+
+PASCAL{***
+  Password-encryption, used to store session-passwords in registry
+
+  @param string Text to encrypt
+  @return string Encrypted Text
+}
+function encrypt(str: String) : String;
+var
+  i, salt, nr : integer;
+  h : String;
+begin
+  randomize();
+  result := '';
+  salt := random(9) + 1;
+  for i:=1 to length(str) do begin
+    nr := ord(str[i])+salt;
+    if nr > 255 then
+      nr := nr - 255;
+    h := inttohex(nr,0);
+    if length(h) = 1 then
+      h := '0' + h;
+    result := result + h;
+  end;
+  result := result + inttostr(salt);
+end;
+
+
+
+{***
+  Password-decryption, used to restore session-passwords from registry
+
+  @param string Text to decrypt
+  @return string Decrypted Text
+}
+function decrypt(str: String) : String;
+var
+  j, salt, nr : integer;
+begin
+  result := '';
+  if str = '' then exit;
+  j := 1;
+  salt := StrToIntDef(str[length(str)],0);
+  result := '';
+  while j < length(str)-1 do begin
+    nr := StrToInt('$' + str[j] + str[j+1]) - salt;
+    if nr < 0 then
+      nr := nr + 255;
+    result := result + chr(nr);
+    inc(j, 2);
+  end;
+end;
+
+
+
+按照下面的步骤从 HeidiSQL 配置文件中找回数据库密码："><title>从 HeidiSQL 配置文件中找回数据库密码 &#183; 白汤四物</title>
 <link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>从 HeidiSQL 配置文件中找回数据库密码</h1><div class=post-line></div><div class=post-info><span>作者</span>
 <span data-pagefind-meta=作者>Fournoas
 </span><span>于&nbsp;</span><time datetime="2023-08-16 00:00:00 +0000 UTC" data-pagefind-meta=日期>2023年8月16日</time>
@@ -54,4 +117,4 @@ begin
   end;
 end;</code></pre><p>按照下面的步骤从 HeidiSQL 配置文件中找回数据库密码：</p><p><img src=./export-config.png alt=导出配置文件></p><ol><li>打开 HeidiSQL 并选择菜单「文件 > 导出配置文件」，将配置保存到 TXT 文件中</li><li>打开 TXT 配置文件，查找 <code>Servers\&lt;Your-DB-Instance-Name>\Password&lt;|||>1&lt;|||></code> （将 <code>&lt;Your-DB-Instance-Name></code> 替换成你恢复密码的数据库实例名称）</li><li>将找到的配置行后面的已加密数据库密码输入到文末的解码工具中进行解码</li></ol><p>在下例中，我们找到 Homestead 数据库实例的已加密密码是 <code>786A68776A795</code>：</p><pre><code class=language-text>Servers\Homestead\Password&lt;|||&gt;1&lt;|||&gt;786A68776A795</code></pre><hr><iframe src=./decrypt.html style=border:none;width:100%;height:300px scrolling=no></iframe></div><div class=taxonomy data-pagefind-ignore></div><div class=pagination data-pagefind-ignore><a href=/posts/gnu-and-linux-command-line-tools-for-windows/ class="left arrow">上一篇：<br>Windows 下的 GNU/Linux 命令行工具</a>
 <a href=/moments/202308/1692072542/ class="right arrow">下一篇</a>
-<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-svelte/dist/svelte.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2024-09-02 10:07:36.071904564 +0000 UTC m=+0.965180356">2024</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-svelte/dist/svelte.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2024-09-19 06:05:22.281967757 +0000 UTC m=+0.961141277">2024</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
