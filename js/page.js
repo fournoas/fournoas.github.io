@@ -65,7 +65,8 @@ $(function(){
 
   $page.find('a').each(function () {
     let href = $(this).attr('href')
-    if (!href || 
+    if (this.classList.contains('nofollow') ||
+        !href || 
         !href.startsWith('http://') && 
         !href.startsWith('https://')) {
       return
