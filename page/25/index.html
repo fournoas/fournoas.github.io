@@ -9,41 +9,10 @@
 trait UsageTrait
 {
     const THE_CONST_NAME = 1;
-}</code></pre><p>错误消息为：</p><pre><code class=language-text>Fatal error: Traits cannot have constants in test.php</code></pre><p>想要在不同的类中共用一组常量，可以通过接口来解决：</p><pre><span class=code-lang>php</span><code class=language-php>interface UsageConstantsInterface
-{
-    const THE_CONST_NAME = __CLASS__;
-}
-
-trait UsageTrait
-{
-    public function usageForBar()
-    {
-        echo UsageConstantsInterface::THE_CONST_NAME, PHP_EOL;
-    }
-    
-    public function usageForFoo()
-    {
-        // 如果使用 UsageTrait 的类实现了 UsageConstantsInterface 接口，
-        // 也可以使用 self::THE_CONST_NAME 来访问常量
-        echo self::THE_CONST_NAME, PHP_EOL;
-    }
-}
-
-class Foo implements UsageConstantsInterface
-{
-    use UsageTrait;
-}
-
-class Bar
-{
-    use UsageTrait;
-}
-
-(new Foo)-&gt;usageForFoo();
-(new Bar)-&gt;usageForBar();</code></pre><p>另外，PHP Trait 的 <code>insteadof</code> 和 <code>as</code> 语句只能处理方法名的冲突，而无法处理成员变量的冲突。如果在 Trait 和类中都定义了同名的成员变量，当它们的初始值不一致时，编译器会报错。如下代码可以正常执行：</p><p>&mldr;&mldr;</p></div><ul class=catalogue-tags><li>#<a href=/tags/PHP/>PHP</a></li></ul></div><div class=catalogue-item><time datetime="2021-10-13 22:52:43 +0800 +0800" class=catalogue-time>2021年10月13日 22:52:43</time><p class=head><a href=/moments/202110/1634136763/ style=float:right><span class="fa-solid fa-arrow-up-right-from-square"></span></a>
+}</code></pre><p>错误消息为：</p><pre><code class=language-text>Fatal error: Traits cannot have constants in test.php</code></pre><p>想要在不同的类中共用一组常量，可以通过接口来解决：</p><p>&mldr;&mldr;</p></div><ul class=catalogue-tags><li>#<a href=/tags/PHP/>PHP</a></li></ul></div><div class=catalogue-item><time datetime="2021-10-13 22:52:43 +0800 +0800" class=catalogue-time>2021年10月13日 22:52:43</time><p class=head><a href=/moments/202110/1634136763/ style=float:right><span class="fa-solid fa-arrow-up-right-from-square"></span></a>
 <span class=author>Fournoas
 </span><span class=action>评论《<a href=https://www.ithome.com/0/579/927.htm target=_blank rel=noopener>钉钉打卡作弊 App“大牛助手”非法获利 500 万，犯罪人被判 5 年 6 个月</a>》：</span></p><div class=catalogue-moment><p>这个判决结果所造成的恶劣影响不亚于当年的南京彭宇案</p></div></div><div class=catalogue-item><time datetime="2021-10-13 00:00:00 +0000 UTC" class=catalogue-time>2021年10月13日</time>
-<a href=/posts/niche-programming-languages/ class=catalogue-title>小众编程语言</a><div class=catalogue-line></div><div class=catalogue-summary><p>这里先给出小众的定义：以 <a href=https://www.tiobe.com/tiobe-index/ target=_blank rel=noopener>TIOBE Index for October 2021</a> 为标准，排名在 20 位以后的编程语言。其中排名前 20 的编程语言为：</p><ol><li>Python</li><li>C</li><li>Java</li><li>C++</li><li>C#</li><li>Visual Basic</li><li>JavaScript</li><li>SQL</li><li>PHP</li><li>Assembly language</li><li>Classic Visual Basic</li><li>Go</li><li>MATLAB</li><li>R</li><li>Groovy</li><li>Ruby</li><li>Swift</li><li>Fortran</li><li>Perl</li><li>Delphi/Object Pascal</li></ol><p>在 TIOBE 榜单 20 至 100 位里的小众编程语言：</p><ul><li><p><a href=https://scratch.mit.edu/ target=_blank rel=noopener>Scratch</a> (24)<br>麻省理工媒体实验室开发一款面向教学的编程工具。主要用于少儿编程教学。</p></li><li><p><a href=https://www.rust-lang.org/ target=_blank rel=noopener>Rust</a> (26)<br>由 Mozilla 基金会主导开发的一款通用型编程语言。可用于替代 C++ 进行系统级的开发。Rust 也是实验性操作系统 <a href=https://www.redox-os.org/ target=_blank rel=noopener>Redox</a> 所使用的开发语言。<br>Rust 开发的网站框架比较丰富，知名的有 <a href=https://actix.rs/ target=_blank rel=noopener>Actix</a>、<a href=https://rocket.rs/ target=_blank rel=noopener>Rocket</a>、<a href=https://github.com/iron/iron target=_blank rel=noopener>Iron</a>。</p><p>&mldr;&mldr;</p></div></div><div class=catalogue-item><time datetime="2021-10-09 09:14:08 +0800 +0800" class=catalogue-time>2021年10月9日 09:14:08</time><p class=head><a href=/moments/202110/1633742048/ style=float:right><span class="fa-solid fa-arrow-up-right-from-square"></span></a>
+<a href=/posts/niche-programming-languages/ class=catalogue-title>小众编程语言</a><div class=catalogue-line></div><div class=catalogue-summary><p>这里先给出小众的定义：以 <a href=https://www.tiobe.com/tiobe-index/ target=_blank rel=noopener>TIOBE Index for October 2021</a> 为标准，排名在 20 位以后的编程语言。其中排名前 20 的编程语言为：</p><ol><li>Python</li><li>C</li><li>Java</li><li>C++</li><li>C#</li><li>Visual Basic</li><li>JavaScript</li><li>SQL</li><li>PHP</li><li>Assembly language</li><li>Classic Visual Basic</li><li>Go</li><li>MATLAB</li><li>R</li><li>Groovy</li><li>Ruby</li><li>Swift</li><li>Fortran</li><li>Perl</li><li>Delphi/Object Pascal</li></ol><p>&mldr;&mldr;</p></div></div><div class=catalogue-item><time datetime="2021-10-09 09:14:08 +0800 +0800" class=catalogue-time>2021年10月9日 09:14:08</time><p class=head><a href=/moments/202110/1633742048/ style=float:right><span class="fa-solid fa-arrow-up-right-from-square"></span></a>
 <span class=author>Fournoas
 </span><span class=action>评论《<a href=http://www.zhihu.com/question/469009557 target=_blank rel=noopener>如何看待中国共产党党员总数为9514.8万名，你是其中的一员吗？</a>》：</span></p><div class=catalogue-moment><p>截止至 1991 年 11 月 6 日，苏联党员近 2000 万，团员约 2600 万，合计占总人口的 16%。</p></div></div><div class=catalogue-item><time datetime="2021-09-30 10:00:01 +0800 +0800" class=catalogue-time>2021年9月30日 10:00:01</time><p class=head><a href=/moments/202109/1632967201/ style=float:right><span class="fa-solid fa-arrow-up-right-from-square"></span></a>
 <span class=author>Fournoas
@@ -55,4 +24,4 @@ class Bar
 <span class=author>Fournoas
 </span><span class=action>评论《<a href=https://finance.sina.com.cn/jjxw/2021-09-28/doc-iktzscyx6900151.shtml target=_blank rel=noopener>哈尔滨新冠肺炎确诊病例家中3只猫两次核酸呈阳性，被执行安乐死</a>》：</span></p><div class=catalogue-moment><p>诚然，猫不是人，不享有人权。但是猫属于个人财产，根据联合国《<a href=https://www.un.org/zh/about-us/universal-declaration-of-human-rights target=_blank rel=noopener>世界人权宣言</a>》第十七条第二款之规定：任何人的财产不得任意剥夺。</p><p>你以为这是猫的问题，归根结底还是人的问题。</p></div></div></div><div class=pagination><a href=/page/24/ class="left arrow">上一页</a>
 <a href=/page/26/ class="right arrow">下一页</a>
-<span><sup>25</sup> &frasl; <sub>40</sub></span></div></main><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-svelte/dist/svelte.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2024-11-15 01:51:04.22924859 +0000 UTC m=+0.402351020">2024</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+<span><sup>25</sup> &frasl; <sub>40</sub></span></div></main><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-svelte/dist/svelte.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2024-11-15 06:45:25.947339705 +0000 UTC m=+0.393468731">2024</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
