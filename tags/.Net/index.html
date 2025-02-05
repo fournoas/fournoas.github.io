@@ -1,0 +1,54 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>.Net &#183; 白汤四物</title>
+<link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><div class=banner><main><ul class=breadcrumb><li><a href=../>标签</a></li><li class=active>.Net</li></ul></main></div><main class=taxon><div class="catalogue taxonomy"><div class=catalogue-item><time datetime="2025-02-05 00:00:00 +0000 UTC" class=catalogue-time>2025年2月5日</time>
+<a href=/posts/the-program-still-prompts-that-dotnet-runtime-is-not-installed-even-though-it-is/ class=catalogue-title>已安装 .Net 运行时，但程序仍提示未安装</a><div class=catalogue-line></div><div class=catalogue-summary><p>运行一个 C# 编写的程序，弹出如下提示：</p><figure><img src=/posts/the-program-still-prompts-that-dotnet-runtime-is-not-installed-even-though-it-is/dotnet.png alt=dotnet></figure><p>按错误消息中的链接下载了 .Net Desktop Runtime 8.0 并重新安装，仍然提示以上错误。</p><p>当前系统情况如下：</p><ul><li><p>通过 WinGet 安装了：</p><ul><li><p>Microsoft.DotNet.Runtime.6</p></li><li><p>Microsoft.DotNet.Runtime.7</p></li><li><p>Microsoft.DotNet.Runtime.8</p></li><li><p>Microsoft.DotNet.Runtime.9</p></li><li><p>Microsoft.DotNet.DesktopRuntime.6</p></li><li><p>Microsoft.DotNet.DesktopRuntime.7</p></li><li><p>Microsoft.DotNet.DesktopRuntime.8</p></li><li><p>Microsoft.DotNet.DesktopRuntime.9</p></li></ul></li><li><p>通过 Scoop 安装了 donet-sdk (9.0.102)</p></li><li><p>安装了 Visual Studio 2022 以及 .Net 桌面开发组件</p></li></ul><p>用 <code>which dotnet</code> 查看 <code>dotnet</code> 命令的路径：</p><pre><code class=language-text>C:\Program Files\dotnet\dotnet.exe</code></pre><p>运行 <code>dotnet --info</code> 查看信息：</p><pre><code class=language-text>.NET SDK:
+ Version:           9.0.102
+ Commit:            cb83cd4923
+ Workload version:  9.0.100-manifests.4a54b1a6
+ MSBuild version:   17.12.18&#43;ed8c6aec5
+
+运行时环境:
+ OS Name:     Windows
+ OS Version:  10.0.19045
+ OS Platform: Windows
+ RID:         win-x64
+ Base Path:   C:\Program Files\dotnet\sdk\9.0.102\
+
+已安装 .NET 工作负载:
+没有要显示的已安装工作负载。
+配置为在安装新清单时使用 loose manifests。
+
+Host:
+  Version:      9.0.1
+  Architecture: x64
+  Commit:       c8acea2262
+
+.NET SDKs installed:
+  9.0.102 C:\Program Files\dotnet\sdk]
+
+.NET runtimes installed:
+  Microsoft.AspNetCore.App 8.0.12 [C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App]
+  Microsoft.AspNetCore.App 9.0.1 [C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App]
+  Microsoft.NETCore.App 6.0.36 [C:\Program Files\dotnet\shared\Microsoft.NETCore.App]
+  Microsoft.NETCore.App 7.0.20 [C:\Program Files\dotnet\shared\Microsoft.NETCore.App]
+  Microsoft.NETCore.App 8.0.12 [C:\Program Files\dotnet\shared\Microsoft.NETCore.App]
+  Microsoft.NETCore.App 9.0.1 [C:\Program Files\dotnet\shared\Microsoft.NETCore.App]
+  Microsoft.WindowsDesktop.App 6.0.36 [C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App]
+  Microsoft.WindowsDesktop.App 7.0.20 [C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App]
+  Microsoft.WindowsDesktop.App 8.0.12 [C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App]
+  Microsoft.WindowsDesktop.App 9.0.1 [C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App]
+
+Other architectures found:
+  x86   [C:\Program Files (x86)\dotnet]
+    registered at [HKLM\SOFTWARE\dotnet\Setup\InstalledVersions\x86\InstallLocation]
+
+Environment variables:
+  DOTNET_ROOT       [C:\scoop\apps\dotnet-sdk\current]
+
+global.json file:
+  Not found
+
+Learn more:
+  https://aka.ms/dotnet/info
+
+Download .NET:
+  https://aka.ms/dotnet/download</code></pre><p>结果中可以发现，.Net 8.0 运行时确实已经安装了。不过默认的 .Net SDK 是 9.0 版本，并且从安装路径可以得知，并非是 Scoop 安装的版本，也许是安装 Visual Studio 时自动安装的。也许是程序优先检测到了 .Net SDK 9.0 自带的运行时，而没有使用已安装的 .Net Runtime 8.0。</p><p>&mldr;&mldr;</p></div><ul class=catalogue-tags><li>#<a href=/tags/.Net/>.Net</a></li></ul></div></div><div class=pagination><span><sup>1</sup> &frasl; <sub>1</sub></span></div></main><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-svelte/dist/svelte.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2025-02-05 06:53:03.345443747 +0000 UTC m=+1.511526093">2025</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
