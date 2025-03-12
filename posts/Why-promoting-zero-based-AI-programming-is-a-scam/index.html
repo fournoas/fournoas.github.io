@@ -1,0 +1,86 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="前阵子在社交媒体上看到一条消息：「我完全不懂编程，N 小时内写了一个 APP，荣登 App Store 排行榜」。我可以言之凿凿地论断：这就是一个卖课的骗子，所谓的排行榜也是靠作弊刷出来的。因为软件开发的内核从来不是你能否掌握一门编程语言，而是你能否像程序一样思考。目前的 AI 本质上不过是一个玩文字接龙游戏的程序罢了，它无法代替人进行思考（所谓强人工智能）。"><title>为什么说鼓吹零基础 AI 编程的都是骗子 &#183; 白汤四物</title>
+<link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>为什么说鼓吹零基础 AI 编程的都是骗子</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas
+</span><span>写于&nbsp;</span><time datetime="2025-03-12 00:00:00 +0000 UTC" data-pagefind-meta=日期>2025年3月12日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>前阵子在社交媒体上看到一条消息：「我完全不懂编程，N 小时内写了一个 APP，荣登 App Store 排行榜」。我可以言之凿凿地论断：这就是一个卖课的骗子，所谓的排行榜也是靠作弊刷出来的。因为软件开发的内核从来不是你能否掌握一门编程语言，而是你能否像程序一样思考。目前的 AI 本质上不过是一个玩文字接龙游戏的程序罢了，它无法代替人进行思考（所谓强人工智能）。</p><p>举个简单的例子。我用如下 Prompt 让 Copilot 生成一段 C 语言代码：</p><blockquote><p>生成一个C语言程序，它接收一个文件的路径作为参数，打印出文件的扩展名</p></blockquote><p>无论采用的是 GPT、Claude，或是 Gemini，生成的代码都大同小异。此处采用 GPT-4o 生成的代码：</p><pre><span class=code-lang>c</span><code class=language-c>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+void print_file_extension(const char *file_path) {
+    const char *dot = strrchr(file_path, &#39;.&#39;);
+    if (!dot || dot == file_path) {
+        printf(&#34;No extension found\n&#34;);
+    } else {
+        printf(&#34;File extension: %s\n&#34;, dot &#43; 1);
+    }
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, &#34;Usage: %s &lt;file_path&gt;\n&#34;, argv[0]);
+        return 1;
+    }
+
+    print_file_extension(argv[1]);
+    return 0;
+}</code></pre><p>稍有常识的人都会看出，如果我们的代码编译运行，这个程序会存在一个很严重的 BUG：假设我们给的参数是 <samp>D:\foobar\test.txt</samp>，程序输出为 <samp>File extension: txt</samp>；然而，当文件路径是 <samp>D:\foo.bar\test</samp> 时，输出就变成了 <samp>File extension: bar\test</samp>，这显然有违我们的预期。继续用如下 Prompt 要求 Copilot 修复代码：</p><blockquote><p>这段代码没有考虑文件名没有扩展名，且文件目录路径包含 <code>.</code> 的情况，请修复</p></blockquote><p>代码修复如下：</p><pre><span class=code-lang>c</span><code class=language-c>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+void print_file_extension(const char *file_path) {
+    const char *dot = strrchr(file_path, &#39;.&#39;);
+    if (!dot || dot == file_path || strchr(dot, &#39;/&#39;)) {
+        printf(&#34;No extension found\n&#34;);
+    } else {
+        printf(&#34;File extension: %s\n&#34;, dot &#43; 1);
+    }
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, &#34;Usage: %s &lt;file_path&gt;\n&#34;, argv[0]);
+        return 1;
+    }
+
+    print_file_extension(argv[1]);
+    return 0;
+}</code></pre><p>这样就好了吗？显然还没有。这段代码没有考虑 Windows 平台的路径分隔符 <code>\\</code>，依然存在 BUG。继续修复代码：</p><blockquote><p>这段代码没有考虑 Windows 路径分隔符，请修复</p></blockquote><p>这次给出的代码总算修复了问题：</p><pre><span class=code-lang>c</span><code class=language-c>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+void print_file_extension(const char *file_path) {
+    const char *dot = strrchr(file_path, &#39;.&#39;);
+    if (!dot || dot == file_path || strchr(dot, &#39;/&#39;) || strchr(dot, &#39;\\&#39;)) {
+        printf(&#34;No extension found\n&#34;);
+    } else {
+        printf(&#34;File extension: %s\n&#34;, dot &#43; 1);
+    }
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, &#34;Usage: %s &lt;file_path&gt;\n&#34;, argv[0]);
+        return 1;
+    }
+
+    print_file_extension(argv[1]);
+    return 0;
+}</code></pre><p>这下想必已经修复了所有问题了吧。答案是并没有！稍有常识的人都会看出，文件名可以是 <samp>.</samp> 开头，在类 Unix 系统中表示隐藏文件，其文件名不应被认作是扩展名。继续修复代码：</p><blockquote><p>这段代码没有考虑到以 <code>.</code> 开头的文件名，这是隐藏文件，不应认作扩展名，请修复</p></blockquote><p>最后给出的代码堪堪可用：</p><pre><span class=code-lang>c</span><code class=language-c>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+void print_file_extension(const char *file_path) {
+    const char *dot = strrchr(file_path, &#39;.&#39;);
+    if (!dot || dot == file_path || strchr(dot, &#39;/&#39;) || strchr(dot, &#39;\\&#39;) || *(dot - 1) == &#39;/&#39; || *(dot - 1) == &#39;\\&#39;) {
+        printf(&#34;No extension found\n&#34;);
+    } else {
+        printf(&#34;File extension: %s\n&#34;, dot &#43; 1);
+    }
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, &#34;Usage: %s &lt;file_path&gt;\n&#34;, argv[0]);
+        return 1;
+    }
+
+    print_file_extension(argv[1]);
+    return 0;
+}</code></pre><p>通常我们把大项目的代码称为「屎山」，按照这个比喻，所谓零基础 AI 编程就相当于一个猴子在使用一台涡轮增压喷粪机。</p><p>用一个笑话来结束本文：</p><blockquote><p>老婆给当程序员的老公打电话：「下班顺路买一斤包子带回来，如果看到卖西瓜的，买一个。」</p><p>当晚，程序员老公手捧一个包子进了家门。</p><p>老婆怒道：「你怎么就买了一个包子？！」</p><p>老公答曰：「因为看到了卖西瓜的。」</p></blockquote><p>编程不存在银弹！自然语言是不严谨的，为了精准表述一个系统，我们需要定义一套规范用语。并且为了简化描述，我们还需要定义一套专业术语。最后，一个崭新的编程语言就诞生了……</p></div><div class=taxonomy data-pagefind-ignore></div><div class=pagination data-pagefind-ignore><a href=/moments/202502/1739956922/ class="right arrow">下一篇</a>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-svelte/dist/svelte.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2025-03-12 09:32:51.68700867 +0000 UTC m=+0.898326033">2025</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
