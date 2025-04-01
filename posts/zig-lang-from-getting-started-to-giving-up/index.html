@@ -7,5 +7,51 @@ error: unable to discover remote git server capabilities: ConnectionTimedOut
 </span><span>写于&nbsp;</span><time datetime="2025-04-01 00:00:00 +0000 UTC" data-pagefind-meta=日期>2025年4月1日</time>
 <span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>一直想用 Zig 来写一点什么。正好看到一个 Zig 的 GUI 项目 <a href=https://capy-ui.org/ target=_blank rel=noopener>Capy</a>，想着用它来试试手。</p><p>首先，用 <code>scoop install zig</code> 命令安装了 Zig，版本是 0.14.0（后续会提到）。然后，按照 Capy 的官方文档下载了项目模板，使用 <code>zig build</code> 命令编译。接下来，就遇到第一个扑面而来的问题：</p><pre><code class=language-text>error: unable to discover remote git server capabilities: ConnectionTimedOut</code></pre><p>可以确信的是，命令执行环境中已经正确地配置了代理，包括 Git 全局配置、环境变量和系统代理。Zig 没能正确使用代理设置。最后只能使用虚拟网卡实现代理。</p><p>解决了网络问题，接着就遇到各种兼容性错误。比如：</p><pre><code class=language-text>build.zig.zon:2:13: error: expected enum literal
     .name = &#34;capy-template&#34;,
-            ^~~~~~~~~~~~~~~</code></pre><p>以及</p><pre><code class=language-text>build.zig.zon:1:2: error: missing top-level &#39;fingerprint&#39; field; suggested value: 0xa46d6299a1ade711</code></pre><p>应该是 Zig 版本升级后，不在兼容旧的 <samp>build.zig.zon</samp> 格式。修复了这些错误后再次编译，这次报了更多的错误，怀疑 Zig 0.14.0 已经不再兼容项目模板中所使用的 Capy 版本了。索性用 <code>zig init</code> 命令创建一个新项目，在新项目中使用 Capy 试试。</p><p>用 <code>zig fetch</code> 命令安装最新版本的 Capy：</p><pre><span class=code-lang>powershell</span><code class=language-powershell>zig fetch --save git&#43;https://github.com/capy-ui#c54ea2c17c9863b9dbc71b04ba0aaf0740d5f355</code></pre><p>编译失败，提示：</p><pre><code class=language-text>error: no module named &#39;capy&#39; available within module root</code></pre><p>原来还要修改 <samp>build.zig</samp> 才行。没想到 Zig 的包管理那么弱智，还需要手动修改构建脚本。按照 Capy 官方文档修改好构建脚本，编译仍旧出错：</p><pre><code class=language-text>error: unsupported Zig version (0.14.0). Required Zig version 2024.11.0-mach: https://machengine.org/docs/nominated-zig/#2024110-mach</code></pre><p>Zig 编译器版本不支持！直接被干懵了，三方库竟然不支持编译器主版本，这 Zig 的语言特性到底是有多不稳定啊！</p><p>最后试了试将 Zig 作为 C 语言项目的构建工具。让 AI 工具将一个 C 项目的 CMake 配置转换成 <samp>build.zig</samp>，让 AI 反反复复改了好多回，每次编译又是一堆错误，调都调不好的那种。</p><p>罢了罢了，这玩意儿语言特性不稳定，还一堆坑，完全没到适合生产环境的地步。</p></div><div class=taxonomy data-pagefind-ignore></div><div class=pagination data-pagefind-ignore><a href=/moments/202503/1743384313/ class="right arrow">下一篇</a>
-<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-svelte/dist/svelte.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2025-04-01 06:06:26.518747996 +0000 UTC m=+0.901268814">2025</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
+            ^~~~~~~~~~~~~~~</code></pre><p>以及</p><pre><code class=language-text>build.zig.zon:1:2: error: missing top-level &#39;fingerprint&#39; field; suggested value: 0xa46d6299a1ade711</code></pre><p>应该是 Zig 版本升级后，不在兼容旧的 <samp>build.zig.zon</samp> 格式。修复了这些错误后再次编译，这次报了更多的错误，怀疑 Zig 0.14.0 已经不再兼容项目模板中所使用的 Capy 版本了。索性用 <code>zig init</code> 命令创建一个新项目，在新项目中使用 Capy 试试。</p><p>用 <code>zig fetch</code> 命令安装最新版本的 Capy：</p><pre><span class=code-lang>powershell</span><code class=language-powershell>zig fetch --save git&#43;https://github.com/capy-ui#c54ea2c17c9863b9dbc71b04ba0aaf0740d5f355</code></pre><p>编译失败，提示：</p><pre><code class=language-text>error: no module named &#39;capy&#39; available within module root</code></pre><p>原来还要修改 <samp>build.zig</samp> 才行。没想到 Zig 的包管理那么弱智，还需要手动修改构建脚本。按照 Capy 官方文档修改好构建脚本，编译仍旧出错：</p><pre><code class=language-text>error: unsupported Zig version (0.14.0). Required Zig version 2024.11.0-mach: https://machengine.org/docs/nominated-zig/#2024110-mach</code></pre><p>Zig 编译器版本不支持！直接被干懵了，三方库竟然不支持编译器主版本，这 Zig 的语言特性到底是有多不稳定啊！</p><p>最后试了试将 Zig 作为 C 语言项目的构建工具。让 AI 工具将一个 C 项目的 CMake 配置转换成 <samp>build.zig</samp>，让 AI 反反复复改了好多回，每次编译又是一堆错误，调都调不好的那种。</p><p>不过写不好构建脚本这事儿也不能赖 AI，实在是 Zig 的 Build API 变化太大，且完全不兼容，AI 的训练数据都没来得及更新呢。比如在 Zig 0.13 的时候，编译 <samp>main.c</samp> 的构建脚本还是这样写的：</p><pre><span class=code-lang>zig</span><code class=language-zig>const std = @import(&#34;std&#34;);
+
+const name = &#34;main&#34;;
+
+pub fn build(b: *std.Build) !void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
+    const exe = b.addExecutable(.{
+        .name = name,
+        .target = target,
+        .optimize = optimize,
+    });
+    exe.addIncludePath(b.path(&#34;src&#34;));
+    exe.addCSourceFile(.{
+        .file = b.path(&#34;src/main.c&#34;),
+    });
+    exe.defineCMacro(&#34;WIN32&#34;, null);
+    exe.linkLibC();
+
+    b.installArtifact(exe);
+}</code></pre><p>到了 Zig 0.14 时，<code>defineCMacro()</code> 被删除了，构建脚本要改成：</p><pre><span class=code-lang>zig</span><code class=language-zig>const std = @import(&#34;std&#34;);
+
+const name = &#34;main&#34;;
+
+pub fn build(b: *std.Build) !void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+
+    const exe_mod = b.createModule(.{
+        .target = target,
+        .optimize = optimize,
+        .link_libc = true,
+    });
+    exe_mod.addCMacro(&#34;WIN32&#34;, &#34;&#34;);
+
+    const exe = b.addExecutable(.{
+        .name = name,
+        .root_module = exe_mod,
+    });
+    exe.addIncludePath(b.path(&#34;src&#34;));
+    exe.addCSourceFile(.{
+        .file = b.path(&#34;src/main.c&#34;),
+    });
+
+    b.installArtifact(exe);
+}</code></pre><p>罢了罢了，这语言不仅语法和 API 不稳定，还一堆坑，完全没到适合生产环境的地步。还是等它发布 1.0 以后再考虑吧。</p></div><div class=taxonomy data-pagefind-ignore></div><div class=pagination data-pagefind-ignore><a href=/moments/202503/1743384313/ class="right arrow">下一篇</a>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-svelte/dist/svelte.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2025-04-01 09:43:36.764205634 +0000 UTC m=+0.818071700">2025</time> fournoas.com. Powered by <a href=https://gohugo.io>Hugo</a>.</span></footer></body></html>
