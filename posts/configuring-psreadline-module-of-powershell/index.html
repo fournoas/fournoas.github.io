@@ -1,0 +1,324 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="PowerShell 的 PSReadLine 模块提供类似 GNU Readline 的功能，包括命令行编辑、历史记录管理、语法高亮、智能提示和多行输入支持，以增强 PowerShell 命令行的交互体验。
+无论是 Windows 10/11 自带的 PowerShell 5.x 版本，或是最新的 PowerShell 7.x 版本，都已自带 PSReadLine 模块。可以使用如下命令查看是否已加载该模块：
+powershellGet-Module PSReadLine
+正常会输出 PSReadLine 版本等信息。如果没有输出内容，则需要手动导入模块："><title>配置 PowerShell PSReadLine 模块 &#183; 白汤四物</title>
+<link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>配置 PowerShell PSReadLine 模块</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas
+</span><span>写于&nbsp;</span><time datetime="2025-04-24 00:00:00 +0000 UTC" data-pagefind-meta=日期>2025年4月24日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/using/>Using</a></li></ul></div><p>PowerShell 的 <strong>PSReadLine</strong> 模块提供类似 GNU Readline 的功能，包括命令行编辑、历史记录管理、语法高亮、智能提示和多行输入支持，以增强 PowerShell 命令行的交互体验。</p><p>无论是 Windows 10/11 自带的 PowerShell 5.x 版本，或是最新的 PowerShell 7.x 版本，都已自带 PSReadLine 模块。可以使用如下命令查看是否已加载该模块：</p><pre><span class=code-lang>powershell</span><code class=language-powershell>Get-Module PSReadLine</code></pre><p>正常会输出 PSReadLine 版本等信息。如果没有输出内容，则需要手动导入模块：</p><pre><span class=code-lang>powershell</span><code class=language-powershell>Import-Module PSReadLine</code></pre><div class=note><div class=note-content><p>某些情况可能系统没有安装该模块，可以从以下地址下载模块安装包：</p><pre><code class=language-text>https://psg-prod-eastus.azureedge.net/packages/psreadline.2.3.6.nupkg</code></pre><p>使用以下命令安装：</p><pre><span class=code-lang>powershell</span><code class=language-powershell>Install-Module -Path &#34;C:\Path\To\psreadline.2.3.6.nupkg&#34;</code></pre></div></div><p>查看 PSReadLine 模块导出的命令：</p><pre><span class=code-lang>powershell</span><code class=language-powershell>$(Get-Module PSReadLine).ExportedCommands</code></pre><pre><code class=language-text>Key                         Value
+---                         -----
+Get-PSReadLineKeyHandler    Get-PSReadLineKeyHandler
+Get-PSReadLineOption        Get-PSReadLineOption
+Remove-PSReadLineKeyHandler Remove-PSReadLineKeyHandler
+Set-PSReadLineKeyHandler    Set-PSReadLineKeyHandler
+Set-PSReadLineOption        Set-PSReadLineOption
+PSConsoleHostReadLine       PSConsoleHostReadLine</code></pre><p>查看所有按键映射：</p><pre><span class=code-lang>powershell</span><code class=language-powershell>Get-PSReadLineKeyHandler -Bound -Unbound</code></pre><pre><code class=language-text>Basic editing functions
+=======================
+
+Key              Function                      Description
+---              --------                      -----------
+Unbound          Abort                         Abort the current operation, e.g. incremental history search
+Unbound          AcceptAndGetNext              Accept the current line and recall the next line from history after the
+                                               current line finishes executing
+Enter            AcceptLine                    Accept the input or move to the next line if input is missing a closing
+                                               token.
+Shift&#43;Enter      AddLine                       Move the cursor to the next line without attempting to execute the input
+Backspace        BackwardDeleteChar            Delete the character before the cursor
+Ctrl&#43;h           BackwardDeleteChar            Delete the character before the cursor
+Ctrl&#43;Home        BackwardDeleteInput           Delete text from the cursor to the start of the input
+Unbound          BackwardDeleteLine            Delete text from the cursor to the start of the current logical line
+Unbound          BackwardDeleteWord            Delete the previous word in the line.
+Unbound          BackwardKillInput             Move the text from the cursor to the beginning of the input to the kill
+                                               ring
+Unbound          BackwardKillLine              Move the text from the start of the current logical line to the cursor t
+                                               o the kill ring
+Ctrl&#43;Backspace   BackwardKillWord              Move the text from the start of the current or previous word to the curs
+                                               or to the kill ring
+Ctrl&#43;w           BackwardKillWord              Move the text from the start of the current or previous word to the curs
+                                               or to the kill ring
+Unbound          CancelLine                    Abort editing the current line and re-evaluate the prompt
+Unbound          CapitalizeWord                Find the next word starting from the current position and then upcase th
+                                               e first character and downcase the remaining characters.
+Ctrl&#43;C           Copy                          Copy selected region to the system clipboard.  If no region is selected,
+                                                copy the whole line
+Ctrl&#43;c           CopyOrCancelLine              Either copy selected text to the clipboard, or if no text is selected, c
+                                               ancel editing the line with CancelLine.
+Ctrl&#43;x           Cut                           Delete selected region placing deleted text in the system clipboard
+Delete           DeleteChar                    Delete the character under the cursor
+Unbound          DeleteCharOrExit              Delete the character under the cursor, or if the line is empty, exit the
+                                                process.
+Unbound          DeleteEndOfBuffer             Delete the current logical line and up to the end of the multiline buffe
+                                               r
+Unbound          DeleteEndOfWord               Delete to the end of the current word, as delimited by white space and c
+                                               ommon delimiters.
+Unbound          DeleteLine                    Deletes the current line.
+Unbound          DeleteLineToFirstChar         Deletes from the first non blank character of the current logical line i
+                                               n a multiline buffer.
+Unbound          DeletePreviousLines           Deletes from the previous n logical lines in a multiline buffer to the c
+                                               urrent logical line included.
+Unbound          DeleteToEnd                   Deletes from the cursor to the end of the line.
+Unbound          DeleteWord                    Deletes the current word.
+Unbound          DowncaseWord                  Find the next word starting from the current position and then make it l
+                                               ower case.
+Ctrl&#43;End         ForwardDeleteInput            Delete text from the cursor to the end of the input
+Unbound          ForwardDeleteLine             Delete text from the cursor to the end of the current logical line
+Ctrl&#43;Enter       InsertLineAbove               Inserts a new empty line above the current line without attempting to ex
+                                               ecute the input
+Shift&#43;Ctrl&#43;Enter InsertLineBelow               Inserts a new empty line below the current line without attempting to ex
+                                               ecute the input
+Unbound          InvertCase                    Inverts the case of the current character and advances the cursor.
+Unbound          KillLine                      Move the text from the cursor to the end of the input to the kill ring
+Unbound          KillRegion                    Kill the text between the cursor and the mark
+Alt&#43;d            KillWord                      Move the text from the cursor to the end of the current or next word to
+                                               the kill ring
+Ctrl&#43;Delete      KillWord                      Move the text from the cursor to the end of the current or next word to
+                                               the kill ring
+Ctrl&#43;v           Paste                         Paste text from the system clipboard
+Shift&#43;Insert     Paste                         Paste text from the system clipboard
+Unbound          PasteAfter                    Write the contents of the local clipboard after the cursor.
+Unbound          PasteBefore                   Write the contents of the local clipboard before the cursor.
+Unbound          PrependAndAccept              Inserts the entered character at the beginning and accepts the line.
+Ctrl&#43;y           Redo                          Redo an undo
+Unbound          RepeatLastCommand             Repeats the last modification command.
+Escape           RevertLine                    Equivalent to undo all edits (clears the line except lines imported from
+                                                history)
+Unbound          ShellBackwardKillWord         Move the text from the cursor to the start of the current or previous to
+                                               ken to the kill ring
+Unbound          ShellKillWord                 Move the text from the cursor to the end of the current or next token to
+                                                the kill ring
+Unbound          SwapCharacters                Swap the current character with the character before it.
+Ctrl&#43;z           Undo                          Undo a previous edit
+Unbound          UndoAll                       Undoes all commands for this line.
+Unbound          UnixWordRubout                Move the text from the cursor to the start of the current or previous wh
+                                               itespace delimited word to the kill ring
+Unbound          UpcaseWord                    Find the next word starting from the current position and then make it u
+                                               pper case.
+Unbound          ValidateAndAcceptLine         Accept the input or move to the next line if input is missing a closing
+                                               token.
+                                               If there are other parse errors, unresolved commands, or incorrect param
+                                               eters, show the error and continue editing.
+Unbound          ViAcceptLine                  Accept the line and switch to Vi&#39;s insert mode.
+Unbound          ViAcceptLineOrExit            If the line is empty, exit, otherwise accept the line as input.
+Unbound          ViAppendLine                  Appends a new multi-line edit mode line to the current line.
+Unbound          ViBackwardDeleteGlob          Delete backward to the beginning of the previous word, as delimited by w
+                                               hite space.
+Unbound          ViBackwardGlob                Move the cursor to the beginning of the previous word, as delimited by w
+                                               hite space.
+Unbound          ViDeleteBrace                 Deletes all characters between the cursor and the matching brace.
+Unbound          ViDeleteEndOfGlob             Delete to the end of this word, as delimited by white space.
+Unbound          ViDeleteGlob                  Delete the current word, as delimited by white space.
+Unbound          ViDeleteToBeforeChar          Deletes until given character.
+Unbound          ViDeleteToBeforeCharBackward  Deletes until given character.
+Unbound          ViDeleteToChar                Deletes until given character.
+Unbound          ViDeleteToCharBackward        Deletes backwards until given character.
+Unbound          ViInsertAtBegining            Moves the cursor to the beginning of the line and switches to insert mod
+                                               e.
+Unbound          ViInsertAtEnd                 Moves the cursor to the end of the line and switches to insert mode.
+Unbound          ViInsertLine                  Inserts a new multi-line edit mode line in front of the current line.
+Unbound          ViInsertWithAppend            Switch to insert mode, appending at the current line position.
+Unbound          ViInsertWithDelete            Deletes the current character and switches to insert mode.
+Unbound          ViJoinLines                   Joins the current multi-line edit mode line with the next.
+Unbound          ViReplaceLine                 Repace the current line with the next set of characters typed.
+Unbound          ViReplaceToBeforeChar         Replaces until given character.
+Unbound          ViReplaceToBeforeCharBackward Replaces until given character.
+Unbound          ViReplaceToChar               Deletes until given character.
+Unbound          ViReplaceToCharBackward       Replaces until given character.
+Unbound          ViYankBeginningOfLine         Place the characters before the cursor into the local clipboard.
+Unbound          ViYankEndOfGlob               Place the characters from the cursor to the end of the next white space
+                                               delimited word into the local clipboard.
+Unbound          ViYankEndOfWord               Place the characters from the cursor to the end of the next word, as del
+                                               imited by white space and common delimiters, into the local clipboard.
+Unbound          ViYankLeft                    Place the character to the left of the cursor into the local clipboard.
+Unbound          ViYankLine                    Place all characters in the current line into the local clipboard.
+Unbound          ViYankNextGlob                Place all characters from the cursor to the end of the word, as delimite
+                                               d by white space, into the local clipboard.
+Unbound          ViYankNextWord                Place all characters from the cursor to the end of the word, as delimite
+                                               d by white space and common delimiters, into the local clipboard.
+Unbound          ViYankPercent                 Place all characters between the matching brace and the cursor into the
+                                               local clipboard.
+Unbound          ViYankPreviousGlob            Place all characters from before the cursor to the beginning of the prev
+                                               ious word, as delimited by white space, into the local clipboard.
+Unbound          ViYankPreviousWord            Place all characters from before the cursor to the beginning of the prev
+                                               ious word, as delimited by white space and common delimiters, into the l
+                                               ocal clipboard.
+Unbound          ViYankRight                   Place the character at the cursor into the local clipboard.
+Unbound          ViYankToEndOfLine             Place all characters at and after the cursor into the local clipboard.
+Unbound          ViYankToFirstChar             Place all characters before the cursor and to the 1st non-white space ch
+                                               aracter into the local clipboard.
+Unbound          Yank                          Copy the text from the current kill ring position to the input
+Alt&#43;.            YankLastArg                   Copy the text of the last argument to the input
+Unbound          YankNthArg                    Copy the text of the first argument to the input
+Unbound          YankPop                       Replace the previously yanked text with the text from the next kill ring
+                                                position
+
+Cursor movement functions
+=========================
+
+Key             Function                Description
+---             --------                -----------
+LeftArrow       BackwardChar            Move the cursor back one character
+Ctrl&#43;LeftArrow  BackwardWord            Move the cursor to the beginning of the current or previous word
+Home            BeginningOfLine         Move the cursor to the beginning of the line
+End             EndOfLine               Move the cursor to the end of the line
+RightArrow      ForwardChar             Move the cursor forward one character
+Unbound         ForwardWord             Move the cursor forward to the end of the current word, or if between words, to
+                                         the end of the next word.
+Ctrl&#43;]          GotoBrace               Go to matching brace
+Unbound         GotoColumn              Moves the cursor to the prescribed column.
+Unbound         GotoFirstNonBlankOfLine Positions the cursor at the first non-blank character.
+Unbound         MoveToEndOfLine         Move to the end of the line.
+Unbound         NextLine                Move the cursor to the next line if the input has multiple lines.
+Ctrl&#43;RightArrow NextWord                Move the cursor forward to the start of the next word
+Unbound         NextWordEnd             Moves the cursor forward to the end of the next word.
+Unbound         PreviousLine            Move the cursor to the previous line if the input has multiple lines.
+Unbound         ShellBackwardWord       Move the cursor to the beginning of the current or previous token or start of t
+                                        he line
+Unbound         ShellForwardWord        Move the cursor to the beginning of the next token or end of line
+Unbound         ShellNextWord           Move the cursor to the end of the current token
+Unbound         ViBackwardChar          Move the cursor back one character in the Vi edit mode.
+Unbound         ViBackwardWord          Delete backward to the beginning of the previous word, as delimited by white sp
+                                        ace and common delimiters, and enter insert mode.
+Unbound         ViEndOfGlob             Move the cursor to the end this word, as delimited by white space.
+Unbound         ViEndOfPreviousGlob     Moves to the end of the previous word, using only white space as a word delimit
+                                        er.
+Unbound         ViForwardChar           Move the cursor forward one character in the Vi edit mode.
+Unbound         ViGotoBrace             Move the cursor to the matching brace.
+Unbound         ViNextGlob              Move the cursor to the beginning of the next word, as delimited by white space.
+Unbound         ViNextWord              Move the cursor to the beginning of the next word, as delimited by white space
+                                        and common delimiters.
+
+History functions
+=================
+
+Key       Function                Description
+---       --------                -----------
+Unbound   BeginningOfHistory      Move to the first item in the history
+Alt&#43;F7    ClearHistory            Remove all items from the command line history (not PowerShell history)
+Unbound   EndOfHistory            Move to the last item (the current input) in the history
+Ctrl&#43;s    ForwardSearchHistory    Search history forward interactively
+F8        HistorySearchBackward   Search for the previous item in the history that starts with the current input - like
+                                   PreviousHistory if the input is empty
+Shift&#43;F8  HistorySearchForward    Search for the next item in the history that starts with the current input - like Nex
+                                  tHistory if the input is empty
+DownArrow NextHistory             Replace the input with the next item in the history
+UpArrow   PreviousHistory         Replace the input with the previous item in the history
+Ctrl&#43;r    ReverseSearchHistory    Search history backwards interactively
+Unbound   ViSearchHistoryBackward Starts a new search backward in the history.
+
+Completion functions
+====================
+
+Key           Function              Description
+---           --------              -----------
+Unbound       Complete              Complete the input if there is a single completion, otherwise complete the input wi
+                                    th common prefix for all completions.  Show possible completions if pressed a secon
+                                    d time.
+Ctrl&#43;@        MenuComplete          Complete the input if there is a single completion, otherwise complete the input by
+                                     selecting from a menu of possible completions.
+Ctrl&#43;Spacebar MenuComplete          Complete the input if there is a single completion, otherwise complete the input by
+                                     selecting from a menu of possible completions.
+Unbound       PossibleCompletions   Display the possible completions without changing the input
+Tab           TabCompleteNext       Complete the input using the next completion
+Shift&#43;Tab     TabCompletePrevious   Complete the input using the previous completion
+Unbound       ViTabCompleteNext     Invokes TabCompleteNext after doing some vi-specific clean up.
+Unbound       ViTabCompletePrevious Invokes TabCompletePrevious after doing some vi-specific clean up.
+
+Prediction functions
+====================
+
+Key     Function                  Description
+---     --------                  -----------
+Unbound AcceptNextSuggestionWord  Accept the next word of the inline or selected suggestion
+Unbound AcceptSuggestion          Accept the current inline or selected suggestion
+Unbound NextSuggestion            Select the next suggestion item shown in the list view.
+Unbound PreviousSuggestion        Select the previous suggestion item shown in the list view.
+F4      ShowFullPredictionTooltip Show the full tooltip of the selected list-view item in the terminal&#39;s alternate scre
+                                  en buffer.
+F2      SwitchPredictionView      Switch between the inline and list prediction views.
+
+Miscellaneous functions
+=======================
+
+Key           Function               Description
+---           --------               -----------
+Unbound       CaptureScreen          Allows you to select multiple lines from the console using Shift&#43;UpArrow/DownArrow
+                                      and copy the selected lines to clipboard by pressing Enter.
+Ctrl&#43;l        ClearScreen            Clear the screen and redraw the current line at the top of the screen
+Alt&#43;0         DigitArgument          Start or accumulate a numeric argument to other functions
+Alt&#43;1         DigitArgument          Start or accumulate a numeric argument to other functions
+Alt&#43;2         DigitArgument          Start or accumulate a numeric argument to other functions
+Alt&#43;3         DigitArgument          Start or accumulate a numeric argument to other functions
+Alt&#43;4         DigitArgument          Start or accumulate a numeric argument to other functions
+Alt&#43;5         DigitArgument          Start or accumulate a numeric argument to other functions
+Alt&#43;6         DigitArgument          Start or accumulate a numeric argument to other functions
+Alt&#43;7         DigitArgument          Start or accumulate a numeric argument to other functions
+Alt&#43;8         DigitArgument          Start or accumulate a numeric argument to other functions
+Alt&#43;9         DigitArgument          Start or accumulate a numeric argument to other functions
+Alt&#43;-         DigitArgument          Start or accumulate a numeric argument to other functions
+Unbound       InvokePrompt           Erases the current prompt and calls the prompt function to redisplay the prompt
+PageDown      ScrollDisplayDown      Scroll the display down one screen
+Ctrl&#43;PageDown ScrollDisplayDownLine  Scroll the display down one line
+Unbound       ScrollDisplayToCursor  Scroll the display to the cursor
+Unbound       ScrollDisplayTop       Scroll the display to the top
+PageUp        ScrollDisplayUp        Scroll the display up one screen
+Ctrl&#43;PageUp   ScrollDisplayUpLine    Scroll the display up one line
+F1            ShowCommandHelp        Shows help for the command at the cursor in an alternate screen buffer.
+Ctrl&#43;Alt&#43;?    ShowKeyBindings        Show all key bindings
+Alt&#43;h         ShowParameterHelp      Shows help for the parameter at the cursor.
+Unbound       ViCommandMode          Switch to VI&#39;s command mode.
+Unbound       ViDigitArgumentInChord Handles the processing of a number argument after the first key of a chord.
+Unbound       ViEditVisually         Invokes the console compatible editor specified by $env:VISUAL or $env:EDITOR on t
+                                     he current command line.
+Unbound       ViExit                 Exit the shell.
+Unbound       ViInsertMode           Switches to insert mode.
+Alt&#43;?         WhatIsKey              Show the key binding for the next chord entered
+
+Selection functions
+===================
+
+Key                   Function                Description
+---                   --------                -----------
+Unbound               ExchangePointAndMark    Mark the location of the cursor and move the cursor to the position of th
+                                              e previous mark
+Ctrl&#43;a                SelectAll               Select the entire line. Moves the cursor to the end of the line
+Shift&#43;LeftArrow       SelectBackwardChar      Adjust the current selection to include the previous character
+Shift&#43;Home            SelectBackwardsLine     Adjust the current selection to include from the cursor to the start of t
+                                              he line
+Shift&#43;Ctrl&#43;LeftArrow  SelectBackwardWord      Adjust the current selection to include the previous word
+Alt&#43;a                 SelectCommandArgument   Make visual selection of the command arguments.
+Shift&#43;RightArrow      SelectForwardChar       Adjust the current selection to include the next character
+Unbound               SelectForwardWord       Adjust the current selection to include the next word using ForwardWord
+Shift&#43;End             SelectLine              Adjust the current selection to include from the cursor to the end of the
+                                               line
+Shift&#43;Ctrl&#43;RightArrow SelectNextWord          Adjust the current selection to include the next word
+Unbound               SelectShellBackwardWord Adjust the current selection to include the previous word using ShellBack
+                                              wardWord
+Unbound               SelectShellForwardWord  Adjust the current selection to include the next word using ShellForwardW
+                                              ord
+Unbound               SelectShellNextWord     Adjust the current selection to include the next word using ShellNextWord
+Unbound               SetMark                 Mark the location of the cursor
+
+Search functions
+================
+
+Key      Function                      Description
+---      --------                      -----------
+F3       CharacterSearch               Read a character and move the cursor to the next occurrence of that character
+Shift&#43;F3 CharacterSearchBackward       Read a character and move the cursor to the previous occurrence of that characte
+                                       r
+Unbound  RepeatLastCharSearch          Repeat the last recorded character search.
+Unbound  RepeatLastCharSearchBackwards Repeat the last recorded character search in the opposite direction.
+Unbound  RepeatSearch                  Repeat the last search.
+Unbound  RepeatSearchBackward          Repeat the last search, but in the opposite direction.
+Unbound  SearchChar                    Move to the next occurrence of the specified character.
+Unbound  SearchCharBackward            Move to the previous occurrence of the specified character.
+Unbound  SearchCharBackwardWithBackoff Move to the previous occurrence of the specified character and then forward one
+                                       character.
+Unbound  SearchCharWithBackoff         Move to he next occurrence of the specified character and then back one characte
+                                       r.
+Unbound  SearchForward                 Prompts for a search string and initiates a search upon AcceptLine.</code></pre><p>命令 <code>Set-PSReadLineKeyHandler</code> 和 <code>Set-PSReadLineOption</code> 分别用于设置按键映射和选项。比如使用以下命令设置 <samp>EditMode</samp> 选项值为 <samp>Vi</samp>：</p><pre><span class=code-lang>powershell</span><code class=language-powershell>Set-PSReadLineOption -EditMode Vi</code></pre><p>PSReadLine 内置了三种编辑模式：</p><ul><li>Windows （默认）</li><li>Emacs</li><li>Vi</li></ul><p>在使用 Vi 编辑模式时，命令行默认为插入模式，可以按 <kbd>Esc</kbd> 切换为命令模式。</p><p>可以通过修改 PowerShell 配置文件持久化配置。编辑 PowerShell 配置文件：</p><pre><span class=code-lang>powershell</span><code class=language-powershell>notepad $PROFILE</code></pre><p>更多配置选项可以参考官方的 <a href=https://github.com/PowerShell/PSReadLine/blob/master/PSReadLine/SamplePSReadLineProfile.ps1 target=_blank rel=noopener>Sample</a>。</p><p>此外，推荐使用 <a href=https://carapace.sh/ target=_blank rel=noopener>Carapace</a> 来作为 PowerShell 的自动补全后端。</p><p>安装 Carapace ：</p><pre><span class=code-lang>powershell</span><code class=language-powershell>scoop install carapace-bin</code></pre><p>在 PowerShell 配置文件中写入以下内容并保存：</p><pre><span class=code-lang>powershell</span><code class=language-powershell>$env:CARAPACE_BRIDGES = &#39;zsh,fish,bash,inshellisense&#39; # optional
+Set-PSReadLineOption -Colors @{ &#34;Selection&#34; = &#34;`e[7m&#34; }
+Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
+carapace _carapace | Out-String | Invoke-Expression</code></pre><p>输入命令时，按下 <kbd>Tab</kbd> 可以进行自动补全。</p></div><div class=taxonomy data-pagefind-ignore></div><div class=pagination data-pagefind-ignore><a class=left>&nbsp</a>
+<a href=/posts/japanese-views-of-Shanghai-from-bakumatsu-to-meiji-period/ class="right arrow">下一篇：<br>幕末·明治时期日本人对上海认识的轨迹</a>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-svelte/dist/svelte.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-zig/dist/zig.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-redbol/dist/redbol.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><footer><span>&copy; <time datetime="2025-04-24 10:20:05.784292163 +0000 UTC m=+1.197330269">2025</time> fournoas.com. Powered by <a href=https://gohugo.io/>Hugo</a> 0.146.7.</span></footer></body></html>
