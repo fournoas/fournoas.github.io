@@ -1,0 +1,99 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="在社交媒体上刷到一条非常扯淡的帖子，算是典型的蛆头为了吃「爱国」流量饭，利用民粹主义，专门针对低认知的蠢货们打造的无耻谣言。冠之以「技术流分析」，实则狗屁不懂。
+
+  言归正传，这个 UCPD.sys 究竟是什么来头呢？故事还要从当年流氓软件大战说起……
+早期 Windows 对文件关联（即文件默认打开程序）的管理非常简单——任何程序都可以通过修改注册表键值来修改文件关联。这导致各种流氓软件滥用该特性来霸占用户电脑，特别是国产浏览器，通过修改 http/https 协议关联程序，来劫持用户上网行为。"><title>什么是 Windows UserChoice 保护驱动（UCPD.sys） &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>什么是 Windows UserChoice 保护驱动（UCPD.sys）</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas
+</span><span>写于&nbsp;</span><time datetime="2025-09-09 00:00:00 +0000 UTC" data-pagefind-meta=日期>2025年9月9日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/using/>Using</a></li></ul></div><p>在社交媒体上刷到一条非常扯淡的帖子，算是典型的蛆头为了吃「爱国」流量饭，利用民粹主义，专门针对低认知的蠢货们打造的无耻谣言。冠之以「技术流分析」，实则狗屁不懂。</p><figure><img src=/posts/what-is-the-windows-userchoice-protection-driver-ucpd.sys/xhs.png alt=xhs></figure><p>言归正传，这个 <samp>UCPD.sys</samp> 究竟是什么来头呢？故事还要从当年流氓软件大战说起……</p><p>早期 Windows 对文件关联（即文件默认打开程序）的管理非常简单——任何程序都可以通过修改注册表键值来修改文件关联。这导致各种流氓软件滥用该特性来霸占用户电脑，特别是国产浏览器，通过修改 http/https 协议关联程序，来劫持用户上网行为。</p><p>从 Windows 7 开始，微软为了防止软件违背用户意愿，随意修改文件关联，引入了 <samp>UserChoice</samp> 键来约束软件的行为。该键值的优先级要高于原来的注册表文件管理程序。同时，Windows 7 还在控制面板中新增了「默认程序」模块让用户来管理 <samp>UserChoice</samp>。微软希望打开文件的默认程序由用户自主选择，而不是被某些流氓软件偷偷地修改。到了 Windows 8，微软又引入了 <samp>UserChoice</samp> 的哈希验证机制。这样即便恶意程序拥有管理员权限，也无法随意修改 UserChoice 键的值。不过哈希验证的算法很快就被破解了。</p><p>因此，微软在 2024 年推出了名为 <strong>UserChoice Protection Driver (UCPD)</strong> 的过滤驱动程序，进一步加强了对特定 <samp>UserChoice</samp> 键的保护。该驱动程序会监控对注册表默认应用关联的相关键值的访问，仅允许受信任的程序对其进行修改。驱动文件 <samp>UCPD.sys</samp> 保存在 <samp>C:\Windows\System32\drivers</samp> 目录下。这个驱动更新比较频繁。目前，在我本地 Windows 系统中的版本是 4.1.1。</p><figure><img src=/posts/what-is-the-windows-userchoice-protection-driver-ucpd.sys/ucpd-sys.png alt=ucpd.sys></figure><p>先来看看 <samp>UCPD.sys</samp> 到底包含了什么内容。用任意一款 PE 分析工具，或者 <samp>strings.exe</samp> 提取该驱动文件中的字符串。这里摘录了一些：</p><pre><code class=language-text>Opera Norway AS
+https
+\userchoice
+\Registry\Machine\SYSTEM\CurrentControlSet\Services\UCPD
+\safemon\
+\kingsoft\
+\opera\
+\msedge.exe
+\explorer.exe
+explorer.exe
+msedge.exe
+kwsprotect64.exe
+kxescore.exe
+360Tray.exe
+ksyshelper64.exe
+Beijing Kingsoft Security software Co.,Ltd
+Beijing Qihu Technology Co., Ltd.
+winlogon.exe
+*\dllhost.exe
+*\reg.exe
+*\rundll32.exe
+*\powershell.exe
+*\regedit.exe
+*\wscript.exe
+*\cscript.exe
+*\cmd.exe
+*\InfDefaultInstall.exe
+*\pwsh.exe
+*\wmiprvse.exe
+*\explorer.exe
+*\shellappruntime.exe
+Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice
+Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoiceLatest
+Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoiceLatest\ProgId
+Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice
+Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoiceLatest
+Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoiceLatest\ProgId
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.html\UserChoice
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.html\UserChoiceLatest
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.html\UserChoiceLatest\ProgId
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.htm\UserChoice
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.htm\UserChoiceLatest
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.htm\UserChoiceLatest\ProgId
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.pdf\UserChoice
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.pdf\UserChoiceLatest
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.pdf\UserChoiceLatest\ProgId
+SOFTWARE\Microsoft\Windows\CurrentVersion\Control Panel\DeviceRegion
+SOFTWARE\Microsoft\Windows\CurrentVersion\Feeds
+Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced
+Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband
+Software\Microsoft\Windows\CurrentVersion\SearchSettings
+Software\Microsoft\Windows\CurrentVersion\Search
+Software\Microsoft\Windows\CurrentVersion\Feeds
+Software\Microsoft\Windows\Shell\BrandedKey
+SOFTWARE\Classes\Unknown\shell
+SOFTWARE\Classes\Unknown\shell\open\command
+SOFTWARE\Classes\Unknown\shell\openas\command
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.doc\UserChoice
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.doc\UserChoiceLatest
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.doc\UserChoiceLatest\ProgId
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.docx\UserChoice
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.docx\UserChoiceLatest
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.docx\UserChoiceLatest\ProgId
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.xls\UserChoice
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.xls\UserChoiceLatest
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.xls\UserChoiceLatest\ProgId
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.xlsx\UserChoice
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.xlsx\UserChoiceLatest
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.xlsx\UserChoiceLatest\ProgId
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ppt\UserChoice
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ppt\UserChoiceLatest
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ppt\UserChoiceLatest\ProgId
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.pptx\UserChoice
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.pptx\UserChoiceLatest
+Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.pptx\UserChoiceLatest\ProgId
+O=Zhuhai Kingsoft Office Software Co., Ltd., L=, C=CN
+O=Lenovo (Beijing) Co., Ltd., S=Beijing, C=CN
+O=Beijing Qihu Technology Co., Ltd., L=Beijing, S=Beijing, C=CN
+O=Beijing Qihu Technology Co., Ltd., S=Beijing, C=CN
+O=Tencent Technology (Shenzhen) Company Limited, L=Shenzhen, S=Guangdong Province, C=CN
+O=Tencent Technology(Shenzhen) Company Limited, L=Shenzhen, S=Guangdong Province, C=CN
+O=Beijing Sogou Technology Development Co., Ltd., S=Beijing, C=CN
+O=ShenZhen Thunder Networking Technologies Ltd., L=Shenzhen, S=Guangdong, C=CN
+O=QIHU 360 SOFTWARE CO. LIMITED, L=Hong Kong, S=Hong Kong, C=HK
+O=Qihoo 360 Software (Beijing) Company Limited, L=Beijing, S=Beijing, C=CN
+O=Lenovo Image (Tianjin) Technology Co. LTD, L=, C=CN
+O=Lenovo (Beijing) Limited, L=Beijing, C=CN
+O=Lenovo (Beijing) Limited, S=Beijing, C=CN
+O=Chengdu Qilu Technology Co. Ltd., L=Chengdu, S=Sichuan, C=CN
+O=Beijing Kingsoft Security software Co.,Ltd, S=, C=CN
+O=Beijing Kingsoft Security software Co.,Ltd, L=BeiJing, S=BeiJing, C=CN, C=CN</code></pre><p>可以发现，驱动文件内包含了很多表示注册表路径的字符串；此外还有一些可执行文件名的字符串，包括微软自家的程序、Opera 浏览器，以及金山、360 等国产软件。</p><p>要进一步了解这些字符串的作用就需要反编译驱动文件。可惜的是，微软已经从 Symbols 服务器上删除了 <samp>UCPD.sys</samp> 的 PDB 符号文件，这给反编译造成了一些麻烦。不过所幸，已经有人在微软删除符号文件之前彻底分析过了这个驱动的工作原理。根据这篇名为《<a href=https://binary.ninja/2025/03/25/default-browser-upcd.html target=_blank rel=noopener>Inside Windows&rsquo; Default Browser Protection</a>》的文章，我们可以对其窥知一二。</p><p>首先，那些字符串中的注册表路径是 UCPD 驱动所要特别保护的键值。主要与协议及文件关联相关，包括：</p><ul><li>http/https 协议</li><li>html 文件</li><li>pdf 文件</li><li>Office 文档</li></ul><p>此外，还有一些资源管理器和控制面板设置相关的注册表分支。</p><p>只有具有微软签名的程序才被允许修改这些注册表分支。不过仍有一个微软程序黑名单。下列程序虽然拥有微软签名，但是由于这些程序可以执行外部脚本或者用户命令而被排除在外：</p><ul><li>dllhost.exe</li><li>reg.exe</li><li>rundll32.exe</li><li>powershell.exe</li><li>regedit.exe</li><li>wscript.exe</li><li>cscript.exe</li><li>cmd.exe</li><li>InfDefaultInstall.exe</li><li>pwsh.exe</li><li>wmiprvse.exe</li><li>explorer.exe</li><li>shellappruntime.exe</li></ul><p>你可以打开注册表编辑器（<samp>regedit.exe</samp>），尝试在 <samp>HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice</samp> 项下创建一个值。会发现无法创建：</p><figure><img src=/posts/what-is-the-windows-userchoice-protection-driver-ucpd.sys/regedit.png alt=Regedit></figure><p>此外，<samp>UCPD.sys</samp> 还内置一个流氓软件清单，也就是在字符串资源中看到的金山、腾讯、360 等国产大流氓。比如 <samp>360Tray.exe</samp>/<samp>kxescore.exe</samp>/<samp>kwsprotect64.exe</samp> 这些程序企图将代码注入到 <samp>explorer.exe</samp> 和 <samp>msedge.exe</samp> 的进程，从而绕过 UCPD 的保护，UCPD 则移除了这些程序的跨进程读写权限；而 Opera 浏览器企图通过修改 Windows 的 UI 来蒙蔽用户，从而将自己设置成默认浏览器，UCPD 则移除了其桌面对象访问权限。对于这些流氓行径，UCPD 予以坚决打击。</p><p>简而言之，UCPD 是用来保护 Windows 系统免遭恶意篡改的驱动程序，在它黑名单里的软件都是劣迹斑斑的大流氓，没有一个是无辜的。这一切都是它们应得的下场！最后希望 UCPD 的黑名单越来越丰富，让国产流氓软件无处容身。</p></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Windows/>Windows</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a class=left>&nbsp</a>
+<a href=/posts/lazarus-project-internationalization-advanced/ class="right arrow">下一篇：<br>Lazarus 项目支持多语言国际化（进阶篇）</a>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-svelte/dist/svelte.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-zig/dist/zig.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-redbol/dist/redbol.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js crossorigin=anonymous referrerpolicy=no-referrer onload=renderMathInElement(document.body)></script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:!0},{left:"$$",right:"$$",display:!0},{left:"\\(",right:"\\)",display:!1}],throwOnError:!1})})</script><footer><span>&copy; <time datetime="2025-09-09 05:03:46.129825916 +0000 UTC m=+0.994186995">2025</time> fournoas.com. Powered by <a href=https://gohugo.io/>Hugo</a> v0.150.0.</span></footer></body></html>
