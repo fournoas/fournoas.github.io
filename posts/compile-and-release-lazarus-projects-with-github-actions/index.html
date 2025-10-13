@@ -1,0 +1,63 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="理论上 Lazarus 是支持交叉编译的，但官方发行的默认版本并没有打包不同平台所依赖的各组件。比如在 Windows 平台上将编译目标设为 Linux 时，编译器会报错：Can&rsquo;t find unit system used by fcllaz ——缺少 Linux 平台上的预编译文件。
+虽然可以使用 fpcupdeluxe (GitHub) 项目安装支持交叉编译的  Lazarus 工具链，不过这个工具似乎不支持命令行环境下的配置和安装。"><title>通过 GitHub Actions 编译 Lazarus 项目 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>通过 GitHub Actions 编译 Lazarus 项目</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas
+</span><span>写于&nbsp;</span><time datetime="2025-10-13 00:00:00 +0000 UTC" data-pagefind-meta=日期>2025年10月13日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>理论上 Lazarus 是支持交叉编译的，但官方发行的默认版本并没有打包不同平台所依赖的各组件。比如在 Windows 平台上将编译目标设为 Linux 时，编译器会报错：<samp>Can&rsquo;t find unit system used by fcllaz</samp> ——缺少 Linux 平台上的预编译文件。</p><p>虽然可以使用 <a href=https://wiki.lazarus.freepascal.org/fpcupdeluxe target=_blank rel=noopener>fpcupdeluxe</a> (<a href=https://github.com/LongDirtyAnimAlf/fpcupdeluxe target=_blank rel=noopener>GitHub</a>) 项目安装支持交叉编译的 Lazarus 工具链，不过这个工具似乎不支持命令行环境下的配置和安装。</p><p>建议还是不要折腾，老老实实使用不同平台的 Lazarus 一对一编译，特别是对于 Windows 和 Linux 这两种差异较大的平台。</p><h2 id=使用第三方-actions-编译>使用第三方 Actions 编译</h2><p>在 Marketplace 中搜索 “<a href="https://github.com/marketplace?query=Lazarus" target=_blank rel=noopener>Lazarus</a>” 可以找到三条结果。推荐使用 <a href=https://github.com/marketplace/actions/setup-lazarus-environment target=_blank rel=noopener>Setup Lazarus environment</a>。使用这个 Actions 可以非常简单地在不同目标平台上进行编译：</p><pre><span class=code-lang>yaml</span><code class=language-yaml>name: build
+
+on:
+  pull_request:
+  push:
+    paths-ignore:
+      - &#34;README.md&#34;
+    branches:
+      - master
+      - releases/*
+
+jobs:
+  build:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [windows-latest, ubuntu-latest, macos-latest]
+        lazarus-versions: [dist, stable, 2.2.0, 2.0.12, 2.0.10, 2.0.8, 2.0.6]
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+      - name: Install Lazarus
+        uses: gcarreno/setup-lazarus@v3
+        with:
+          lazarus-version: ${{ matrix.lazarus-versions }}
+          include-packages: &#34;Synapse 40.1&#34;
+          with-cache: true
+      - name: Build the Main Application
+        if: ${{ matrix.operating-system != &#39;macos-latest&#39; }}
+        run: lazbuild -B &#34;src/lazaruswithgithubactions.lpi&#34;
+      - name: Build the Main Application (macOS)
+        if: ${{ matrix.operating-system == &#39;macos-latest&#39; }}
+        run: lazbuild -B --ws=cocoa &#34;src/lazaruswithgithubactions.lpi&#34;
+      - name: Build the Unit Tests Application
+        run: lazbuild -B &#34;tests/testconsoleapplication.lpi&#34;
+      - name: Run the Unit Tests Application
+        run: bin/testconsoleapplication &#34;--all&#34; &#34;--format=plain&#34;</code></pre><h2 id=仅-windows-平台编译>仅 Windows 平台编译</h2><p>虽然 <a href=https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-Readme.md target=_blank rel=noopener>GitHub 官方文档</a>里并没有提及 Windows Runner 预安装了 WinGet，但实测是可以使用的。不过 WinGet 安装 Lazarus 的缺点是不会设置环境变量，需要在脚本中指定路径。</p><p>下面的示例包含安装 Lazarus 环境、下载在线包、编译目标三大步骤：</p><pre><span class=code-lang>yaml</span><code class=language-yaml>build:
+  runs-on: windows-latest
+  steps:
+    - uses: actions/checkout@v4
+    - name: Install Lazarus
+      run: |
+        winget install Lazarus.Lazarus --silent --accept-source-agreements --accept-package-agreements
+    - name: Download thirdparty packages
+      shell: pwsh
+      run: |
+        # 从 https://packages.lazarus-ide.org/ 下载第三方包
+        Invoke-WebRequest -Uri &#34;https://packages.lazarus-ide.org/ATSynEdit.zip&#34; -OutFile &#34;ATSynEdit.zip&#34;
+        7z x ATSynEdit.zip -y
+        # 从 Git 仓库下载第三方包
+        # git clone --depth 1 https://github.com/Alexey-T/ATSynEdit
+    - name: Build packages and projects
+      shell: pwsh
+      run: |
+        $lazbuild=&#34;C:\lazarus\lazbuild.exe&#34;
+        &amp; $lazbuild --pcp=C:\lazarus\configs --lazarusdir=C:\lazarus ATSynEdit\atsynedit\atsynedit_package.lpk
+        &amp; $lazbuild --pcp=C:\lazarus\configs --lazarusdir=C:\lazarus --bm=Release src\myproject.lpi</code></pre></div><div class=taxonomy data-pagefind-ignore><div class=taxonomy-tags><ul class=tags><li>#<a data-pagefind-filter=标签 href=/tags/Pascal/>Pascal</a></li><li>#<a data-pagefind-filter=标签 href=/tags/Lazarus/>Lazarus</a></li></ul></div></div><div class=pagination data-pagefind-ignore><a class=left>&nbsp</a>
+<a href=/moments/202510/1760077893/ class="right arrow">下一篇</a>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-svelte/dist/svelte.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-zig/dist/zig.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-redbol/dist/redbol.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js crossorigin=anonymous referrerpolicy=no-referrer onload=renderMathInElement(document.body)></script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:!0},{left:"$$",right:"$$",display:!0},{left:"\\(",right:"\\)",display:!1}],throwOnError:!1})})</script><footer><span>&copy; <time datetime="2025-10-13 05:00:59.299948839 +0000 UTC m=+1.298588811">2025</time> fournoas.com. Powered by <a href=https://gohugo.io/>Hugo</a> v0.151.0.</span></footer></body></html>
