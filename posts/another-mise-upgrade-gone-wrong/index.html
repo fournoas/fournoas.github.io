@@ -1,0 +1,165 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="使用 mise 管理 Windows 平台的开发工具已经有一阵子了。这几天突然发现 mise 管理的 PHP 失效了。现象是找不到 php 命令、重新安装 PHP 失败。疑为某次 mise 版本升级导致的问题。"><title>mise 升级又出幺蛾子 &#183; 白汤四物</title><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/fontawesome.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/solid.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/regular.min.css crossorigin=anonymous referrerpolicy=no-referrer><script src=https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js crossorigin=anonymous></script><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/rainbow.min.css crossorigin=anonymous referrerpolicy=no-referrer><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css crossorigin=anonymous referrerpolicy=no-referrer><link href rel=alternate type=application/rss+xml title=白汤四物><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/fonts.css><script async src="https://www.googletagmanager.com/gtag/js?id=G-3GNL63B62Q"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3GNL63B62Q")</script></head><body><nav class=nav><div class=nav-container><h1 class=nav-title><a href=/><img src=/logo.png alt=白汤四物></a></h1><ul><li><a href=/posts/><span>文章</span></a></li><li><a href=/moments/><span>动态</span></a></li><li><a href=/categories/><span>分类</span></a></li><li><a href=/tags/><span>标签</span></a></li><li><a href=/search/><span>搜索</span></a></li><li><a href=/about/><span>关于</span></a></li></ul></div></nav><main data-pagefind-body><div class="page post"><h1 class=post-title data-pagefind-meta=title>mise 升级又出幺蛾子</h1><div class=post-line></div><div class=post-info><span>作者</span>
+<span data-pagefind-meta=作者>Fournoas
+</span><span>写于&nbsp;</span><time datetime="2026-07-30 00:00:00 +0000 UTC" data-pagefind-meta=日期>2026年7月30日</time>
+<span>发布在&nbsp;</span><ul class=categories><li><a data-pagefind-filter=分类 href=/categories/coding/>Coding</a></li></ul></div><p>使用 <a href=https://mise.jdx.dev/ target=_blank rel=noopener>mise</a> 管理 Windows 平台的开发工具已经有一阵子了。这几天突然发现 mise 管理的 PHP 失效了。现象是找不到 php 命令、重新安装 PHP 失败。疑为某次 mise 版本升级导致的问题。</p><p>用 <code>mise doctor</code> 命令进行诊断：</p><pre><code class=language-text>version: 2026.7.15 windows-x64 (2026-07-27)
+shims_on_path: no
+self_update_available: yes
+
+... ...
+
+plugins:
+  php     https://github.com/jdx/vfox-php.git#b423527
+  ... ...
+
+path:
+  C:\mise\installs\php\8.5.5\bin
+  ... ...</code></pre><p>PHP 失效的问题找到了：PATH 的原本路径应该是 <code>C:\\mise\\installs\\php\\8.5.5</code>，但现在变成了 <code>C:\\mise\\installs\\php\\8.5.5\\bin</code>，路径末尾多出了 <code>bin</code>——这显然是 Linux 风格的路径。</p><p>而使用 <code>mise install php 8.5.5</code> 命令安装 PHP 出现如下错误：</p><pre><code class=language-text>mise Downloading https://github.com/php/php-src/archive/php-8.5.5.tar.gz
+mise Verifying &#34;C:\\mise\\downloads\\php\\8.5.5\\php-8.5.5\\php-8.5.5.tar.gz&#34; checksum
+mise Extracting &#34;C:\\mise\\downloads\\php\\8.5.5\\php-8.5.5\\php-8.5.5.tar.gz&#34; to &#34;C:\\mise\\installs\\php\\8.5.5&#34;
+php@8.5.5      install
+The system cannot find the path specified.
+mise [php] Running buildconf...
+php@8.5.5      install
+mise ERROR Failed to install vfox:php@8.5.5: runtime error: C:\mise\plugins\php\hooks/post_install.lua:79: Failed to run buildconf
+stack traceback:
+        [C]: in function &#39;error&#39;
+        C:\mise\plugins\php\hooks/post_install.lua:79: in function &#39;PLUGIN.PostInstall&#39;
+        crates\vfox\src\plugin.rs:189:2: in main chunk
+mise ERROR Version: 2026.7.15 windows-x64 (2026-07-27)
+mise ERROR Run with --verbose or MISE_VERBOSE=1 for more information</code></pre><p>安装脚本尝试通过源代码编译 PHP，而不是直接下载 Windows 二进制包。</p><p>根据以上结果推测，问题应该出在 mise 的 PHP 插件上。查看当前的版本的 mise <a href=https://github.com/jdx/mise/blob/main/registry/php.toml target=_blank rel=noopener>源代码</a>：</p><figure class=code><pre><span class=code-lang>toml</span><code data-ln-selected data-ln-start-from data-ln=false class=language-toml>backends = [&#34;vfox:jdx/vfox-php&#34;, &#34;asdf:mise-plugins/asdf-php&#34;]
+description = &#34;popular general-purpose scripting language that is especially suited to web development. Fast, flexible and pragmatic, PHP powers everything from your blog to the most popular websites in the world&#34;</code></pre><figcaption>registry/php.toml</figcaption></figure><p>与上个月的版本进行比较：</p><figure class=code><pre><span class=code-lang>toml</span><code data-ln-selected data-ln-start-from data-ln=false class=language-toml>backends = [&#34;asdf:mise-plugins/asdf-php&#34;, &#34;vfox:mise-plugins/vfox-php&#34;]
+description = &#34;popular general-purpose scripting language that is especially suited to web development. Fast, flexible and pragmatic, PHP powers everything from your blog to the most popular websites in the world&#34;</code></pre><figcaption>registry/php.toml</figcaption></figure><p>插件的 banckend 变更了。问题应该就出在这里——我记以前 vfox 的插件都使用的是 vfox 官方的源，也就是 version-fox/vfox-php 。现在 mise 项目自己 fork 了这些插件。</p><p>来比较一下原版 <a href=https://github.com/version-fox/vfox-php target=_blank rel=noopener>vfox-php</a> 和 mise 版本 <a href=https://github.com/jdx/vfox-php target=_blank rel=noopener>vfox-php</a> 有什么差异。首先看原版：</p><figure class=code><pre><span class=code-lang>lua</span><code data-ln-selected=10,11 data-ln-start-from data-ln=true class=language-lua>--- Each SDK may have different environment variable configurations.
+--- This allows plugins to define custom environment variables (including PATH settings)
+--- Note: Be sure to distinguish between environment variable settings for different platforms!
+--- @param ctx table Context information
+--- @field ctx.path string SDK installation directory
+function PLUGIN:EnvKeys(ctx)
+    --- this variable is same as ctx.sdkInfo[&#39;plugin-name&#39;].path
+    local mainPath = ctx.path
+    local bin = &#34;&#34;
+    if RUNTIME.osType ~= &#34;windows&#34; then
+        bin = &#34;/bin&#34;
+    end
+
+    return {
+        {
+            key = &#34;PATH&#34;,
+            value = mainPath .. bin
+        }
+    }
+end</code></pre><figcaption>hooks/env_keys.lua</figcaption></figure><p>如果操作系统不是 Windows，PATH 路径加 <code>/bin</code> ——完全没毛病。</p><figure class=code><pre><span class=code-lang>lua</span><code data-ln-selected=10,11 data-ln-start-from data-ln=true class=language-lua>local http = require(&#39;http&#39;)
+local html = require(&#39;html&#39;)
+local util = require(&#39;util&#39;)
+require(&#39;constants&#39;)
+
+--- Return all available versions provided by this plugin
+--- @param ctx table Empty table used as context, for future extension
+--- @return table Descriptions of available versions and accompanying tool descriptions
+function PLUGIN:Available(ctx)
+    if RUNTIME.osType == &#39;windows&#39; then
+        return GetReleaseListForWindows()
+    else
+        return GetReleaseListForLinux()
+    end
+end</code></pre><figcaption>hooks/available.lua</figcaption></figure><p>如果操作系统是 Windows，调用 <code>GetReleaseListForWindows()</code> ——非常好。</p><p>再来看看 mise 自己维护的 vfox-php 代码：</p><figure class=code><pre><span class=code-lang>lua</span><code data-ln-selected data-ln-start-from data-ln=false class=language-lua>--- Returns environment variables for PHP
+--- @param ctx table Context provided by vfox
+--- @return table Environment configuration
+function PLUGIN:EnvKeys(ctx)
+    local sdkInfo = ctx.sdkInfo[&#34;php&#34;]
+    local installDir = sdkInfo.path
+
+    local envs = {
+        {
+            key = &#34;PATH&#34;,
+            value = installDir .. &#34;/bin&#34;,
+        },
+        {
+            key = &#34;PATH&#34;,
+            value = installDir .. &#34;/sbin&#34;,
+        },
+        {
+            key = &#34;PATH&#34;,
+            value = installDir .. &#34;/.composer/vendor/bin&#34;,
+        },
+        {
+            key = &#34;COMPOSER_HOME&#34;,
+            value = installDir .. &#34;/.composer&#34;,
+        },
+    }
+
+    -- Add LD_LIBRARY_PATH on Linux
+    if RUNTIME.osType == &#34;linux&#34; then
+        table.insert(envs, {
+            key = &#34;LD_LIBRARY_PATH&#34;,
+            value = installDir .. &#34;/lib&#34;,
+        })
+    end
+
+    return envs
+end</code></pre><figcaption>hooks/env_keys.lua</figcaption></figure><figure class=code><pre><span class=code-lang>lua</span><code data-ln-selected data-ln-start-from data-ln=false class=language-lua>--- Returns available PHP versions from GitHub php-src tags
+--- @param ctx table Context provided by vfox
+--- @return table Available versions
+function PLUGIN:Available(ctx)
+    local http = require(&#34;http&#34;)
+    local result = {}
+    local seen = {}
+
+    -- Fetch tags from php-src GitHub repository
+    -- We use the GitHub API to get all tags
+    local page = 1
+    local per_page = 100
+
+    while true do
+        local resp, err = http.get({
+            url = &#34;https://api.github.com/repos/php/php-src/tags?per_page=&#34; .. per_page .. &#34;&amp;page=&#34; .. page,
+            headers = {
+                [&#34;Accept&#34;] = &#34;application/vnd.github.v3&#43;json&#34;,
+                [&#34;User-Agent&#34;] = &#34;vfox-php&#34;,
+            },
+        })
+
+        if err ~= nil or resp.status_code ~= 200 then
+            -- Fallback: try git ls-remote approach via web
+            break
+        end
+
+        local json = require(&#34;json&#34;)
+        local tags = json.decode(resp.body)
+
+        if tags == nil or #tags == 0 then
+            break
+        end
+
+        for _, tag in ipairs(tags) do
+            local name = tag.name
+            -- Match tags like &#34;php-8.4.17&#34;, &#34;php-8.3.0RC1&#34;, etc.
+            local version = string.match(name, &#34;^php%-([0-9]&#43;%.[0-9]&#43;%.%d&#43;[%w%-]*)$&#34;)
+            if version ~= nil and not seen[version] then
+                seen[version] = true
+                table.insert(result, { version = version })
+            end
+        end
+
+        page = page &#43; 1
+
+        -- Stop if we got less than a full page
+        if #tags &lt; per_page then
+            break
+        end
+
+        -- Safety limit
+        if page &gt; 20 then
+            break
+        end
+    end
+
+    -- Sort versions (newest first)
+    table.sort(result, function(a, b)
+        return compare_versions(a.version, b.version) &gt; 0
+    end)
+
+    return result
+end</code></pre><figcaption>hooks/available.lua</figcaption></figure><p>都什么鬼！压根就没判断操作系统——路径全部加 <code>/bin</code>、安装都从源代码编译——也不知道维护者脑子里装的啥。</p><p>解决方法就是删除 mise 官方的 PHP 插件，安装 version-fox/vfox-php 插件：</p><pre><span class=code-lang>shell</span><code class=language-shell>mise plugins remove php
+mise plugins install php https://github.com/version-fox/vfox-php.git</code></pre></div><div class=taxonomy data-pagefind-ignore></div><div class=pagination data-pagefind-ignore><a class=left>&nbsp</a>
+<a href=/posts/the-demolished-virtuous-woman-paifang-of-downtown-shanghai/ class="right arrow">下一篇：<br>曾立在上海市中心的女性旌表牌坊</a>
+<a href=# class=top>返回顶部</a></div></main><script src=/js/page.js></script><script src=/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/scala.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nim.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/powershell.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/nginx.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/delphi.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/dos.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/haxe.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-svelte/dist/svelte.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-zig/dist/zig.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://unpkg.com/highlightjs-redbol/dist/redbol.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=/js/code.js></script><script>hljs.highlightAll(),hljs.initLineNumbersOnLoad(),hljs.initSelectLines()</script><script src=https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js crossorigin=anonymous referrerpolicy=no-referrer></script><script src=https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js crossorigin=anonymous referrerpolicy=no-referrer onload=renderMathInElement(document.body)></script><script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:!0},{left:"$$",right:"$$",display:!0},{left:"\\(",right:"\\)",display:!1}],throwOnError:!1})})</script><footer><span>&copy; <time datetime="2026-07-30 03:29:51.909732344 +0000 UTC m=+0.716937175">2026</time> fournoas.com. Powered by <a href=https://gohugo.io/>Hugo</a> v0.164.0.</span></footer></body></html>
